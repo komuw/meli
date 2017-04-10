@@ -41,6 +41,8 @@ type serviceConfig struct {
 type dockerComposeConfig struct {
 	Version  string                   `yaml:"version,omitempty"`
 	Services map[string]serviceConfig `yaml:"services"`
+	//networks map[string]     `yaml:"networks,omitempty"`
+	//volumes map[string]                  `yaml:"volumes,omitempty"`
 }
 
 func (dcy *dockerComposeConfig) Parse(data []byte) error {
