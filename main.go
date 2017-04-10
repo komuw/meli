@@ -65,6 +65,7 @@ func main() {
 		fmt.Println()
 		fmt.Println(v.Image)
 		fmt.Println()
+		pullImage(v.Image)
 	}
 
 }
@@ -76,25 +77,27 @@ func pullImage(imagename string) {
 		panic(err)
 	}
 
-	_, err = cli.ImagePull(ctx, imagename, types.ImagePullOptions{})
+	closer, err := cli.ImagePull(ctx, imagename, types.ImagePullOptions{})
+	if err != nil {
+		panic(err)
+	}
+	err = closer.Close()
 	if err != nil {
 		panic(err)
 	}
 
-	resp, err := cli.ContainerCreate(ctx, &container.Config{
-		Image: imagename
-	}, nil, nil, "")
+	resp, err := cli.ContainerCreate(ctx, &container.Config{Image: imagename}, nil, nil, "")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		panic(err)
 	}
 
-	if _, err = cli.ContainerWait(ctx, resp.ID); err != nil {
+	/*if _, err = cli.ContainerWait(ctx, resp.ID); err != nil {
 		panic(err)
-	}
+	}*/
 
 	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
 	if err != nil {
