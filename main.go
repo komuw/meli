@@ -86,22 +86,22 @@ func pullImage(imagename string) {
 		log.Println(err)
 	}
 
-	resp, err := cli.ContainerCreate(ctx, &container.Config{Image: imagename}, nil, nil, "")
+	containerCreateResp, err := cli.ContainerCreate(ctx, &container.Config{Image: imagename}, nil, nil, "")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
+	err = cli.ContainerStart(ctx, containerCreateResp.ID, types.ContainerStartOptions{})
 	if err != nil {
 		panic(err)
 	}
 
-	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
+	containerLogResp, err := cli.ContainerLogs(ctx, containerCreateResp.ID, types.ContainerLogsOptions{ShowStdout: true})
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = io.Copy(os.Stdout, out)
+	_, err = io.Copy(os.Stdout, containerLogResp)
 	if err != nil {
 		log.Println(err)
 	}
