@@ -96,7 +96,7 @@ func pullImage(imagename string) {
 		panic(err)
 	}
 
-	containerLogResp, err := cli.ContainerLogs(ctx, containerCreateResp.ID, types.ContainerLogsOptions{ShowStdout: true})
+	containerLogResp, err := cli.ContainerLogs(ctx, containerCreateResp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Timestamps: true})
 	if err != nil {
 		panic(err)
 	}
