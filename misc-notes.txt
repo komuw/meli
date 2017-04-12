@@ -1,0 +1,48 @@
+$ docker-compose up
+Creating network "meli_default" with the default driver
+Pulling nats (nats:latest)...
+
+$ docker network inspect meli_default
+[
+    {
+        "Name": "meli_default",
+        "Id": "364d5fa57eb59130677b2e39aad5944e524dc08f1cdbfe378a9b153c6cb83092",
+        "Created": "2017-04-12T13:28:19.451877006+03:00",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": true,
+        "Containers": {
+            "1f277e51b82263395b341a509708bd0cb37772190709326dcb9b2b4ea4e0c562": {
+                "Name": "meli_redis_1",
+                "EndpointID": "c9bf9b2d30450da48b2dacaf26cbd3e7e85f1ec8bd23780a6907d0db45c83570",
+                "MacAddress": "02:42:ac:12:00:03",
+                "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": ""
+            },
+            "a273e8c705735f0a79be0aad6b20d85538ec7554ebc18719f5ace4c5d9d36851": {
+                "Name": "meli_nats_1",
+                "EndpointID": "1c19c2bcaf13f92250eee59d86283202f60721c20b3dc275f6341361276345db",
+                "MacAddress": "02:42:ac:12:00:02",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {
+            "com.docker.compose.network": "default",
+            "com.docker.compose.project": "meli"
+        }
+    }
+]
