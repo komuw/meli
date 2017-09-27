@@ -10,6 +10,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"gopkg.in/yaml.v2"
 )
@@ -49,9 +50,40 @@ func (dcy *dockerComposeConfig) Parse(data []byte) error {
 	return yaml.Unmarshal(data, dcy)
 }
 
+func getNetwork() (string, error) {
+	// create/get newtwork
+	// TODO: move this into it's own file
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		return "", err
+	}
+	networkName := "melinetworkname"
+	var typeNetworkCreate = types.NetworkCreate{
+		CheckDuplicate: true,
+		Driver:         "bridge",
+		EnableIPv6:     false,
+		IPAM:           &network.IPAM{Driver: "default"},
+		Internal:       false,
+		Attachable:     true,
+	}
+	networkCreateResponse, err := cli.NetworkCreate(
+		ctx,
+		networkName,
+		typeNetworkCreate)
+	if err != nil {
+		return "", err
+	}
+	return networkCreateResponse.ID, nil
+
+}
+
 func main() {
 	data, err := ioutil.ReadFile("docker-compose.yml")
-
+	if err != nil {
+		log.Fatal(err)
+	}
+	networkID, err := getNetwork()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,21 +95,24 @@ func main() {
 
 	for _, v := range dockerCyaml.Services {
 		fmt.Println()
-		fmt.Println(v.Image)
+		fmt.Println("image & networkID: ", v.Image, networkID)
 		fmt.Println()
-		pullImage(v.Image)
+		pullImage(v.Image, networkID)
 	}
 
 }
 
-func pullImage(imagename string) {
+func pullImage(imagename, networkID string) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		panic(err)
 	}
 
-	imagePullResp, err := cli.ImagePull(ctx, imagename, types.ImagePullOptions{})
+	imagePullResp, err := cli.ImagePull(
+		ctx,
+		imagename,
+		types.ImagePullOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -87,17 +122,43 @@ func pullImage(imagename string) {
 		log.Println(err)
 	}
 
-	containerCreateResp, err := cli.ContainerCreate(ctx, &container.Config{Image: imagename}, &container.HostConfig{PublishAllPorts: true}, nil, "")
+	containerCreateResp, err := cli.ContainerCreate(
+		ctx,
+		&container.Config{Image: imagename},
+		&container.HostConfig{PublishAllPorts: true},
+		nil,
+		"")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = cli.ContainerStart(ctx, containerCreateResp.ID, types.ContainerStartOptions{})
+	//
+	//Connect container to network
+	err = cli.NetworkConnect(
+		ctx,
+		networkID,
+		containerCreateResp.ID,
+		&network.EndpointSettings{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	//
+
+	err = cli.ContainerStart(
+		ctx,
+		containerCreateResp.ID,
+		types.ContainerStartOptions{})
 	if err != nil {
 		panic(err)
 	}
 
-	containerLogResp, err := cli.ContainerLogs(ctx, containerCreateResp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true, Timestamps: true})
+	containerLogResp, err := cli.ContainerLogs(
+		ctx,
+		containerCreateResp.ID,
+		types.ContainerLogsOptions{
+			ShowStdout: true,
+			ShowStderr: true,
+			Timestamps: true})
 	if err != nil {
 		panic(err)
 	}
