@@ -81,6 +81,7 @@ func pullImage(imagename string) {
 	if err != nil {
 		panic(err)
 	}
+	defer imagePullResp.Close()
 	_, err = io.Copy(os.Stdout, imagePullResp)
 	if err != nil {
 		log.Println(err)
@@ -100,6 +101,7 @@ func pullImage(imagename string) {
 	if err != nil {
 		panic(err)
 	}
+	defer containerLogResp.Close()
 
 	_, err = io.Copy(os.Stdout, containerLogResp)
 	if err != nil {
