@@ -12,6 +12,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -53,12 +54,24 @@ func (dcy *dockerComposeConfig) Parse(data []byte) error {
 func getNetwork() (string, error) {
 	// create/get newtwork
 	// TODO: move this into it's own file
+	networkName := "melinetworkname"
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "unable to intialize docker client")
 	}
-	networkName := "melinetworkname"
+
+	// return early if network exists
+	netList, err := cli.NetworkList(ctx, types.NetworkListOptions{})
+	if err != nil {
+		return "", errors.Wrap(err, "unable to intialize docker client")
+	}
+	for _, v := range netList {
+		if v.Name == networkName {
+			return v.ID, nil
+		}
+	}
+
 	var typeNetworkCreate = types.NetworkCreate{
 		CheckDuplicate: true,
 		Driver:         "bridge",
@@ -72,7 +85,7 @@ func getNetwork() (string, error) {
 		networkName,
 		typeNetworkCreate)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "unable to create docker network")
 	}
 	return networkCreateResponse.ID, nil
 
@@ -81,7 +94,7 @@ func getNetwork() (string, error) {
 func main() {
 	data, err := ioutil.ReadFile("docker-compose.yml")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "unable to read docker-compose file"))
 	}
 	networkID, err := getNetwork()
 	if err != nil {
@@ -90,7 +103,7 @@ func main() {
 
 	var dockerCyaml dockerComposeConfig
 	if err := dockerCyaml.Parse(data); err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "unable to parse docker-compose file contents"))
 	}
 
 	for _, v := range dockerCyaml.Services {
