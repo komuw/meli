@@ -87,7 +87,7 @@ func pullImage(imagename string) {
 		log.Println(err)
 	}
 
-	containerCreateResp, err := cli.ContainerCreate(ctx, &container.Config{Image: imagename}, nil, nil, imagename)
+	containerCreateResp, err := cli.ContainerCreate(ctx, &container.Config{Image: imagename}, &container.HostConfig{PublishAllPorts: true}, nil, imagename)
 	if err != nil {
 		log.Fatal(err)
 	}
