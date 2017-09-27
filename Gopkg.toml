@@ -22,5 +22,9 @@
 
 
 [[constraint]]
+  name = "github.com/docker/docker"
+  version = "1.13.1"
+
+[[constraint]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"

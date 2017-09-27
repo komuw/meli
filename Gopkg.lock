@@ -4,20 +4,14 @@
 [[projects]]
   name = "github.com/Microsoft/go-winio"
   packages = ["."]
-  revision = "c4dc1301f1dc0307acd38e611aa375a64dfe0642"
-  version = "v0.4.3"
-
-[[projects]]
-  name = "github.com/Sirupsen/logrus"
-  packages = ["."]
-  revision = "a3f95b5c423586578a4e099b11a46c2479628cac"
-  version = "1.0.2"
+  revision = "78439966b38d69bf38227fbf57ac8a6fee70f69a"
+  version = "v0.4.5"
 
 [[projects]]
   name = "github.com/docker/distribution"
   packages = ["digest","reference"]
-  revision = "a25b9ef0c9fe242ac04bb20d3a028442b7d266b6"
-  version = "v2.6.1"
+  revision = "48294d928ced5dd9b378f7fd7c6f5da3ff3f2c89"
+  version = "v2.6.2"
 
 [[projects]]
   name = "github.com/docker/docker"
@@ -28,20 +22,14 @@
 [[projects]]
   name = "github.com/docker/go-connections"
   packages = ["nat","sockets","tlsconfig"]
-  revision = "990a1a1a70b0da4c4cb70e117971a4f0babfbf1a"
-  version = "v0.2.1"
+  revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
+  version = "v0.3.0"
 
 [[projects]]
   name = "github.com/docker/go-units"
   packages = ["."]
-  revision = "f2d77a61e3c169b43402a0a1e84f06daf29b8190"
-  version = "v0.3.1"
-
-[[projects]]
-  name = "github.com/opencontainers/runc"
-  packages = ["libcontainer/user"]
-  revision = "baf6536d6259209c3edfa2b22237af82942d3dfa"
-  version = "v0.1.1"
+  revision = "0dadbb0345b35ec7ef35e228dabb8de89a65bf52"
+  version = "v0.3.2"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -53,23 +41,23 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp","proxy"]
-  revision = "5d0d7096b5f2ef7ba83f319c07ef63989a1c6f91"
+  revision = "0744d001aa8470aaa53df28d32e5ceeb8af9bd70"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
-  revision = "cd2c276457edda6df7fb04895d3fd6a6add42926"
+  packages = ["windows"]
+  revision = "429f518978ab01db8bb6f44b66785088e7fba58b"
 
 [[projects]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "3b4ad1db5b2a649883ff3782f5f9f6fb52be71af"
+  revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "850225f58a7ac6da14f47f0a90edd3edfa52ef8579411d8be9f22518a1a9ec0c"
+  inputs-digest = "4706794e074e27f993dbf3213db28ca84f8c51860bc77205795e3578403cda84"
   solver-name = "gps-cdcl"
   solver-version = 1
