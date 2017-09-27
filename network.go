@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"os"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
@@ -11,8 +13,8 @@ import (
 
 func getNetwork() (string, error) {
 	// create/get newtwork
-	// TODO: move this into it's own file
-	networkName := "melinetworkname"
+	curentDir := os.Getwd()
+	networkName := getCwdName(curentDir)
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -47,4 +49,18 @@ func getNetwork() (string, error) {
 	}
 	return networkCreateResponse.ID, nil
 
+}
+
+func getCwdName(path string) string {
+	//TODO: investigate if this will work cross platform
+	// it might be unable to handle paths in windows OS
+	f := func(c rune) bool {
+		if c == 47 {
+			// 47 is the '/' character
+			return true
+		}
+		return false
+	}
+	pathSlice := strings.FieldsFunc(path, f)
+	return pathSlice[len(pathSlice)-1]
 }
