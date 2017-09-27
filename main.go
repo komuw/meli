@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -68,17 +69,22 @@ func main() {
 		log.Fatal(errors.Wrap(err, "unable to parse docker-compose file contents"))
 	}
 
+	var wg sync.WaitGroup
+
 	for _, v := range dockerCyaml.Services {
-		fmt.Println()
-		fmt.Println("image, networkID, name: ", v.Image, networkID, v.Name)
-		fmt.Println()
-		pullImage(v.Image, networkID)
+		wg.Add(1)
+		go pullImage(v.Image, networkID, &wg)
 	}
+	wg.Wait()
 
 }
 
-func pullImage(imagename, networkID string) {
+func pullImage(imagename, networkID string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	formattedImageName := fomatImageName(imagename)
+	fmt.Println()
+	fmt.Println("dockerImage, networkID, name:", imagename, networkID, formattedImageName)
+	fmt.Println()
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
