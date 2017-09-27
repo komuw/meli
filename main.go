@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -77,6 +78,7 @@ func main() {
 }
 
 func pullImage(imagename, networkID string) {
+	formattedImageName := fomatImageName(imagename)
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -101,13 +103,11 @@ func pullImage(imagename, networkID string) {
 		&container.Config{Image: imagename},
 		&container.HostConfig{PublishAllPorts: true},
 		nil,
-		"")
+		formattedImageName)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "unable to create container"))
 	}
 
-	//
-	//Connect container to network
 	err = cli.NetworkConnect(
 		ctx,
 		networkID,
@@ -116,7 +116,6 @@ func pullImage(imagename, networkID string) {
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "unable to connect container to network"))
 	}
-	//
 
 	err = cli.ContainerStart(
 		ctx,
@@ -142,4 +141,15 @@ func pullImage(imagename, networkID string) {
 	if err != nil {
 		log.Println(errors.Wrap(err, "unable to write to stdout"))
 	}
+}
+
+func fomatImageName(imagename string) string {
+	f := func(c rune) bool {
+		if c == 58 {
+			// 58 is the ':' character
+			return true
+		}
+		return false
+	}
+	return strings.FieldsFunc(imagename, f)[0]
 }
