@@ -12,6 +12,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
@@ -51,46 +52,6 @@ func (dcy *dockerComposeConfig) Parse(data []byte) error {
 	return yaml.Unmarshal(data, dcy)
 }
 
-func getNetwork() (string, error) {
-	// create/get newtwork
-	// TODO: move this into it's own file
-	networkName := "melinetworkname"
-	ctx := context.Background()
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return "", errors.Wrap(err, "unable to intialize docker client")
-	}
-
-	// return early if network exists
-	netList, err := cli.NetworkList(ctx, types.NetworkListOptions{})
-	if err != nil {
-		return "", errors.Wrap(err, "unable to intialize docker client")
-	}
-	for _, v := range netList {
-		if v.Name == networkName {
-			return v.ID, nil
-		}
-	}
-
-	var typeNetworkCreate = types.NetworkCreate{
-		CheckDuplicate: true,
-		Driver:         "bridge",
-		EnableIPv6:     false,
-		IPAM:           &network.IPAM{Driver: "default"},
-		Internal:       false,
-		Attachable:     true,
-	}
-	networkCreateResponse, err := cli.NetworkCreate(
-		ctx,
-		networkName,
-		typeNetworkCreate)
-	if err != nil {
-		return "", errors.Wrap(err, "unable to create docker network")
-	}
-	return networkCreateResponse.ID, nil
-
-}
-
 func main() {
 	data, err := ioutil.ReadFile("docker-compose.yml")
 	if err != nil {
@@ -108,7 +69,7 @@ func main() {
 
 	for _, v := range dockerCyaml.Services {
 		fmt.Println()
-		fmt.Println("image & networkID: ", v.Image, networkID)
+		fmt.Println("image, networkID, name: ", v.Image, networkID, v.Name)
 		fmt.Println()
 		pullImage(v.Image, networkID)
 	}
@@ -119,7 +80,7 @@ func pullImage(imagename, networkID string) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "unable to intialize docker client"))
 	}
 
 	imagePullResp, err := cli.ImagePull(
@@ -127,12 +88,12 @@ func pullImage(imagename, networkID string) {
 		imagename,
 		types.ImagePullOptions{})
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "unable to pull image"))
 	}
 	defer imagePullResp.Close()
 	_, err = io.Copy(os.Stdout, imagePullResp)
 	if err != nil {
-		log.Println(err)
+		log.Println(errors.Wrap(err, "unable to write to stdout"))
 	}
 
 	containerCreateResp, err := cli.ContainerCreate(
@@ -142,7 +103,7 @@ func pullImage(imagename, networkID string) {
 		nil,
 		"")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "unable to create container"))
 	}
 
 	//
@@ -153,7 +114,7 @@ func pullImage(imagename, networkID string) {
 		containerCreateResp.ID,
 		&network.EndpointSettings{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "unable to connect container to network"))
 	}
 	//
 
@@ -162,7 +123,7 @@ func pullImage(imagename, networkID string) {
 		containerCreateResp.ID,
 		types.ContainerStartOptions{})
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "unable to start container"))
 	}
 
 	containerLogResp, err := cli.ContainerLogs(
@@ -173,12 +134,12 @@ func pullImage(imagename, networkID string) {
 			ShowStderr: true,
 			Timestamps: true})
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "unable to get container logs"))
 	}
 	defer containerLogResp.Close()
 
 	_, err = io.Copy(os.Stdout, containerLogResp)
 	if err != nil {
-		log.Println(err)
+		log.Println(errors.Wrap(err, "unable to write to stdout"))
 	}
 }
