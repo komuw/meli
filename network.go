@@ -17,7 +17,7 @@ func getNetwork() (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "unable to get the current working directory")
 	}
-	networkName := getCwdName(curentDir)
+	networkName := "meli_network_" + getCwdName(curentDir)
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
