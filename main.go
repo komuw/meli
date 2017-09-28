@@ -41,6 +41,7 @@ type serviceConfig struct {
 	Volumes     []string `yaml:"volumes,omitempty"`
 	VolumesFrom []string `yaml:"volumes_from,omitempty"`
 	Expose      []string `yaml:"expose,omitempty"`
+	Labels      []string `yaml:"labels,omitempty"`
 }
 
 type dockerComposeConfig struct {
@@ -73,12 +74,17 @@ func main() {
 
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
-		go pullImage(v.Image, networkID, &wg)
+		fmt.Println("image, labels", v.Image, v.Labels)
+		go fakepullImage(v.Image, networkID, &wg)
+		//go pullImage(v.Image, networkID, &wg)
 	}
 	wg.Wait()
 
 }
 
+func fakepullImage(imagename, networkID string, wg *sync.WaitGroup) {
+	defer wg.Done()
+}
 func pullImage(imagename, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	formattedImageName := fomatImageName(imagename)

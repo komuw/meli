@@ -5,3 +5,6 @@ services:
 
   nats:
     image: nats
+    labels:
+      - "traefik.backend=web"
+      - "traefik.port=80"
