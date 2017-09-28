@@ -13,7 +13,10 @@ import (
 
 func getNetwork() (string, error) {
 	// create/get newtwork
-	curentDir := os.Getwd()
+	curentDir, err := os.Getwd()
+	if err != nil {
+		return "", errors.Wrap(err, "unable to get the current working directory")
+	}
 	networkName := getCwdName(curentDir)
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
