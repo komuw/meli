@@ -74,22 +74,37 @@ func main() {
 
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
-		fmt.Println("image, labels", v.Image, v.Labels)
-		go fakepullImage(v.Image, networkID, &wg)
-		//go pullImage(v.Image, networkID, &wg)
+		//fmt.Println("image, labels, v", v.Image, v.Labels, v)
+		go fakepullImage(v, networkID, &wg)
+		//go pullImage(v, networkID, &wg)
 	}
 	wg.Wait()
 
 }
 
-func fakepullImage(imagename, networkID string, wg *sync.WaitGroup) {
+func fakepullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
+	myMap := make(map[string]string)
+
+	if len(s.Labels) > 0 {
+		for _, v := range s.Labels {
+
+			fmt.Println("z::", fomatLabels(v))
+			yo := fomatLabels(v)
+			myMap[yo[0]] = yo[1]
+			fmt.Println("map", myMap)
+		}
+
+		// fmt.Printf("labels: %#+v\n", s.Labels[0])
+		// fmt.Printf("labels: %#+v\n", s.Labels[1])
+	}
+
 }
-func pullImage(imagename, networkID string, wg *sync.WaitGroup) {
+func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	formattedImageName := fomatImageName(imagename)
+	formattedImageName := fomatImageName(s.Image)
 	fmt.Println()
-	fmt.Println("dockerImage, networkID, name:", imagename, networkID, formattedImageName)
+	fmt.Println("dockerImage, networkID, name:", s.Image, networkID, formattedImageName)
 	fmt.Println()
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
@@ -99,7 +114,7 @@ func pullImage(imagename, networkID string, wg *sync.WaitGroup) {
 
 	imagePullResp, err := cli.ImagePull(
 		ctx,
-		imagename,
+		s.Image,
 		types.ImagePullOptions{})
 	if err != nil {
 		panic(errors.Wrap(err, "unable to pull image"))
@@ -112,7 +127,7 @@ func pullImage(imagename, networkID string, wg *sync.WaitGroup) {
 
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
-		&container.Config{Image: imagename},
+		&container.Config{Image: s.Image},
 		&container.HostConfig{PublishAllPorts: true},
 		nil,
 		formattedImageName)
@@ -164,4 +179,18 @@ func fomatImageName(imagename string) string {
 		return false
 	}
 	return strings.FieldsFunc(imagename, f)[0]
+}
+
+func fomatLabels(label string) []string {
+	f := func(c rune) bool {
+		if c == 58 {
+			// 58 is the ':' character
+			return true
+		} else if c == 61 {
+			//61 is '=' char
+			return true
+		}
+		return false
+	}
+	return strings.FieldsFunc(label, f)
 }
