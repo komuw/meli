@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -74,9 +75,9 @@ func main() {
 
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
-		//fmt.Println("image, labels, v", v.Image, v.Labels, v)
-		go fakepullImage(v, networkID, &wg)
-		//go pullImage(v, networkID, &wg)
+		fmt.Println("docker service", v)
+		//go fakepullImage(v, networkID, &wg)
+		go pullImage(v, networkID, &wg)
 	}
 	wg.Wait()
 
@@ -85,7 +86,6 @@ func main() {
 func fakepullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	myMap := make(map[string]string)
-
 	if len(s.Labels) > 0 {
 		for _, v := range s.Labels {
 
@@ -94,9 +94,6 @@ func fakepullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 			myMap[yo[0]] = yo[1]
 			fmt.Println("map", myMap)
 		}
-
-		// fmt.Printf("labels: %#+v\n", s.Labels[0])
-		// fmt.Printf("labels: %#+v\n", s.Labels[1])
 	}
 
 }
@@ -112,6 +109,7 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 		panic(errors.Wrap(err, "unable to intialize docker client"))
 	}
 
+	// 1. Pull Image
 	imagePullResp, err := cli.ImagePull(
 		ctx,
 		s.Image,
@@ -125,9 +123,20 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 		log.Println(errors.Wrap(err, "unable to write to stdout"))
 	}
 
+	// 2. Create a container
+	labelsMap := make(map[string]string)
+	if len(s.Labels) > 0 {
+		for _, v := range s.Labels {
+			onelabel := fomatLabels(v)
+			labelsMap[onelabel[0]] = onelabel[1]
+			fmt.Println("labelsMap", labelsMap)
+		}
+	}
+	// TODO: we should skip creating the container again if already exists
+	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
-		&container.Config{Image: s.Image},
+		&container.Config{Image: s.Image, Labels: labelsMap},
 		&container.HostConfig{PublishAllPorts: true},
 		nil,
 		formattedImageName)
@@ -135,6 +144,7 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 		log.Fatal(errors.Wrap(err, "unable to create container"))
 	}
 
+	// 3. Connect container to network
 	err = cli.NetworkConnect(
 		ctx,
 		networkID,
@@ -144,6 +154,7 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 		log.Fatal(errors.Wrap(err, "unable to connect container to network"))
 	}
 
+	// 4. Start container
 	err = cli.ContainerStart(
 		ctx,
 		containerCreateResp.ID,
@@ -152,6 +163,7 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 		panic(errors.Wrap(err, "unable to start container"))
 	}
 
+	// 5. Stream container logs to stdOut
 	containerLogResp, err := cli.ContainerLogs(
 		ctx,
 		containerCreateResp.ID,
@@ -163,7 +175,6 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 		panic(errors.Wrap(err, "unable to get container logs"))
 	}
 	defer containerLogResp.Close()
-
 	_, err = io.Copy(os.Stdout, containerLogResp)
 	if err != nil {
 		log.Println(errors.Wrap(err, "unable to write to stdout"))
@@ -171,6 +182,12 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 }
 
 func fomatImageName(imagename string) string {
+	// container names are supposed to be unique
+	// since we are using the image name as the container name
+	// make it unique by adding a time.
+	// TODO: we should skip creating the container again if already exists
+	// instead of creating a uniquely named container name
+	now := time.Now()
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -178,7 +195,7 @@ func fomatImageName(imagename string) string {
 		}
 		return false
 	}
-	return strings.FieldsFunc(imagename, f)[0]
+	return strings.FieldsFunc(imagename, f)[0] + now.Format("2006-02-15-04-05")
 }
 
 func fomatLabels(label string) []string {
