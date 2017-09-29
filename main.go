@@ -209,5 +209,7 @@ func fomatLabels(label string) []string {
 		}
 		return false
 	}
+	// TODO: we should trim any whitespace before returning.
+	// this will prevent labels like type= web
 	return strings.FieldsFunc(label, f)
 }
