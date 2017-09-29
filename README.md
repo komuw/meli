@@ -6,3 +6,4 @@ as it can in parallel.
 Meli is a Swahili word meaning ship; so think of Meli as a ship carrying your docker contatiners safely across the treacherous container seas.
 
 It's currently work in progress.
+I obly intend to support docker-compose version 3+; https://docs.docker.com/compose/compose-file/compose-versioning/
