@@ -7,14 +7,13 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 	"sync"
-	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	"github.com/docker/go-connections/nat"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
@@ -61,7 +60,13 @@ func main() {
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "unable to read docker-compose file"))
 	}
-	networkID, err := getNetwork()
+	curentDir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err, "unable to get the current working directory")
+	}
+	networkName := "meli_network_" + getCwdName(curentDir)
+	networkID, err := getNetwork(networkName)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,19 +81,19 @@ func main() {
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
 		fmt.Println("docker service", v)
-		//go fakepullImage(v, networkID, &wg)
-		go pullImage(v, networkID, &wg)
+		//go fakepullImage(v, networkID, networkName, &wg)
+		go pullImage(v, networkID, networkName, &wg)
 	}
 	wg.Wait()
 
 }
 
-func fakepullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
+func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	fmt.Println()
 }
 
-func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
+func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	formattedImageName := fomatImageName(s.Image)
 	fmt.Println()
@@ -115,6 +120,7 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 	}
 
 	// 2. Create a container
+	// 2.1 make labels
 	labelsMap := make(map[string]string)
 	if len(s.Labels) > 0 {
 		for _, v := range s.Labels {
@@ -123,12 +129,43 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 			fmt.Println("labelsMap", labelsMap)
 		}
 	}
+	//2.2 make ports
+	portsMap := make(map[nat.Port]struct{})
+	type emptyStruct struct{}
+	if len(s.Ports) > 0 {
+		for _, v := range s.Ports {
+			oneport := fomatPorts(v)
+			//hostport := oneport[0]
+			containerport := oneport[1]
+			port, err := nat.NewPort("tcp", containerport)
+			if err != nil {
+				log.Println(errors.Wrap(err, "unable to create a nat.Port"))
+			}
+			portsMap[port] = emptyStruct{}
+		}
+	}
+	// TODO: remove this extra loop. we could reuse the one above, ie the one for portsMap
+	portBindingMap := make(map[nat.Port][]nat.PortBinding)
+	if len(s.Ports) > 0 {
+		for _, v := range s.Ports {
+			oneport := fomatPorts(v)
+			hostport := oneport[0]
+			containerport := oneport[1]
+			port, err := nat.NewPort("tcp", containerport)
+			myPortBinding := nat.PortBinding{HostPort: hostport}
+			if err != nil {
+				log.Println(errors.Wrap(err, "unable to create a nat.Port"))
+			}
+			portBindingMap[port] = []nat.PortBinding{myPortBinding}
+		}
+	}
+
 	// TODO: we should skip creating the container again if already exists
 	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
-		&container.Config{Image: s.Image, Labels: labelsMap, Env: s.Environment},
-		&container.HostConfig{PublishAllPorts: true},
+		&container.Config{Image: s.Image, Labels: labelsMap, Env: s.Environment, ExposedPorts: portsMap},
+		&container.HostConfig{PublishAllPorts: false, PortBindings: portBindingMap, NetworkMode: container.NetworkMode(networkName)},
 		nil,
 		formattedImageName)
 	if err != nil {
@@ -170,37 +207,4 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 	if err != nil {
 		log.Println(errors.Wrap(err, "unable to write to stdout"))
 	}
-}
-
-func fomatImageName(imagename string) string {
-	// container names are supposed to be unique
-	// since we are using the image name as the container name
-	// make it unique by adding a time.
-	// TODO: we should skip creating the container again if already exists
-	// instead of creating a uniquely named container name
-	now := time.Now()
-	f := func(c rune) bool {
-		if c == 58 {
-			// 58 is the ':' character
-			return true
-		}
-		return false
-	}
-	return strings.FieldsFunc(imagename, f)[0] + now.Format("2006-02-15-04-05")
-}
-
-func fomatLabels(label string) []string {
-	f := func(c rune) bool {
-		if c == 58 {
-			// 58 is the ':' character
-			return true
-		} else if c == 61 {
-			//61 is '=' char
-			return true
-		}
-		return false
-	}
-	// TODO: we should trim any whitespace before returning.
-	// this will prevent labels like type= web
-	return strings.FieldsFunc(label, f)
 }
