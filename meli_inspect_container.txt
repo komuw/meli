@@ -1,0 +1,231 @@
+[
+    {
+        "Id": "525ce38a3d62d76756f41b510d47d85cb7aa3db170da4f77af5a63b1e3a17b2c",
+        "Created": "2017-09-29T13:23:16.140870774Z",
+        "Path": "docker-entrypoint.sh",
+        "Args": [
+            "redis-server"
+        ],
+        "State": {
+            "Status": "created",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 128,
+            "Error": "driver failed programming external connectivity on endpoint redis2017-29-16-23-09 (5623378b1dce606eb61ca7e49bc47541836a6bf9072c9b7f0869e5dd93e45e9b): Bind for 0.0.0.0:6300 failed: port is already allocated",
+            "StartedAt": "0001-01-01T00:00:00Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:856249f48b0c1a735290ca73026de261a2ffbc57d8903e9ff50c6ed05f669b70",
+        "ResolvConfPath": "/var/lib/docker/containers/525ce38a3d62d76756f41b510d47d85cb7aa3db170da4f77af5a63b1e3a17b2c/resolv.conf",
+        "HostnamePath": "",
+        "HostsPath": "/var/lib/docker/containers/525ce38a3d62d76756f41b510d47d85cb7aa3db170da4f77af5a63b1e3a17b2c/hosts",
+        "LogPath": "",
+        "Name": "/redis2017-29-16-23-09",
+        "RestartCount": 0,
+        "Driver": "aufs",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "meli_network_meli",
+            "PortBindings": {
+                "22/tcp": [
+                    {
+                        "HostIp": "",
+                        "HostPort": ""
+                    },
+                    {
+                        "HostIp": "",
+                        "HostPort": ""
+                    },
+                    {
+                        "HostIp": "",
+                        "HostPort": "6300"
+                    },
+                    {
+                        "HostIp": "",
+                        "HostPort": "6400"
+                    }
+                ],
+                "6379/tcp": [
+                    {
+                        "HostIp": "",
+                        "HostPort": ""
+                    },
+                    {
+                        "HostIp": "",
+                        "HostPort": ""
+                    },
+                    {
+                        "HostIp": "",
+                        "HostPort": "6300"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": -1,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0
+        },
+        "GraphDriver": {
+            "Data": null,
+            "Name": "aufs"
+        },
+        "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "0706aecc8f52e57df5534c6a42a76e2407852a60f0a22f485e8cb0f887321b41",
+                "Source": "/var/lib/docker/volumes/0706aecc8f52e57df5534c6a42a76e2407852a60f0a22f485e8cb0f887321b41/_data",
+                "Destination": "/data",
+                "Driver": "local",
+                "Mode": "",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+        "Config": {
+            "Hostname": "525ce38a3d62",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "22/tcp": {},
+                "6379/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "RACK_ENV=development",
+                "type=database",
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "REDIS_VERSION=3.0.7",
+                "REDIS_DOWNLOAD_URL=http://download.redis.io/releases/redis-3.0.7.tar.gz",
+                "REDIS_DOWNLOAD_SHA=e56b4b7e033ae8dbf311f9191cf6fdf3ae974d1c"
+            ],
+            "Cmd": [
+                "redis-server"
+            ],
+            "ArgsEscaped": true,
+            "Image": "redis:3.0-alpine",
+            "Volumes": {
+                "/data": {}
+            },
+            "WorkingDir": "/data",
+            "Entrypoint": [
+                "docker-entrypoint.sh"
+            ],
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "167d589d00a5965b8141cda9a2a574bc372b86e64da8e89e873dcb5efa2fa0b0",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/167d589d00a5",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "meli_network_meli": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": [
+                        "525ce38a3d62"
+                    ],
+                    "NetworkID": "40bad1717e2dffa8272da2ccf2dc3c89239b1ec293423eea3e5271a0992d611f",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]

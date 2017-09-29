@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"os"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -11,13 +10,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func getNetwork() (string, error) {
+func getNetwork(networkName string) (string, error) {
 	// create/get newtwork
-	curentDir, err := os.Getwd()
-	if err != nil {
-		return "", errors.Wrap(err, "unable to get the current working directory")
-	}
-	networkName := "meli_network_" + getCwdName(curentDir)
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
