@@ -1,35 +1,35 @@
 [
     {
-        "Id": "525ce38a3d62d76756f41b510d47d85cb7aa3db170da4f77af5a63b1e3a17b2c",
-        "Created": "2017-09-29T13:23:16.140870774Z",
+        "Id": "627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651",
+        "Created": "2017-09-29T14:52:08.675876609Z",
         "Path": "docker-entrypoint.sh",
         "Args": [
             "redis-server"
         ],
         "State": {
-            "Status": "created",
-            "Running": false,
+            "Status": "running",
+            "Running": true,
             "Paused": false,
             "Restarting": false,
             "OOMKilled": false,
             "Dead": false,
-            "Pid": 0,
-            "ExitCode": 128,
-            "Error": "driver failed programming external connectivity on endpoint redis2017-29-16-23-09 (5623378b1dce606eb61ca7e49bc47541836a6bf9072c9b7f0869e5dd93e45e9b): Bind for 0.0.0.0:6300 failed: port is already allocated",
-            "StartedAt": "0001-01-01T00:00:00Z",
+            "Pid": 31823,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2017-09-29T14:52:09.162064999Z",
             "FinishedAt": "0001-01-01T00:00:00Z"
         },
         "Image": "sha256:856249f48b0c1a735290ca73026de261a2ffbc57d8903e9ff50c6ed05f669b70",
-        "ResolvConfPath": "/var/lib/docker/containers/525ce38a3d62d76756f41b510d47d85cb7aa3db170da4f77af5a63b1e3a17b2c/resolv.conf",
-        "HostnamePath": "",
-        "HostsPath": "/var/lib/docker/containers/525ce38a3d62d76756f41b510d47d85cb7aa3db170da4f77af5a63b1e3a17b2c/hosts",
-        "LogPath": "",
-        "Name": "/redis2017-29-16-23-09",
+        "ResolvConfPath": "/var/lib/docker/containers/627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651/hostname",
+        "HostsPath": "/var/lib/docker/containers/627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651/hosts",
+        "LogPath": "/var/lib/docker/containers/627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651/627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651-json.log",
+        "Name": "/redis2017-29-17-51-55",
         "RestartCount": 0,
         "Driver": "aufs",
         "MountLabel": "",
         "ProcessLabel": "",
-        "AppArmorProfile": "",
+        "AppArmorProfile": "docker-default",
         "ExecIDs": null,
         "HostConfig": {
             "Binds": null,
@@ -43,30 +43,10 @@
                 "22/tcp": [
                     {
                         "HostIp": "",
-                        "HostPort": ""
-                    },
-                    {
-                        "HostIp": "",
-                        "HostPort": ""
-                    },
-                    {
-                        "HostIp": "",
-                        "HostPort": "6300"
-                    },
-                    {
-                        "HostIp": "",
                         "HostPort": "6400"
                     }
                 ],
                 "6379/tcp": [
-                    {
-                        "HostIp": "",
-                        "HostPort": ""
-                    },
-                    {
-                        "HostIp": "",
-                        "HostPort": ""
-                    },
                     {
                         "HostIp": "",
                         "HostPort": "6300"
@@ -143,8 +123,8 @@
         "Mounts": [
             {
                 "Type": "volume",
-                "Name": "0706aecc8f52e57df5534c6a42a76e2407852a60f0a22f485e8cb0f887321b41",
-                "Source": "/var/lib/docker/volumes/0706aecc8f52e57df5534c6a42a76e2407852a60f0a22f485e8cb0f887321b41/_data",
+                "Name": "173dd34af01f9a36b238c7962f16b37db4351b8be7b0210f87e79ae6a824fe65",
+                "Source": "/var/lib/docker/volumes/173dd34af01f9a36b238c7962f16b37db4351b8be7b0210f87e79ae6a824fe65/_data",
                 "Destination": "/data",
                 "Driver": "local",
                 "Mode": "",
@@ -153,7 +133,7 @@
             }
         ],
         "Config": {
-            "Hostname": "525ce38a3d62",
+            "Hostname": "627b3de0e200",
             "Domainname": "",
             "User": "",
             "AttachStdin": false,
@@ -191,12 +171,25 @@
         },
         "NetworkSettings": {
             "Bridge": "",
-            "SandboxID": "167d589d00a5965b8141cda9a2a574bc372b86e64da8e89e873dcb5efa2fa0b0",
+            "SandboxID": "f57ddbc3bcf3012c9353006e0a0285d26acbdceb65b0111d0c7ed535675a81a7",
             "HairpinMode": false,
             "LinkLocalIPv6Address": "",
             "LinkLocalIPv6PrefixLen": 0,
-            "Ports": {},
-            "SandboxKey": "/var/run/docker/netns/167d589d00a5",
+            "Ports": {
+                "22/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "6400"
+                    }
+                ],
+                "6379/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "6300"
+                    }
+                ]
+            },
+            "SandboxKey": "/var/run/docker/netns/f57ddbc3bcf3",
             "SecondaryIPAddresses": null,
             "SecondaryIPv6Addresses": null,
             "EndpointID": "",
@@ -212,17 +205,17 @@
                     "IPAMConfig": null,
                     "Links": null,
                     "Aliases": [
-                        "525ce38a3d62"
+                        "627b3de0e200"
                     ],
                     "NetworkID": "40bad1717e2dffa8272da2ccf2dc3c89239b1ec293423eea3e5271a0992d611f",
-                    "EndpointID": "",
-                    "Gateway": "",
-                    "IPAddress": "",
-                    "IPPrefixLen": 0,
+                    "EndpointID": "3d696f8ac875a139660fc2547373981c6176e16e7f81b230850e7d2bf276c2a4",
+                    "Gateway": "172.18.0.1",
+                    "IPAddress": "172.18.0.2",
+                    "IPPrefixLen": 16,
                     "IPv6Gateway": "",
                     "GlobalIPv6Address": "",
                     "GlobalIPv6PrefixLen": 0,
-                    "MacAddress": "",
+                    "MacAddress": "02:42:ac:12:00:02",
                     "DriverOpts": null
                 }
             }

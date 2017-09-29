@@ -145,7 +145,6 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		}
 	}
 	// TODO: remove this extra loop. we could reuse the one above, ie the one for portsMap
-	slicePortBinding := make([]nat.PortBinding, 2)
 	portBindingMap := make(map[nat.Port][]nat.PortBinding)
 	if len(s.Ports) > 0 {
 		for _, v := range s.Ports {
@@ -157,8 +156,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 			if err != nil {
 				log.Println(errors.Wrap(err, "unable to create a nat.Port"))
 			}
-			slicePortBinding = append(slicePortBinding, myPortBinding)
-			portBindingMap[port] = slicePortBinding
+			portBindingMap[port] = []nat.PortBinding{myPortBinding}
 		}
 	}
 
