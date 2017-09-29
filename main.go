@@ -32,9 +32,9 @@ services:
 type serviceConfig struct {
 	Build string `yaml:"build,omitempty"`
 	//Command        yaml.Command         `yaml:"command,flow,omitempty"`
-	Dockerfile string `yaml:"dockerfile,omitempty"`
-	//Environment    yaml.MaporEqualSlice `yaml:"environment,omitempty"`
-	Image string `yaml:"image,omitempty"`
+	Dockerfile  string   `yaml:"dockerfile,omitempty"`
+	Environment []string `yaml:"environment,omitempty"`
+	Image       string   `yaml:"image,omitempty"`
 	//Links          yaml.MaporColonSlice `yaml:"links,omitempty"`
 	Name        string   `yaml:"name,omitempty"`
 	Ports       []string `yaml:"ports,omitempty"`
@@ -85,18 +85,9 @@ func main() {
 
 func fakepullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	myMap := make(map[string]string)
-	if len(s.Labels) > 0 {
-		for _, v := range s.Labels {
-
-			fmt.Println("z::", fomatLabels(v))
-			yo := fomatLabels(v)
-			myMap[yo[0]] = yo[1]
-			fmt.Println("map", myMap)
-		}
-	}
-
+	fmt.Println()
 }
+
 func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	formattedImageName := fomatImageName(s.Image)
@@ -136,7 +127,7 @@ func pullImage(s serviceConfig, networkID string, wg *sync.WaitGroup) {
 	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
-		&container.Config{Image: s.Image, Labels: labelsMap},
+		&container.Config{Image: s.Image, Labels: labelsMap, Env: s.Environment},
 		&container.HostConfig{PublishAllPorts: true},
 		nil,
 		formattedImageName)
