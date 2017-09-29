@@ -2,6 +2,9 @@ version: '3'
 services:
   redis:
     image: 'redis:3.0-alpine'
+    environment:
+      - RACK_ENV=development
+      - type=database
 
   nats:
     image: nats
