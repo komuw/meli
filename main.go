@@ -132,19 +132,6 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 	//2.2 make ports
 	portsMap := make(map[nat.Port]struct{})
 	type emptyStruct struct{}
-	if len(s.Ports) > 0 {
-		for _, v := range s.Ports {
-			oneport := fomatPorts(v)
-			//hostport := oneport[0]
-			containerport := oneport[1]
-			port, err := nat.NewPort("tcp", containerport)
-			if err != nil {
-				log.Println(errors.Wrap(err, "unable to create a nat.Port"))
-			}
-			portsMap[port] = emptyStruct{}
-		}
-	}
-	// TODO: remove this extra loop. we could reuse the one above, ie the one for portsMap
 	portBindingMap := make(map[nat.Port][]nat.PortBinding)
 	if len(s.Ports) > 0 {
 		for _, v := range s.Ports {
@@ -156,10 +143,10 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 			if err != nil {
 				log.Println(errors.Wrap(err, "unable to create a nat.Port"))
 			}
+			portsMap[port] = emptyStruct{}
 			portBindingMap[port] = []nat.PortBinding{myPortBinding}
 		}
 	}
-
 	// TODO: we should skip creating the container again if already exists
 	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
