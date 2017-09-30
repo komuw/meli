@@ -14,3 +14,7 @@ services:
     labels:
       - "traefik.backend=web"
       - "traefik.port=80"
+
+  busybox:
+    image: 'busybox'
+    command: tail -fn10 .dockerenv
