@@ -77,7 +77,6 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
-
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
 		fmt.Println("docker service", v)
@@ -151,8 +150,15 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
-		&container.Config{Image: s.Image, Labels: labelsMap, Env: s.Environment, ExposedPorts: portsMap},
-		&container.HostConfig{PublishAllPorts: false, PortBindings: portBindingMap, NetworkMode: container.NetworkMode(networkName)},
+		&container.Config{
+			Image:        s.Image,
+			Labels:       labelsMap,
+			Env:          s.Environment,
+			ExposedPorts: portsMap},
+		&container.HostConfig{
+			PublishAllPorts: false,
+			PortBindings:    portBindingMap,
+			NetworkMode:     container.NetworkMode(networkName)},
 		nil,
 		formattedImageName)
 	if err != nil {
