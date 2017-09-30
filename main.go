@@ -21,21 +21,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-/*
-version: '3'
-services:
-  redis:
-    image: 'redis:3.0-alpine'
-
-  busybox:
-    image: busybox
-*/
 type serviceConfig struct {
 	Image       string   `yaml:"image,omitempty"`
 	Ports       []string `yaml:"ports,omitempty"`
 	Labels      []string `yaml:"labels,omitempty"`
 	Environment []string `yaml:"environment,omitempty"`
 	Command     string   `yaml:"command,flow,omitempty"`
+	Restart     string   `yaml:"restart,omitempty"`
 	//Build string `yaml:"build,omitempty"`
 	//Dockerfile  string   `yaml:"dockerfile,omitempty"`
 	//Restart     string   `yaml:"restart,omitempty"`
@@ -68,7 +60,7 @@ func main() {
 	networkName := "meli_network_" + getCwdName(curentDir)
 	networkID, err := getNetwork(networkName)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err, "unable to create/get network")
 	}
 
 	var dockerCyaml dockerComposeConfig
@@ -100,7 +92,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		panic(errors.Wrap(err, "unable to intialize docker client"))
+		log.Fatal(errors.Wrap(err, "unable to intialize docker client"))
 	}
 
 	// 1. Pull Image
@@ -109,7 +101,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		s.Image,
 		types.ImagePullOptions{})
 	if err != nil {
-		panic(errors.Wrap(err, "unable to pull image"))
+		log.Println(errors.Wrap(err, "unable to pull image"))
 	}
 	defer imagePullResp.Close()
 	_, err = io.Copy(os.Stdout, imagePullResp)
@@ -151,6 +143,18 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		sliceCommand := strings.Fields(s.Command)
 		cmd = strslice.StrSlice(sliceCommand)
 	}
+	//2.4 create restart policy
+	restartPolicy := container.RestartPolicy{}
+	if s.Restart != "" {
+		// you cannot set MaximumRetryCount for the following restart policies;
+		// always, no, unless-stopped
+		if s.Restart == "on-failure" {
+			restartPolicy = container.RestartPolicy{Name: s.Restart, MaximumRetryCount: 3}
+		} else {
+			restartPolicy = container.RestartPolicy{Name: s.Restart}
+		}
+
+	}
 
 	// TODO: we should skip creating the container again if already exists
 	// instead of creating a uniquely named container name
@@ -165,11 +169,12 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		&container.HostConfig{
 			PublishAllPorts: false,
 			PortBindings:    portBindingMap,
-			NetworkMode:     container.NetworkMode(networkName)},
+			NetworkMode:     container.NetworkMode(networkName),
+			RestartPolicy:   restartPolicy},
 		nil,
 		formattedImageName)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "unable to create container"))
+		log.Println(errors.Wrap(err, "unable to create container"))
 	}
 
 	// 3. Connect container to network
@@ -179,7 +184,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		containerCreateResp.ID,
 		&network.EndpointSettings{})
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "unable to connect container to network"))
+		log.Println(errors.Wrap(err, "unable to connect container to network"))
 	}
 
 	// 4. Start container
@@ -188,7 +193,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		containerCreateResp.ID,
 		types.ContainerStartOptions{})
 	if err != nil {
-		panic(errors.Wrap(err, "unable to start container"))
+		log.Println(errors.Wrap(err, "unable to start container"))
 	}
 
 	// 5. Stream container logs to stdOut
@@ -200,7 +205,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 			ShowStderr: true,
 			Timestamps: true})
 	if err != nil {
-		panic(errors.Wrap(err, "unable to get container logs"))
+		log.Println(errors.Wrap(err, "unable to get container logs"))
 	}
 	defer containerLogResp.Close()
 	_, err = io.Copy(os.Stdout, containerLogResp)

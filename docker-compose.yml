@@ -18,4 +18,4 @@ services:
   busybox:
     image: 'busybox'
     command: tail -fn10 .dockerenv
-    restart: always
+    restart: unless-stopped
