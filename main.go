@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 
@@ -29,19 +31,18 @@ services:
     image: busybox
 */
 type serviceConfig struct {
-	Build string `yaml:"build,omitempty"`
-	//Command        yaml.Command         `yaml:"command,flow,omitempty"`
-	Dockerfile  string   `yaml:"dockerfile,omitempty"`
-	Environment []string `yaml:"environment,omitempty"`
 	Image       string   `yaml:"image,omitempty"`
-	//Links          yaml.MaporColonSlice `yaml:"links,omitempty"`
-	Name        string   `yaml:"name,omitempty"`
 	Ports       []string `yaml:"ports,omitempty"`
-	Restart     string   `yaml:"restart,omitempty"`
-	Volumes     []string `yaml:"volumes,omitempty"`
-	VolumesFrom []string `yaml:"volumes_from,omitempty"`
-	Expose      []string `yaml:"expose,omitempty"`
 	Labels      []string `yaml:"labels,omitempty"`
+	Environment []string `yaml:"environment,omitempty"`
+	Command     string   `yaml:"command,flow,omitempty"`
+	//Build string `yaml:"build,omitempty"`
+	//Dockerfile  string   `yaml:"dockerfile,omitempty"`
+	//Restart     string   `yaml:"restart,omitempty"`
+	//Volumes     []string `yaml:"volumes,omitempty"`
+	//VolumesFrom []string `yaml:"volumes_from,omitempty"`
+	//Expose      []string `yaml:"expose,omitempty"`
+	//Links          yaml.MaporColonSlice `yaml:"links,omitempty"`
 }
 
 type dockerComposeConfig struct {
@@ -66,7 +67,6 @@ func main() {
 	}
 	networkName := "meli_network_" + getCwdName(curentDir)
 	networkID, err := getNetwork(networkName)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -77,7 +77,6 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
-
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
 		fmt.Println("docker service", v)
@@ -85,7 +84,6 @@ func main() {
 		go pullImage(v, networkID, networkName, &wg)
 	}
 	wg.Wait()
-
 }
 
 func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
@@ -147,12 +145,27 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 			portBindingMap[port] = []nat.PortBinding{myPortBinding}
 		}
 	}
+	//2.3 create command
+	cmd := strslice.StrSlice{}
+	if s.Command != "" {
+		sliceCommand := strings.Fields(s.Command)
+		cmd = strslice.StrSlice(sliceCommand)
+	}
+
 	// TODO: we should skip creating the container again if already exists
 	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
-		&container.Config{Image: s.Image, Labels: labelsMap, Env: s.Environment, ExposedPorts: portsMap},
-		&container.HostConfig{PublishAllPorts: false, PortBindings: portBindingMap, NetworkMode: container.NetworkMode(networkName)},
+		&container.Config{
+			Image:        s.Image,
+			Labels:       labelsMap,
+			Env:          s.Environment,
+			ExposedPorts: portsMap,
+			Cmd:          cmd},
+		&container.HostConfig{
+			PublishAllPorts: false,
+			PortBindings:    portBindingMap,
+			NetworkMode:     container.NetworkMode(networkName)},
 		nil,
 		formattedImageName)
 	if err != nil {

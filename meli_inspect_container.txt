@@ -1,10 +1,11 @@
 [
     {
-        "Id": "627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651",
-        "Created": "2017-09-29T14:52:08.675876609Z",
-        "Path": "docker-entrypoint.sh",
+        "Id": "a1f1e38fe0f02f3765d2e37028c0ee1c47795be010d4d564fe78fda8f6555f0f",
+        "Created": "2017-09-30T07:48:51.409049844Z",
+        "Path": "tail",
         "Args": [
-            "redis-server"
+            "-fn10",
+            ".dockerenv"
         ],
         "State": {
             "Status": "running",
@@ -13,18 +14,18 @@
             "Restarting": false,
             "OOMKilled": false,
             "Dead": false,
-            "Pid": 31823,
+            "Pid": 1855,
             "ExitCode": 0,
             "Error": "",
-            "StartedAt": "2017-09-29T14:52:09.162064999Z",
+            "StartedAt": "2017-09-30T07:48:53.033745583Z",
             "FinishedAt": "0001-01-01T00:00:00Z"
         },
-        "Image": "sha256:856249f48b0c1a735290ca73026de261a2ffbc57d8903e9ff50c6ed05f669b70",
-        "ResolvConfPath": "/var/lib/docker/containers/627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651/resolv.conf",
-        "HostnamePath": "/var/lib/docker/containers/627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651/hostname",
-        "HostsPath": "/var/lib/docker/containers/627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651/hosts",
-        "LogPath": "/var/lib/docker/containers/627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651/627b3de0e200550dc06ce21cd5112b7139f0ad2b51f081138f15faecdacae651-json.log",
-        "Name": "/redis2017-29-17-51-55",
+        "Image": "sha256:54511612f1c4d97e93430fc3d5dc2f05dfbe8fb7e6259b7351deeca95eaf2971",
+        "ResolvConfPath": "/var/lib/docker/containers/a1f1e38fe0f02f3765d2e37028c0ee1c47795be010d4d564fe78fda8f6555f0f/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/a1f1e38fe0f02f3765d2e37028c0ee1c47795be010d4d564fe78fda8f6555f0f/hostname",
+        "HostsPath": "/var/lib/docker/containers/a1f1e38fe0f02f3765d2e37028c0ee1c47795be010d4d564fe78fda8f6555f0f/hosts",
+        "LogPath": "/var/lib/docker/containers/a1f1e38fe0f02f3765d2e37028c0ee1c47795be010d4d564fe78fda8f6555f0f/a1f1e38fe0f02f3765d2e37028c0ee1c47795be010d4d564fe78fda8f6555f0f-json.log",
+        "Name": "/busybox2017-30-10-48-39",
         "RestartCount": 0,
         "Driver": "aufs",
         "MountLabel": "",
@@ -39,20 +40,7 @@
                 "Config": {}
             },
             "NetworkMode": "meli_network_meli",
-            "PortBindings": {
-                "22/tcp": [
-                    {
-                        "HostIp": "",
-                        "HostPort": "6400"
-                    }
-                ],
-                "6379/tcp": [
-                    {
-                        "HostIp": "",
-                        "HostPort": "6300"
-                    }
-                ]
-            },
+            "PortBindings": {},
             "RestartPolicy": {
                 "Name": "",
                 "MaximumRetryCount": 0
@@ -120,76 +108,40 @@
             "Data": null,
             "Name": "aufs"
         },
-        "Mounts": [
-            {
-                "Type": "volume",
-                "Name": "173dd34af01f9a36b238c7962f16b37db4351b8be7b0210f87e79ae6a824fe65",
-                "Source": "/var/lib/docker/volumes/173dd34af01f9a36b238c7962f16b37db4351b8be7b0210f87e79ae6a824fe65/_data",
-                "Destination": "/data",
-                "Driver": "local",
-                "Mode": "",
-                "RW": true,
-                "Propagation": ""
-            }
-        ],
+        "Mounts": [],
         "Config": {
-            "Hostname": "627b3de0e200",
+            "Hostname": "a1f1e38fe0f0",
             "Domainname": "",
             "User": "",
             "AttachStdin": false,
             "AttachStdout": false,
             "AttachStderr": false,
-            "ExposedPorts": {
-                "22/tcp": {},
-                "6379/tcp": {}
-            },
             "Tty": false,
             "OpenStdin": false,
             "StdinOnce": false,
             "Env": [
-                "RACK_ENV=development",
-                "type=database",
-                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-                "REDIS_VERSION=3.0.7",
-                "REDIS_DOWNLOAD_URL=http://download.redis.io/releases/redis-3.0.7.tar.gz",
-                "REDIS_DOWNLOAD_SHA=e56b4b7e033ae8dbf311f9191cf6fdf3ae974d1c"
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
             ],
             "Cmd": [
-                "redis-server"
+                "tail",
+                "-fn10",
+                ".dockerenv"
             ],
-            "ArgsEscaped": true,
-            "Image": "redis:3.0-alpine",
-            "Volumes": {
-                "/data": {}
-            },
-            "WorkingDir": "/data",
-            "Entrypoint": [
-                "docker-entrypoint.sh"
-            ],
+            "Image": "busybox",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
             "OnBuild": null,
             "Labels": {}
         },
         "NetworkSettings": {
             "Bridge": "",
-            "SandboxID": "f57ddbc3bcf3012c9353006e0a0285d26acbdceb65b0111d0c7ed535675a81a7",
+            "SandboxID": "df05640fb10e9247ec5bdb7524414bdae1bc2301b0584168bdf61cd88bb9faa3",
             "HairpinMode": false,
             "LinkLocalIPv6Address": "",
             "LinkLocalIPv6PrefixLen": 0,
-            "Ports": {
-                "22/tcp": [
-                    {
-                        "HostIp": "0.0.0.0",
-                        "HostPort": "6400"
-                    }
-                ],
-                "6379/tcp": [
-                    {
-                        "HostIp": "0.0.0.0",
-                        "HostPort": "6300"
-                    }
-                ]
-            },
-            "SandboxKey": "/var/run/docker/netns/f57ddbc3bcf3",
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/df05640fb10e",
             "SecondaryIPAddresses": null,
             "SecondaryIPv6Addresses": null,
             "EndpointID": "",
@@ -205,17 +157,17 @@
                     "IPAMConfig": null,
                     "Links": null,
                     "Aliases": [
-                        "627b3de0e200"
+                        "a1f1e38fe0f0"
                     ],
-                    "NetworkID": "40bad1717e2dffa8272da2ccf2dc3c89239b1ec293423eea3e5271a0992d611f",
-                    "EndpointID": "3d696f8ac875a139660fc2547373981c6176e16e7f81b230850e7d2bf276c2a4",
-                    "Gateway": "172.18.0.1",
-                    "IPAddress": "172.18.0.2",
+                    "NetworkID": "c84a2e19bf7b3dcac28553d5f5af7a98e54c9a8e22356c063db60a42ef60a267",
+                    "EndpointID": "671a230d5667c037b3d64893f0d464a52934c0403f26bf48465a1a00520713ca",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.4",
                     "IPPrefixLen": 16,
                     "IPv6Gateway": "",
                     "GlobalIPv6Address": "",
                     "GlobalIPv6PrefixLen": 0,
-                    "MacAddress": "02:42:ac:12:00:02",
+                    "MacAddress": "02:42:ac:13:00:04",
                     "DriverOpts": null
                 }
             }
