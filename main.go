@@ -123,6 +123,7 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 		}
 		defer imageBuildResponse.Body.Close()
 		b := make([]byte, 500)
+		// we should use ioutil.ReadAll(r io.Reader) here instead
 		n, err := imageBuildResponse.Body.Read(b)
 		if err != nil {
 			log.Println(errors.Wrap(err, "fakepullImage:: unable read image build response"))
