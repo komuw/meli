@@ -19,3 +19,8 @@ services:
     image: 'busybox'
     command: tail -fn10 .dockerenv
     restart: unless-stopped
+
+  buildservice:
+    build:
+      context: .
+      dockerfile: buildserviceDockerfile
