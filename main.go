@@ -77,8 +77,8 @@ func main() {
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
 		fmt.Println("docker service", v)
-		//go fakepullImage(v, networkID, networkName, &wg)
-		go pullImage(v, networkID, networkName, &wg)
+		go fakepullImage(v, networkID, networkName, &wg)
+		//go pullImage(v, networkID, networkName, &wg)
 	}
 	wg.Wait()
 }
@@ -86,6 +86,41 @@ func main() {
 func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	fmt.Println()
+
+	if s.Build != (buildstruct{}) {
+		fmt.Printf("%+v\n", s)
+
+		ctx := context.Background()
+		cli, err := client.NewEnvClient()
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "fakepullImage:: unable to intialize docker client"))
+		}
+
+		dockerContext, err := os.Open(s.Build.Dockerfile)
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "fakepullImage:: unable to open Dockerfile"))
+		}
+		defer dockerContext.Close()
+		// b := make([]byte, 100)
+		// dockerContext.Read(b)
+		// fmt.Println("b::::", string(b))
+		//dockerContext := bytes.NewReader([]byte(s.Build.Context)) //strings.NewReader(s.Build.Context) bytes.NewReader([]byte)
+		imageBuildResponse, err := cli.ImageBuild(ctx, dockerContext, types.ImageBuildOptions{
+			//PullParent:     true,
+			//Squash:     true, currently only supported in experimenta mode
+			Remove:         true, //remove intermediary containers after build
+			ForceRemove:    true,
+			SuppressOutput: false,
+			Dockerfile:     s.Build.Dockerfile,
+			Context:        dockerContext,
+		})
+		if err != nil {
+			log.Fatal(errors.Wrap(err, "fakepullImage:: unable to build docker image"))
+		}
+		fmt.Println("imageBuildResponse::", imageBuildResponse)
+
+	}
+
 }
 
 func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
