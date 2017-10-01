@@ -21,6 +21,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+/* DOCS:
+1. https://godoc.org/github.com/moby/moby/client
+2. https://docs.docker.com/engine/api/v1.31/
+*/
+
 type serviceConfig struct {
 	Image       string   `yaml:"image,omitempty"`
 	Ports       []string `yaml:"ports,omitempty"`
@@ -85,10 +90,10 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 
 func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
 	defer wg.Done()
+	fmt.Println()
+	fmt.Println("docker servie:", s)
+	fmt.Println()
 	formattedImageName := fomatImageName(s.Image)
-	fmt.Println()
-	fmt.Println("dockerImage, networkID, name:", s.Image, networkID, formattedImageName)
-	fmt.Println()
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
