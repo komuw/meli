@@ -26,19 +26,22 @@ import (
 2. https://docs.docker.com/engine/api/v1.31/
 */
 
+type buildstruct struct {
+	// remember to use caps so that they can be exported
+	Context    string `yaml:"context,omitempty"`
+	Dockerfile string `yaml:"dockerfile,omitempty"`
+}
+
 type serviceConfig struct {
-	Image       string   `yaml:"image,omitempty"`
-	Ports       []string `yaml:"ports,omitempty"`
-	Labels      []string `yaml:"labels,omitempty"`
-	Environment []string `yaml:"environment,omitempty"`
-	Command     string   `yaml:"command,flow,omitempty"`
-	Restart     string   `yaml:"restart,omitempty"`
-	//Build string `yaml:"build,omitempty"`
-	//Dockerfile  string   `yaml:"dockerfile,omitempty"`
-	//Restart     string   `yaml:"restart,omitempty"`
+	Image       string      `yaml:"image,omitempty"`
+	Ports       []string    `yaml:"ports,omitempty"`
+	Labels      []string    `yaml:"labels,omitempty"`
+	Environment []string    `yaml:"environment,omitempty"`
+	Command     string      `yaml:"command,flow,omitempty"`
+	Restart     string      `yaml:"restart,omitempty"`
+	Build       buildstruct `yaml:"build,omitempty"`
 	//Volumes     []string `yaml:"volumes,omitempty"`
 	//VolumesFrom []string `yaml:"volumes_from,omitempty"`
-	//Expose      []string `yaml:"expose,omitempty"`
 	//Links          yaml.MaporColonSlice `yaml:"links,omitempty"`
 }
 
@@ -47,10 +50,6 @@ type dockerComposeConfig struct {
 	Services map[string]serviceConfig `yaml:"services"`
 	//networks map[string]     `yaml:"networks,omitempty"`
 	//volumes map[string]                  `yaml:"volumes,omitempty"`
-}
-
-func (dcy *dockerComposeConfig) Parse(data []byte) error {
-	return yaml.Unmarshal(data, dcy)
 }
 
 func main() {
@@ -69,7 +68,8 @@ func main() {
 	}
 
 	var dockerCyaml dockerComposeConfig
-	if err := dockerCyaml.Parse(data); err != nil {
+	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
+	if err != nil {
 		log.Fatal(errors.Wrap(err, "unable to parse docker-compose file contents"))
 	}
 
