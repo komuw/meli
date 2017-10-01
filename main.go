@@ -100,7 +100,8 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "fakepullImage:: unable to open Dockerfile"))
 		}
-		defer dockerContext.Close()
+		// dont close: defer dockerContext.Close()
+		// it will be closed by the client
 		// b := make([]byte, 100)
 		// dockerContext.Read(b)
 		// fmt.Println("b::::", string(b))
