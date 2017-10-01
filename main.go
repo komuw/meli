@@ -104,6 +104,9 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 		// b := make([]byte, 100)
 		// dockerContext.Read(b)
 		// fmt.Println("b::::", string(b))
+		// dont call dockerContext.Read(), otherwise cli.ImageBuild will fail with EOF
+		// you cant read twice
+
 		//dockerContext := bytes.NewReader([]byte(s.Build.Context)) //strings.NewReader(s.Build.Context) bytes.NewReader([]byte)
 		imageBuildResponse, err := cli.ImageBuild(ctx, dockerContext, types.ImageBuildOptions{
 			//PullParent:     true,
