@@ -121,6 +121,14 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "fakepullImage:: unable to build docker image"))
 		}
+		defer imageBuildResponse.Body.Close()
+		b := make([]byte, 500)
+		n, err := imageBuildResponse.Body.Read(b)
+		if err != nil {
+			log.Println(errors.Wrap(err, "fakepullImage:: unable read image build response"))
+		}
+		fmt.Println("image build response:", n, b)
+
 		fmt.Println("imageBuildResponse::", imageBuildResponse)
 
 	}
