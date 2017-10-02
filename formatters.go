@@ -63,5 +63,5 @@ type popagateError struct {
 }
 
 func (p *popagateError) Error() string {
-	return fmt.Sprintf("%s - %s", p.originalErr, p.newErr)
+	return fmt.Sprintf("originalErr:: %s \nThisErr:: %s", p.originalErr, p.newErr)
 }
