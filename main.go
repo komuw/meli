@@ -103,23 +103,11 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 	defer cli.Close()
 
 	// 1. Pull Image
-	// TODO: choose a better default image name
 	formattedImageName := fomatImageName("containerFromBuild")
 	if len(s.Image) > 0 {
 		formattedImageName = fomatImageName(s.Image)
 		// TODO move cli.ImagePull into image.go
-		imagePullResp, err := cli.ImagePull(
-			ctx,
-			s.Image,
-			types.ImagePullOptions{})
-		if err != nil {
-			log.Println(errors.Wrap(err, "unable to pull image"))
-		}
-		defer imagePullResp.Close()
-		_, err = io.Copy(os.Stdout, imagePullResp)
-		if err != nil {
-			log.Println(errors.Wrap(err, "unable to write to stdout"))
-		}
+		PullDockerImage(ctx, s.Image)
 	}
 
 	// 2. Create a container

@@ -15,8 +15,23 @@ import (
 	"github.com/pkg/errors"
 )
 
-func BuildDockerImage(ctx context.Context, dockerFile string) string {
+func PullDockerImage(ctx context.Context, imageName string) {
+	cli, err := client.NewEnvClient()
+	imagePullResp, err := cli.ImagePull(
+		ctx,
+		imageName,
+		types.ImagePullOptions{})
+	if err != nil {
+		log.Println(errors.Wrap(err, "unable to pull image"))
+	}
+	defer imagePullResp.Close()
+	_, err = io.Copy(os.Stdout, imagePullResp)
+	if err != nil {
+		log.Println(errors.Wrap(err, "unable to write to stdout"))
+	}
+}
 
+func BuildDockerImage(ctx context.Context, dockerFile string) string {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "unable to intialize docker client"))
