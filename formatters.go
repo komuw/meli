@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -54,4 +55,13 @@ func fomatPorts(port string) []string {
 	// TODO: we should trim any whitespace before returning.
 	// this will prevent labels like type= web
 	return strings.FieldsFunc(port, f)
+}
+
+type popagateError struct {
+	originalErr error
+	newErr      error
+}
+
+func (p *popagateError) Error() string {
+	return fmt.Sprintf("originalErr:: %s \nThisErr:: %s", p.originalErr, p.newErr)
 }

@@ -17,7 +17,6 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -55,7 +54,7 @@ type dockerComposeConfig struct {
 func main() {
 	data, err := ioutil.ReadFile("docker-compose.yml")
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "unable to read docker-compose file"))
+		log.Fatal(err, "unable to read docker-compose file")
 	}
 	curentDir, err := os.Getwd()
 	if err != nil {
@@ -70,7 +69,7 @@ func main() {
 	var dockerCyaml dockerComposeConfig
 	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "unable to parse docker-compose file contents"))
+		log.Fatal(err, "unable to parse docker-compose file contents")
 	}
 
 	var wg sync.WaitGroup
@@ -98,7 +97,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "unable to intialize docker client"))
+		log.Fatal(err, "unable to intialize docker client")
 	}
 	defer cli.Close()
 
@@ -132,7 +131,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 			port, err := nat.NewPort("tcp", containerport)
 			myPortBinding := nat.PortBinding{HostPort: hostport}
 			if err != nil {
-				log.Println(errors.Wrap(err, "unable to create a nat.Port"))
+				log.Println(err, "unable to create a nat.Port")
 			}
 			portsMap[port] = emptyStruct{}
 			portBindingMap[port] = []nat.PortBinding{myPortBinding}
@@ -180,7 +179,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		nil,
 		formattedImageName)
 	if err != nil {
-		log.Println(errors.Wrap(err, "unable to create container"))
+		log.Println(err, "unable to create container")
 	}
 
 	// 3. Connect container to network
@@ -190,7 +189,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		containerCreateResp.ID,
 		&network.EndpointSettings{})
 	if err != nil {
-		log.Println(errors.Wrap(err, "unable to connect container to network"))
+		log.Println(err, "unable to connect container to network")
 	}
 
 	// 4. Start container
@@ -199,7 +198,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		containerCreateResp.ID,
 		types.ContainerStartOptions{})
 	if err != nil {
-		log.Println(errors.Wrap(err, "unable to start container"))
+		log.Println(err, "unable to start container")
 	}
 
 	// 5. Stream container logs to stdOut
@@ -211,11 +210,11 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 			ShowStderr: true,
 			Timestamps: true})
 	if err != nil {
-		log.Println(errors.Wrap(err, "unable to get container logs"))
+		log.Println(err, "unable to get container logs")
 	}
 	defer containerLogResp.Close()
 	_, err = io.Copy(os.Stdout, containerLogResp)
 	if err != nil {
-		log.Println(errors.Wrap(err, "unable to write to stdout"))
+		log.Println(err, "unable to write to stdout")
 	}
 }
