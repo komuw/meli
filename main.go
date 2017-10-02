@@ -97,6 +97,7 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 		if err != nil {
 			log.Fatal(errors.Wrap(err, "unable to intialize docker client"))
 		}
+		defer cli.Close()
 		buf := new(bytes.Buffer)
 		tw := tar.NewWriter(buf)
 		defer tw.Close()
@@ -163,6 +164,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "unable to intialize docker client"))
 	}
+	defer cli.Close()
 
 	// 1. Pull Image
 	imagePullResp, err := cli.ImagePull(
