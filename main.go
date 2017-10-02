@@ -130,6 +130,7 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 			types.ImageBuildOptions{
 				//PullParent:     true,
 				//Squash:     true, currently only supported in experimenta mode
+				Tags:           []string{"meli_" + strings.ToLower(dockerFile)},
 				Remove:         true, //remove intermediary containers after build
 				ForceRemove:    true,
 				SuppressOutput: false,
