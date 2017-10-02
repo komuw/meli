@@ -149,6 +149,20 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 			log.Fatal(err, " :unable to read image build response")
 		}
 
+		fmt.Println()
+		fmt.Println("ONCE")
+		fmt.Println()
+		containerCreateResp, err := cli.ContainerCreate(
+			ctx,
+			&container.Config{Image: "meli_" + strings.ToLower(dockerFile)},
+			&container.HostConfig{PublishAllPorts: true},
+			nil,
+			fomatImageName("containerFromBuild"))
+		if err != nil {
+			log.Fatal(err, " :unable to create container")
+		}
+		fmt.Println("container created:", containerCreateResp.ID, containerCreateResp.Warnings)
+
 	}
 
 }
