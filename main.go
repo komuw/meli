@@ -1,8 +1,6 @@
 package main
 
 import (
-	"archive/tar"
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -79,8 +77,8 @@ func main() {
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
 		fmt.Println("docker service", v)
-		go fakepullImage(v, networkID, networkName, &wg)
-		//go pullImage(v, networkID, networkName, &wg)
+		//go fakepullImage(v, networkID, networkName, &wg)
+		go pullImage(v, networkID, networkName, &wg)
 	}
 	wg.Wait()
 }
@@ -89,82 +87,6 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 	defer wg.Done()
 	fmt.Println()
 
-	if s.Build != (buildstruct{}) {
-		fmt.Printf("%+v\n", s)
-
-		ctx := context.Background()
-		cli, err := client.NewEnvClient()
-		if err != nil {
-			log.Fatal(errors.Wrap(err, "unable to intialize docker client"))
-		}
-		defer cli.Close()
-		buf := new(bytes.Buffer)
-		tw := tar.NewWriter(buf)
-		defer tw.Close()
-
-		dockerFile := s.Build.Dockerfile
-		if s.Build.Dockerfile == "" {
-			dockerFile = "Dockerfile"
-		}
-		dockerFileReader, err := os.Open(dockerFile)
-		if err != nil {
-			log.Fatal(err, " :unable to open Dockerfile")
-		}
-		readDockerFile, err := ioutil.ReadAll(dockerFileReader)
-		if err != nil {
-			log.Fatal(err, " :unable to read dockerfile")
-		}
-
-		tarHeader := &tar.Header{
-			Name: dockerFile,
-			Size: int64(len(readDockerFile)),
-		}
-		err = tw.WriteHeader(tarHeader)
-		if err != nil {
-			log.Fatal(err, " :unable to write tar header")
-		}
-		_, err = tw.Write(readDockerFile)
-		if err != nil {
-			log.Fatal(err, " :unable to write tar body")
-		}
-		dockerFileTarReader := bytes.NewReader(buf.Bytes())
-		imageBuildResponse, err := cli.ImageBuild(
-			ctx,
-			dockerFileTarReader,
-			types.ImageBuildOptions{
-				//PullParent:     true,
-				//Squash:     true, currently only supported in experimenta mode
-				Tags:           []string{"meli_" + strings.ToLower(dockerFile)},
-				Remove:         true, //remove intermediary containers after build
-				ForceRemove:    true,
-				SuppressOutput: false,
-				Dockerfile:     dockerFile,
-				Context:        dockerFileTarReader})
-		if err != nil {
-			log.Fatal(err, " :unable to build docker image")
-		}
-		defer imageBuildResponse.Body.Close()
-		_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
-		if err != nil {
-			log.Fatal(err, " :unable to read image build response")
-		}
-
-		fmt.Println()
-		fmt.Println("ONCE")
-		fmt.Println()
-		containerCreateResp, err := cli.ContainerCreate(
-			ctx,
-			&container.Config{Image: "meli_" + strings.ToLower(dockerFile)},
-			&container.HostConfig{PublishAllPorts: true},
-			nil,
-			fomatImageName("containerFromBuild"))
-		if err != nil {
-			log.Fatal(err, " :unable to create container")
-		}
-		fmt.Println("container created:", containerCreateResp.ID, containerCreateResp.Warnings)
-
-	}
-
 }
 
 func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
@@ -172,7 +94,7 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 	fmt.Println()
 	fmt.Println("docker servie:", s)
 	fmt.Println()
-	formattedImageName := fomatImageName(s.Image)
+
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -181,17 +103,23 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 	defer cli.Close()
 
 	// 1. Pull Image
-	imagePullResp, err := cli.ImagePull(
-		ctx,
-		s.Image,
-		types.ImagePullOptions{})
-	if err != nil {
-		log.Println(errors.Wrap(err, "unable to pull image"))
-	}
-	defer imagePullResp.Close()
-	_, err = io.Copy(os.Stdout, imagePullResp)
-	if err != nil {
-		log.Println(errors.Wrap(err, "unable to write to stdout"))
+	// TODO: choose a better default image name
+	formattedImageName := fomatImageName("containerFromBuild")
+	if len(s.Image) > 0 {
+		formattedImageName = fomatImageName(s.Image)
+		// TODO move cli.ImagePull into image.go
+		imagePullResp, err := cli.ImagePull(
+			ctx,
+			s.Image,
+			types.ImagePullOptions{})
+		if err != nil {
+			log.Println(errors.Wrap(err, "unable to pull image"))
+		}
+		defer imagePullResp.Close()
+		_, err = io.Copy(os.Stdout, imagePullResp)
+		if err != nil {
+			log.Println(errors.Wrap(err, "unable to write to stdout"))
+		}
 	}
 
 	// 2. Create a container
@@ -240,13 +168,18 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		}
 
 	}
+	//2.5 build image
+	imageName := s.Image
+	if s.Build != (buildstruct{}) {
+		imageName = BuildDockerImage(ctx, s.Build.Dockerfile)
+	}
 
 	// TODO: we should skip creating the container again if already exists
 	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
-			Image:        s.Image,
+			Image:        imageName,
 			Labels:       labelsMap,
 			Env:          s.Environment,
 			ExposedPorts: portsMap,
