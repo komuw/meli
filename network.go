@@ -7,7 +7,8 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
+
+	"errors"
 )
 
 func getNetwork(networkName string) (string, error) {
@@ -15,13 +16,14 @@ func getNetwork(networkName string) (string, error) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		return "", errors.Wrap(err, "unable to intialize docker client")
+		return "", &popagateError{originalErr: err, newErr: errors.New("unable to intialize docker client")}
 	}
 
 	// return early if network exists
 	netList, err := cli.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
-		return "", errors.Wrap(err, "unable to intialize docker client")
+		return "", &popagateError{originalErr: err, newErr: errors.New("unable to intialize docker client")}
+
 	}
 	for _, v := range netList {
 		if v.Name == networkName {
@@ -42,7 +44,7 @@ func getNetwork(networkName string) (string, error) {
 		networkName,
 		typeNetworkCreate)
 	if err != nil {
-		return "", errors.Wrap(err, "unable to create docker network")
+		return "", &popagateError{originalErr: err, newErr: errors.New("unable to create docker network")}
 	}
 	return networkCreateResponse.ID, nil
 

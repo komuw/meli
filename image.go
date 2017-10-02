@@ -12,7 +12,6 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 )
 
 func PullDockerImage(ctx context.Context, imageName string) {
@@ -22,19 +21,20 @@ func PullDockerImage(ctx context.Context, imageName string) {
 		imageName,
 		types.ImagePullOptions{})
 	if err != nil {
-		log.Println(errors.Wrap(err, "unable to pull image"))
+		log.Println(err, "unable to pull image")
 	}
 	defer imagePullResp.Close()
 	_, err = io.Copy(os.Stdout, imagePullResp)
 	if err != nil {
-		log.Println(errors.Wrap(err, "unable to write to stdout"))
+		log.Println(err, "unable to write to stdout")
 	}
+
 }
 
 func BuildDockerImage(ctx context.Context, dockerFile string) string {
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "unable to intialize docker client"))
+		log.Println(err, "unable to intialize docker client")
 	}
 	defer cli.Close()
 	buf := new(bytes.Buffer)
@@ -46,11 +46,11 @@ func BuildDockerImage(ctx context.Context, dockerFile string) string {
 	}
 	dockerFileReader, err := os.Open(dockerFile)
 	if err != nil {
-		log.Fatal(err, " :unable to open Dockerfile")
+		log.Println(err, " :unable to open Dockerfile")
 	}
 	readDockerFile, err := ioutil.ReadAll(dockerFileReader)
 	if err != nil {
-		log.Fatal(err, " :unable to read dockerfile")
+		log.Println(err, " :unable to read dockerfile")
 	}
 
 	tarHeader := &tar.Header{
@@ -59,11 +59,11 @@ func BuildDockerImage(ctx context.Context, dockerFile string) string {
 	}
 	err = tw.WriteHeader(tarHeader)
 	if err != nil {
-		log.Fatal(err, " :unable to write tar header")
+		log.Println(err, " :unable to write tar header")
 	}
 	_, err = tw.Write(readDockerFile)
 	if err != nil {
-		log.Fatal(err, " :unable to write tar body")
+		log.Println(err, " :unable to write tar body")
 	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 	imageName := "meli_" + strings.ToLower(dockerFile)
@@ -80,12 +80,12 @@ func BuildDockerImage(ctx context.Context, dockerFile string) string {
 			Dockerfile:     dockerFile,
 			Context:        dockerFileTarReader})
 	if err != nil {
-		log.Fatal(err, " :unable to build docker image")
+		log.Println(err, " :unable to build docker image")
 	}
 	defer imageBuildResponse.Body.Close()
 	_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
 	if err != nil {
-		log.Fatal(err, " :unable to read image build response")
+		log.Println(err, " :unable to read image build response")
 	}
 
 	return imageName
