@@ -102,6 +102,9 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 		defer tw.Close()
 
 		dockerFile := s.Build.Dockerfile
+		if s.Build.Dockerfile == "" {
+			dockerFile = "Dockerfile"
+		}
 		dockerFileReader, err := os.Open(dockerFile)
 		if err != nil {
 			log.Fatal(err, " :unable to open Dockerfile")
