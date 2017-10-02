@@ -24,3 +24,7 @@ services:
     build:
       context: .
       dockerfile: buildserviceDockerfile
+
+  build_with_no_specified_dockerfile:
+      build:
+        context: .
