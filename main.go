@@ -21,19 +21,27 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+/* DOCS:
+1. https://godoc.org/github.com/moby/moby/client
+2. https://docs.docker.com/engine/api/v1.31/
+*/
+
+type buildstruct struct {
+	// remember to use caps so that they can be exported
+	Context    string `yaml:"context,omitempty"`
+	Dockerfile string `yaml:"dockerfile,omitempty"`
+}
+
 type serviceConfig struct {
-	Image       string   `yaml:"image,omitempty"`
-	Ports       []string `yaml:"ports,omitempty"`
-	Labels      []string `yaml:"labels,omitempty"`
-	Environment []string `yaml:"environment,omitempty"`
-	Command     string   `yaml:"command,flow,omitempty"`
-	Restart     string   `yaml:"restart,omitempty"`
-	//Build string `yaml:"build,omitempty"`
-	//Dockerfile  string   `yaml:"dockerfile,omitempty"`
-	//Restart     string   `yaml:"restart,omitempty"`
+	Image       string      `yaml:"image,omitempty"`
+	Ports       []string    `yaml:"ports,omitempty"`
+	Labels      []string    `yaml:"labels,omitempty"`
+	Environment []string    `yaml:"environment,omitempty"`
+	Command     string      `yaml:"command,flow,omitempty"`
+	Restart     string      `yaml:"restart,omitempty"`
+	Build       buildstruct `yaml:"build,omitempty"`
 	//Volumes     []string `yaml:"volumes,omitempty"`
 	//VolumesFrom []string `yaml:"volumes_from,omitempty"`
-	//Expose      []string `yaml:"expose,omitempty"`
 	//Links          yaml.MaporColonSlice `yaml:"links,omitempty"`
 }
 
@@ -42,10 +50,6 @@ type dockerComposeConfig struct {
 	Services map[string]serviceConfig `yaml:"services"`
 	//networks map[string]     `yaml:"networks,omitempty"`
 	//volumes map[string]                  `yaml:"volumes,omitempty"`
-}
-
-func (dcy *dockerComposeConfig) Parse(data []byte) error {
-	return yaml.Unmarshal(data, dcy)
 }
 
 func main() {
@@ -64,7 +68,8 @@ func main() {
 	}
 
 	var dockerCyaml dockerComposeConfig
-	if err := dockerCyaml.Parse(data); err != nil {
+	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
+	if err != nil {
 		log.Fatal(errors.Wrap(err, "unable to parse docker-compose file contents"))
 	}
 
@@ -81,32 +86,28 @@ func main() {
 func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	fmt.Println()
+
 }
 
 func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	formattedImageName := fomatImageName(s.Image)
 	fmt.Println()
-	fmt.Println("dockerImage, networkID, name:", s.Image, networkID, formattedImageName)
+	fmt.Println("docker servie:", s)
 	fmt.Println()
+
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "unable to intialize docker client"))
 	}
+	defer cli.Close()
 
 	// 1. Pull Image
-	imagePullResp, err := cli.ImagePull(
-		ctx,
-		s.Image,
-		types.ImagePullOptions{})
-	if err != nil {
-		log.Println(errors.Wrap(err, "unable to pull image"))
-	}
-	defer imagePullResp.Close()
-	_, err = io.Copy(os.Stdout, imagePullResp)
-	if err != nil {
-		log.Println(errors.Wrap(err, "unable to write to stdout"))
+	formattedImageName := fomatImageName("containerFromBuild")
+	if len(s.Image) > 0 {
+		formattedImageName = fomatImageName(s.Image)
+		// TODO move cli.ImagePull into image.go
+		PullDockerImage(ctx, s.Image)
 	}
 
 	// 2. Create a container
@@ -155,13 +156,18 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		}
 
 	}
+	//2.5 build image
+	imageName := s.Image
+	if s.Build != (buildstruct{}) {
+		imageName = BuildDockerImage(ctx, s.Build.Dockerfile)
+	}
 
 	// TODO: we should skip creating the container again if already exists
 	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
-			Image:        s.Image,
+			Image:        imageName,
 			Labels:       labelsMap,
 			Env:          s.Environment,
 			ExposedPorts: portsMap,

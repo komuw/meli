@@ -1,6 +1,8 @@
 package main
 
 import (
+	"math/rand"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -19,7 +21,7 @@ func fomatImageName(imagename string) string {
 		}
 		return false
 	}
-	return strings.FieldsFunc(imagename, f)[0] + now.Format("2006-02-15-04-05")
+	return strings.FieldsFunc(imagename, f)[0] + now.Format("2006-02-15-04-05") + strconv.Itoa(rand.Int())
 }
 
 func fomatLabels(label string) []string {

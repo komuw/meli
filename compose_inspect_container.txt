@@ -1,11 +1,11 @@
 [
     {
-        "Id": "b1baeb858d14d9345c78a500b3357679155cd9d579f664664c8ae48fe1791151",
-        "Created": "2017-09-30T06:59:11.97038447Z",
-        "Path": "tail",
+        "Id": "cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b",
+        "Created": "2017-10-01T06:33:19.96898463Z",
+        "Path": "/bin/sh",
         "Args": [
-            "-fn10",
-            ".dockerenv"
+            "-c",
+            "tail -fn10 .dockerenv"
         ],
         "State": {
             "Status": "running",
@@ -14,18 +14,18 @@
             "Restarting": false,
             "OOMKilled": false,
             "Dead": false,
-            "Pid": 31535,
+            "Pid": 8050,
             "ExitCode": 0,
             "Error": "",
-            "StartedAt": "2017-09-30T06:59:13.922342296Z",
+            "StartedAt": "2017-10-01T06:33:23.710743794Z",
             "FinishedAt": "0001-01-01T00:00:00Z"
         },
-        "Image": "sha256:54511612f1c4d97e93430fc3d5dc2f05dfbe8fb7e6259b7351deeca95eaf2971",
-        "ResolvConfPath": "/var/lib/docker/containers/b1baeb858d14d9345c78a500b3357679155cd9d579f664664c8ae48fe1791151/resolv.conf",
-        "HostnamePath": "/var/lib/docker/containers/b1baeb858d14d9345c78a500b3357679155cd9d579f664664c8ae48fe1791151/hostname",
-        "HostsPath": "/var/lib/docker/containers/b1baeb858d14d9345c78a500b3357679155cd9d579f664664c8ae48fe1791151/hosts",
-        "LogPath": "/var/lib/docker/containers/b1baeb858d14d9345c78a500b3357679155cd9d579f664664c8ae48fe1791151/b1baeb858d14d9345c78a500b3357679155cd9d579f664664c8ae48fe1791151-json.log",
-        "Name": "/meli_busybox_1",
+        "Image": "sha256:61faedaaca0866deaec72e39a16e17c1f2052ac28acf33d3665408ac587506f7",
+        "ResolvConfPath": "/var/lib/docker/containers/cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b/hostname",
+        "HostsPath": "/var/lib/docker/containers/cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b/hosts",
+        "LogPath": "/var/lib/docker/containers/cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b/cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b-json.log",
+        "Name": "/meli_buildservice_1",
         "RestartCount": 0,
         "Driver": "aufs",
         "MountLabel": "",
@@ -110,7 +110,7 @@
         },
         "Mounts": [],
         "Config": {
-            "Hostname": "b1baeb858d14",
+            "Hostname": "cda9b6fbb54a",
             "Domainname": "",
             "User": "",
             "AttachStdin": false,
@@ -123,32 +123,33 @@
                 "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
             ],
             "Cmd": [
-                "tail",
-                "-fn10",
-                ".dockerenv"
+                "/bin/sh",
+                "-c",
+                "tail -fn10 .dockerenv"
             ],
-            "Image": "busybox",
+            "ArgsEscaped": true,
+            "Image": "meli_buildservice",
             "Volumes": null,
             "WorkingDir": "",
             "Entrypoint": null,
             "OnBuild": null,
             "Labels": {
-                "com.docker.compose.config-hash": "8e7b245b88971d6d3079049259748e2076fd97e5cb564110d5691987e51e5ea5",
+                "com.docker.compose.config-hash": "802c9f8916981a62fd26ede5abeb632bd2714881f1baf80952c4e5f9c4617321",
                 "com.docker.compose.container-number": "1",
                 "com.docker.compose.oneoff": "False",
                 "com.docker.compose.project": "meli",
-                "com.docker.compose.service": "busybox",
+                "com.docker.compose.service": "buildservice",
                 "com.docker.compose.version": "1.11.2"
             }
         },
         "NetworkSettings": {
             "Bridge": "",
-            "SandboxID": "c9f4304b082089a3ee029e4be1cb0c9acd446d2e9f12750f09f73e64e7753e6c",
+            "SandboxID": "135351c13793515b83d0e6a47350edb56501dbbb86bc7c8a87bf7d8cff85cfa2",
             "HairpinMode": false,
             "LinkLocalIPv6Address": "",
             "LinkLocalIPv6PrefixLen": 0,
             "Ports": {},
-            "SandboxKey": "/var/run/docker/netns/c9f4304b0820",
+            "SandboxKey": "/var/run/docker/netns/135351c13793",
             "SecondaryIPAddresses": null,
             "SecondaryIPv6Addresses": null,
             "EndpointID": "",
@@ -164,18 +165,18 @@
                     "IPAMConfig": null,
                     "Links": null,
                     "Aliases": [
-                        "busybox",
-                        "b1baeb858d14"
+                        "buildservice",
+                        "cda9b6fbb54a"
                     ],
-                    "NetworkID": "9476067c64e5a32ab88d7468423ba4f7f27ff17c7700a23efea9ff5b74bd2daa",
-                    "EndpointID": "4062788615a6c2aba4f21ae46c13b61e05443069cf212caded8ad2d49373b209",
+                    "NetworkID": "99b0ddbbfcda84847d93422be88d84ac56cc032829cf432ad2a049fa4ded0f22",
+                    "EndpointID": "72431aaea942b92a439a3b2efa91de1db9e70baeea6bda231a593585f7b93b80",
                     "Gateway": "172.18.0.1",
-                    "IPAddress": "172.18.0.4",
+                    "IPAddress": "172.18.0.5",
                     "IPPrefixLen": 16,
                     "IPv6Gateway": "",
                     "GlobalIPv6Address": "",
                     "GlobalIPv6PrefixLen": 0,
-                    "MacAddress": "02:42:ac:12:00:04",
+                    "MacAddress": "02:42:ac:12:00:05",
                     "DriverOpts": null
                 }
             }
