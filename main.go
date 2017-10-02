@@ -1,6 +1,8 @@
 package main
 
 import (
+	"archive/tar"
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -93,44 +95,54 @@ func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.Wait
 		ctx := context.Background()
 		cli, err := client.NewEnvClient()
 		if err != nil {
-			log.Fatal(errors.Wrap(err, "fakepullImage:: unable to intialize docker client"))
+			log.Fatal(errors.Wrap(err, "unable to intialize docker client"))
+		}
+		buf := new(bytes.Buffer)
+		tw := tar.NewWriter(buf)
+		defer tw.Close()
+
+		dockerFile := s.Build.Dockerfile
+		dockerFileReader, err := os.Open(dockerFile)
+		if err != nil {
+			log.Fatal(err, " :unable to open Dockerfile")
+		}
+		readDockerFile, err := ioutil.ReadAll(dockerFileReader)
+		if err != nil {
+			log.Fatal(err, " :unable to read dockerfile")
 		}
 
-		dockerContext, err := os.Open(s.Build.Dockerfile)
-		if err != nil {
-			log.Fatal(errors.Wrap(err, "fakepullImage:: unable to open Dockerfile"))
+		tarHeader := &tar.Header{
+			Name: dockerFile,
+			Size: int64(len(readDockerFile)),
 		}
-		// dont close: defer dockerContext.Close()
-		// it will be closed by the client
-		// b := make([]byte, 100)
-		// dockerContext.Read(b)
-		// fmt.Println("b::::", string(b))
-		// dont call dockerContext.Read(), otherwise cli.ImageBuild will fail with EOF
-		// you cant read twice
-
-		//dockerContext := bytes.NewReader([]byte(s.Build.Context)) //strings.NewReader(s.Build.Context) bytes.NewReader([]byte)
-		imageBuildResponse, err := cli.ImageBuild(ctx, dockerContext, types.ImageBuildOptions{
-			//PullParent:     true,
-			//Squash:     true, currently only supported in experimenta mode
-			Remove:         true, //remove intermediary containers after build
-			ForceRemove:    true,
-			SuppressOutput: false,
-			Dockerfile:     s.Build.Dockerfile,
-			Context:        dockerContext,
-		})
+		err = tw.WriteHeader(tarHeader)
 		if err != nil {
-			log.Fatal(errors.Wrap(err, "fakepullImage:: unable to build docker image"))
+			log.Fatal(err, " :unable to write tar header")
+		}
+		_, err = tw.Write(readDockerFile)
+		if err != nil {
+			log.Fatal(err, " :unable to write tar body")
+		}
+		dockerFileTarReader := bytes.NewReader(buf.Bytes())
+		imageBuildResponse, err := cli.ImageBuild(
+			ctx,
+			dockerFileTarReader,
+			types.ImageBuildOptions{
+				//PullParent:     true,
+				//Squash:     true, currently only supported in experimenta mode
+				Remove:         true, //remove intermediary containers after build
+				ForceRemove:    true,
+				SuppressOutput: false,
+				Dockerfile:     dockerFile,
+				Context:        dockerFileTarReader})
+		if err != nil {
+			log.Fatal(err, " :unable to build docker image")
 		}
 		defer imageBuildResponse.Body.Close()
-		b := make([]byte, 500)
-		// we should use ioutil.ReadAll(r io.Reader) here instead
-		n, err := imageBuildResponse.Body.Read(b)
+		_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
 		if err != nil {
-			log.Println(errors.Wrap(err, "fakepullImage:: unable read image build response"))
+			log.Fatal(err, " :unable to read image build response")
 		}
-		fmt.Println("image build response:", n, b)
-
-		fmt.Println("imageBuildResponse::", imageBuildResponse)
 
 	}
 
