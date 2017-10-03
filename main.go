@@ -39,7 +39,7 @@ type serviceConfig struct {
 	Command     string      `yaml:"command,flow,omitempty"`
 	Restart     string      `yaml:"restart,omitempty"`
 	Build       buildstruct `yaml:"build,omitempty"`
-	//Volumes     []string    `yaml:"volumes,omitempty"`
+	Volumes     []string    `yaml:"volumes,omitempty"`
 	//Links          yaml.MaporColonSlice `yaml:"links,omitempty"`
 }
 
@@ -91,8 +91,8 @@ func main() {
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
 		fmt.Println("docker service", v)
-		//go fakepullImage(ctx, v, networkID, networkName, &wg)
-		go pullImage(ctx, v, networkID, networkName, &wg)
+		go fakepullImage(ctx, v, networkID, networkName, &wg)
+		//go pullImage(ctx, v, networkID, networkName, &wg)
 	}
 	wg.Wait()
 }
@@ -100,6 +100,10 @@ func main() {
 func fakepullImage(ctx context.Context, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	fmt.Println()
+	if len(s.Volumes) > 0 {
+		fmt.Println("service level volume:", s.Volumes)
+		// do other important stuff
+	}
 }
 
 func pullImage(ctx context.Context, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
