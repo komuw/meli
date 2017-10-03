@@ -1,11 +1,11 @@
 [
     {
-        "Id": "cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b",
-        "Created": "2017-10-01T06:33:19.96898463Z",
+        "Id": "cea46b9f2584fc71bd4cbe672899727c7588569302537d7c617dcdb250372f4c",
+        "Created": "2017-10-03T15:03:52.901776671Z",
         "Path": "/bin/sh",
         "Args": [
             "-c",
-            "tail -fn10 .dockerenv"
+            "tail -fn3 .dockerenv"
         ],
         "State": {
             "Status": "running",
@@ -14,18 +14,18 @@
             "Restarting": false,
             "OOMKilled": false,
             "Dead": false,
-            "Pid": 8050,
+            "Pid": 8300,
             "ExitCode": 0,
             "Error": "",
-            "StartedAt": "2017-10-01T06:33:23.710743794Z",
+            "StartedAt": "2017-10-03T15:03:57.362069491Z",
             "FinishedAt": "0001-01-01T00:00:00Z"
         },
-        "Image": "sha256:61faedaaca0866deaec72e39a16e17c1f2052ac28acf33d3665408ac587506f7",
-        "ResolvConfPath": "/var/lib/docker/containers/cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b/resolv.conf",
-        "HostnamePath": "/var/lib/docker/containers/cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b/hostname",
-        "HostsPath": "/var/lib/docker/containers/cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b/hosts",
-        "LogPath": "/var/lib/docker/containers/cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b/cda9b6fbb54ace5029f2f433c11bf638f0b6e272f7da284c6d7581ebf156270b-json.log",
-        "Name": "/meli_buildservice_1",
+        "Image": "sha256:11a883be2a2ea128dde224f58dfc2ac161acd685470bef854748bfdc8456eb28",
+        "ResolvConfPath": "/var/lib/docker/containers/cea46b9f2584fc71bd4cbe672899727c7588569302537d7c617dcdb250372f4c/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/cea46b9f2584fc71bd4cbe672899727c7588569302537d7c617dcdb250372f4c/hostname",
+        "HostsPath": "/var/lib/docker/containers/cea46b9f2584fc71bd4cbe672899727c7588569302537d7c617dcdb250372f4c/hosts",
+        "LogPath": "/var/lib/docker/containers/cea46b9f2584fc71bd4cbe672899727c7588569302537d7c617dcdb250372f4c/cea46b9f2584fc71bd4cbe672899727c7588569302537d7c617dcdb250372f4c-json.log",
+        "Name": "/meli_db_1",
         "RestartCount": 0,
         "Driver": "aufs",
         "MountLabel": "",
@@ -33,7 +33,9 @@
         "AppArmorProfile": "docker-default",
         "ExecIDs": null,
         "HostConfig": {
-            "Binds": [],
+            "Binds": [
+                "meli_data-volume:/home:rw"
+            ],
             "ContainerIDFile": "",
             "LogConfig": {
                 "Type": "json-file",
@@ -108,9 +110,20 @@
             "Data": null,
             "Name": "aufs"
         },
-        "Mounts": [],
+        "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "meli_data-volume",
+                "Source": "/var/lib/docker/volumes/meli_data-volume/_data",
+                "Destination": "/home",
+                "Driver": "local",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
         "Config": {
-            "Hostname": "cda9b6fbb54a",
+            "Hostname": "cea46b9f2584",
             "Domainname": "",
             "User": "",
             "AttachStdin": false,
@@ -125,31 +138,33 @@
             "Cmd": [
                 "/bin/sh",
                 "-c",
-                "tail -fn10 .dockerenv"
+                "tail -fn3 .dockerenv"
             ],
             "ArgsEscaped": true,
-            "Image": "meli_buildservice",
-            "Volumes": null,
+            "Image": "meli_db",
+            "Volumes": {
+                "/home": {}
+            },
             "WorkingDir": "",
             "Entrypoint": null,
             "OnBuild": null,
             "Labels": {
-                "com.docker.compose.config-hash": "802c9f8916981a62fd26ede5abeb632bd2714881f1baf80952c4e5f9c4617321",
+                "com.docker.compose.config-hash": "1f42894064fd251f6cf9cf9083f2ef881cb1401b998eb39ab6ab87e2d19ce73a",
                 "com.docker.compose.container-number": "1",
                 "com.docker.compose.oneoff": "False",
                 "com.docker.compose.project": "meli",
-                "com.docker.compose.service": "buildservice",
-                "com.docker.compose.version": "1.11.2"
+                "com.docker.compose.service": "db",
+                "com.docker.compose.version": "1.16.1"
             }
         },
         "NetworkSettings": {
             "Bridge": "",
-            "SandboxID": "135351c13793515b83d0e6a47350edb56501dbbb86bc7c8a87bf7d8cff85cfa2",
+            "SandboxID": "55c33402a8aba61f1f677716701785257661f6ad7aa88a306ee55399436fc990",
             "HairpinMode": false,
             "LinkLocalIPv6Address": "",
             "LinkLocalIPv6PrefixLen": 0,
             "Ports": {},
-            "SandboxKey": "/var/run/docker/netns/135351c13793",
+            "SandboxKey": "/var/run/docker/netns/55c33402a8ab",
             "SecondaryIPAddresses": null,
             "SecondaryIPv6Addresses": null,
             "EndpointID": "",
@@ -165,18 +180,18 @@
                     "IPAMConfig": null,
                     "Links": null,
                     "Aliases": [
-                        "buildservice",
-                        "cda9b6fbb54a"
+                        "cea46b9f2584",
+                        "db"
                     ],
-                    "NetworkID": "99b0ddbbfcda84847d93422be88d84ac56cc032829cf432ad2a049fa4ded0f22",
-                    "EndpointID": "72431aaea942b92a439a3b2efa91de1db9e70baeea6bda231a593585f7b93b80",
+                    "NetworkID": "caea2137118c04f6f1414cec9df3d70da6956607a0fbc238fa561c3f8733ba59",
+                    "EndpointID": "71bb7e150e895c341ee4b8485dcd404c8eac1fe088345e0a16249d79a4eeda3e",
                     "Gateway": "172.18.0.1",
-                    "IPAddress": "172.18.0.5",
+                    "IPAddress": "172.18.0.4",
                     "IPPrefixLen": 16,
                     "IPv6Gateway": "",
                     "GlobalIPv6Address": "",
                     "GlobalIPv6PrefixLen": 0,
-                    "MacAddress": "02:42:ac:12:00:05",
+                    "MacAddress": "02:42:ac:12:00:04",
                     "DriverOpts": null
                 }
             }
