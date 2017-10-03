@@ -26,5 +26,25 @@ services:
       dockerfile: buildserviceDockerfile
 
   build_with_no_specified_dockerfile:
-      build:
-        context: .
+    build:
+      context: .
+
+  # we will backup this conatiners /home directory
+  # using the service below called backup
+  db:
+    build:
+      context: .
+      dockerfile: volumeDockerfile
+    volumes:
+      - data-volume:/home
+
+  # backup the db services /home dir
+  # into this containers /var dir
+  backup:
+    build:
+      context: .
+    volumes:
+      - data-volume:/var
+
+volumes:
+  data-volume:
