@@ -91,8 +91,8 @@ func main() {
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
 		fmt.Println("docker service", v)
-		//go fakepullImage(ctx, v, networkID, networkName, &wg)
-		go pullImage(ctx, v, networkID, networkName, &wg)
+		go fakepullImage(ctx, v, networkID, networkName, &wg)
+		//go pullImage(ctx, v, networkID, networkName, &wg)
 	}
 	wg.Wait()
 }
@@ -101,29 +101,19 @@ func fakepullImage(ctx context.Context, s serviceConfig, networkName, networkID 
 	defer wg.Done()
 	fmt.Println()
 	if len(s.Volumes) > 0 {
-		// "HostConfig": {
-		//     "Binds": [
-		//         "meli_data-volume:/home:rw"
-		//     ],
-		// "Mounts": [
-		//     {
-		//         "Type": "volume",
-		//         "Name": "meli_data-volume",
-		//         "Source": "/var/lib/docker/volumes/meli_data-volume/_data",
-		//         "Destination": "/home",
-		//         "Driver": "local",
-		//         "Mode": "rw",
-		//         "RW": true,
-		//         "Propagation": ""
-		//     }
-		// ],
-		// "Config": {
-		//     "Image": "meli_db",
-		//     "Volumes": {
+		//Volumes map[string]struct{}
+		// fmt.Println("service level volume:", s.Volumes)
+		fmt.Printf("service level volume22: %#v", s.Volumes)
+		fmt.Println()
+		fmt.Printf("service level volume33: %#v", s.Volumes[0])
+
+		x := fomatServiceVolumes(s.Volumes[0])
+		fmt.Println()
+		fmt.Printf("x %+v:", x[1])
+		fmt.Println()
+		// "Volumes": {
 		//         "/home": {}
-		//     },
-		fmt.Println("service level volume:", s.Volumes)
-		// do other important stuff
+		//     }
 	}
 }
 
@@ -197,6 +187,22 @@ func pullImage(ctx context.Context, s serviceConfig, networkID, networkName stri
 	imageName := s.Image
 	if s.Build != (buildstruct{}) {
 		imageName = BuildDockerImage(ctx, s.Build.Dockerfile)
+	}
+
+	//2.6 add volumes
+	if len(s.Volumes) > 0 {
+		//Volumes map[string]struct{}
+		// fmt.Println("service level volume:", s.Volumes)
+		fmt.Printf("service level volume22: %#v", s.Volumes)
+		fmt.Printf("service level volume33: %#v", s.Volumes[0])
+
+		x := fomatServiceVolumes(s.Volumes[0])
+		fmt.Println()
+		fmt.Printf("x %+v:", x[1])
+		fmt.Println()
+		// "Volumes": {
+		//         "/home": {}
+		//     }
 	}
 
 	// TODO: we should skip creating the container again if already exists

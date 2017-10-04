@@ -57,6 +57,22 @@ func fomatPorts(port string) []string {
 	return strings.FieldsFunc(port, f)
 }
 
+func fomatServiceVolumes(volume string) []string {
+	f := func(c rune) bool {
+		if c == 58 {
+			// 58 is the ':' character
+			return true
+		}
+		return false
+	}
+	fmt.Printf("\nvol %#v", volume)
+	z := strings.FieldsFunc(volume, f)
+	fmt.Printf("\nz %#v", z[0])
+	// TODO: we should trim any whitespace before returning.
+	// this will prevent labels like type= web
+	return z
+}
+
 type popagateError struct {
 	originalErr error
 	newErr      error
