@@ -91,8 +91,8 @@ func main() {
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
 		fmt.Println("docker service", v)
-		go fakepullImage(ctx, v, networkID, networkName, &wg)
-		//go pullImage(ctx, v, networkID, networkName, &wg)
+		//go fakepullImage(ctx, v, networkID, networkName, &wg)
+		go pullImage(ctx, v, networkID, networkName, &wg)
 	}
 	wg.Wait()
 }
@@ -101,6 +101,27 @@ func fakepullImage(ctx context.Context, s serviceConfig, networkName, networkID 
 	defer wg.Done()
 	fmt.Println()
 	if len(s.Volumes) > 0 {
+		// "HostConfig": {
+		//     "Binds": [
+		//         "meli_data-volume:/home:rw"
+		//     ],
+		// "Mounts": [
+		//     {
+		//         "Type": "volume",
+		//         "Name": "meli_data-volume",
+		//         "Source": "/var/lib/docker/volumes/meli_data-volume/_data",
+		//         "Destination": "/home",
+		//         "Driver": "local",
+		//         "Mode": "rw",
+		//         "RW": true,
+		//         "Propagation": ""
+		//     }
+		// ],
+		// "Config": {
+		//     "Image": "meli_db",
+		//     "Volumes": {
+		//         "/home": {}
+		//     },
 		fmt.Println("service level volume:", s.Volumes)
 		// do other important stuff
 	}
