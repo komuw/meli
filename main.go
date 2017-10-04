@@ -100,21 +100,6 @@ func main() {
 func fakepullImage(ctx context.Context, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	fmt.Println()
-	if len(s.Volumes) > 0 {
-		//Volumes map[string]struct{}
-		// fmt.Println("service level volume:", s.Volumes)
-		fmt.Printf("service level volume22: %#v", s.Volumes)
-		fmt.Println()
-		fmt.Printf("service level volume33: %#v", s.Volumes[0])
-
-		x := fomatServiceVolumes(s.Volumes[0])
-		fmt.Println()
-		fmt.Printf("x %+v:", x[1])
-		fmt.Println()
-		// "Volumes": {
-		//         "/home": {}
-		//     }
-	}
 }
 
 func pullImage(ctx context.Context, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
@@ -190,16 +175,20 @@ func pullImage(ctx context.Context, s serviceConfig, networkID, networkName stri
 	}
 
 	//2.6 add volumes
+	volume := make(map[string]struct{})
 	if len(s.Volumes) > 0 {
 		//Volumes map[string]struct{}
-		// fmt.Println("service level volume:", s.Volumes)
-		fmt.Printf("service level volume22: %#v", s.Volumes)
-		fmt.Printf("service level volume33: %#v", s.Volumes[0])
 
 		x := fomatServiceVolumes(s.Volumes[0])
 		fmt.Println()
-		fmt.Printf("x %+v:", x[1])
+		fmt.Printf("x %+v ", x[1])
+
+		portsMap[port] = emptyStruct{}
+
+		volume
+
 		fmt.Println()
+
 		// "Volumes": {
 		//         "/home": {}
 		//     }

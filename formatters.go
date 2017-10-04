@@ -65,12 +65,9 @@ func fomatServiceVolumes(volume string) []string {
 		}
 		return false
 	}
-	fmt.Printf("\nvol %#v", volume)
-	z := strings.FieldsFunc(volume, f)
-	fmt.Printf("\nz %#v", z[0])
 	// TODO: we should trim any whitespace before returning.
 	// this will prevent labels like type= web
-	return z
+	return strings.FieldsFunc(volume, f)
 }
 
 type popagateError struct {
