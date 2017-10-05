@@ -2,9 +2,9 @@ package main
 
 import (
 	"archive/tar"
+	"bufio"
 	"bytes"
 	"context"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -28,9 +28,15 @@ func PullDockerImage(ctx context.Context, imageName string) {
 		log.Println(err, "unable to pull image")
 	}
 	defer imagePullResp.Close()
-	_, err = io.Copy(os.Stdout, imagePullResp)
+
+	scanner := bufio.NewScanner(imagePullResp)
+	for scanner.Scan() {
+		output := strings.Replace(scanner.Text(), "u003e", ">", -1)
+		log.Println(output)
+	}
+	err = scanner.Err()
 	if err != nil {
-		log.Println(err, "unable to write to stdout")
+		log.Println(err, "error in scanning")
 	}
 
 }
@@ -87,9 +93,15 @@ func BuildDockerImage(ctx context.Context, dockerFile string) string {
 		log.Println(err, " :unable to build docker image")
 	}
 	defer imageBuildResponse.Body.Close()
-	_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
+
+	scanner := bufio.NewScanner(imageBuildResponse.Body)
+	for scanner.Scan() {
+		output := strings.Replace(scanner.Text(), "u003e", ">", -1)
+		log.Println(output)
+	}
+	err = scanner.Err()
 	if err != nil {
-		log.Println(err, " :unable to read image build response")
+		log.Println(err, "error in scanning")
 	}
 
 	return imageName

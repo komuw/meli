@@ -1,10 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"context"
-	"io"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -141,8 +140,14 @@ func ContainerLogs(ctx context.Context, containerId string) {
 		log.Println(err, "unable to get container logs")
 	}
 	defer containerLogResp.Close()
-	_, err = io.Copy(os.Stdout, containerLogResp)
+
+	scanner := bufio.NewScanner(containerLogResp)
+	for scanner.Scan() {
+		output := strings.Replace(scanner.Text(), "u003e", ">", -1)
+		log.Println(output)
+	}
+	err = scanner.Err()
 	if err != nil {
-		log.Println(err, "unable to write to stdout")
+		log.Println(err, "error in scanning")
 	}
 }
