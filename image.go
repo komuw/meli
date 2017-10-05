@@ -26,7 +26,7 @@ func PullDockerImage(ctx context.Context, imageName string) {
 	imagePullResp, err := cli.ImagePull(
 		ctx,
 		imageName,
-		types.ImagePullOptions{})
+		types.ImagePullOptions{RegistryAuth: GetRegistryAuth()})
 	if err != nil {
 		log.Println(err, "unable to pull image")
 	}
