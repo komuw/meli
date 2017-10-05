@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -66,7 +65,6 @@ func main() {
 
 	// Create top level volumes, if any
 	if len(dockerCyaml.Volumes) > 0 {
-		fmt.Println("len", len(dockerCyaml.Volumes))
 		for k := range dockerCyaml.Volumes {
 			// TODO we need to synchronise here else we'll get a race
 			// but I think we can get away for now because:
@@ -81,7 +79,6 @@ func main() {
 	var wg sync.WaitGroup
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
-		fmt.Println("docker service", v)
 		//go fakepullImage(ctx, v, networkID, networkName, &wg)
 		go pullImage(ctx, v, networkID, networkName, &wg)
 	}
@@ -90,28 +87,36 @@ func main() {
 
 func fakepullImage(ctx context.Context, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	fmt.Println()
 }
 
 func pullImage(ctx context.Context, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	// 1. Pull Image
+	/*
+		1. Pull Image
+		2. Create a container
+		3. Connect container to network
+		4. Start container
+		5. Stream container logs
+	*/
+
 	formattedImageName := fomatImageName("containerFromBuild")
 	if len(s.Image) > 0 {
 		formattedImageName = fomatImageName(s.Image)
 		PullDockerImage(ctx, s.Image)
 	}
-
-	// 2. Create a container
-	containerCreateResp := CreateContainer(ctx, s, networkName, formattedImageName)
-
-	// 3. Connect container to network
-	networkConnect(ctx, networkID, containerCreateResp.ID)
-
-	// 4. Start container
-	ContainerStart(ctx, containerCreateResp.ID)
-
-	// 5. Stream container logs to stdOut
-	ContainerLogs(ctx, containerCreateResp.ID)
+	containerCreateResp := CreateContainer(
+		ctx,
+		s,
+		networkName,
+		formattedImageName)
+	networkConnect(
+		ctx,
+		networkID,
+		containerCreateResp.ID)
+	ContainerStart(
+		ctx, containerCreateResp.ID)
+	ContainerLogs(
+		ctx,
+		containerCreateResp.ID)
 }

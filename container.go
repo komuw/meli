@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -28,7 +27,6 @@ func CreateContainer(ctx context.Context, s serviceConfig, networkName, formatte
 		for _, v := range s.Labels {
 			onelabel := fomatLabels(v)
 			labelsMap[onelabel[0]] = onelabel[1]
-			fmt.Println("labelsMap", labelsMap)
 		}
 	}
 	//2.2 make ports
