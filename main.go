@@ -177,9 +177,13 @@ func pullImage(ctx context.Context, s serviceConfig, networkID, networkName stri
 
 	//2.6 add volumes
 	volume := make(map[string]struct{})
+	binds := []string{}
 	if len(s.Volumes) > 0 {
 		vol := fomatServiceVolumes(s.Volumes[0])
 		volume[vol[1]] = emptyStruct{}
+		// TODO: handle other read/write modes
+		whatToBind := "meli_" + vol[0] + ":" + vol[1] + ":rw"
+		binds = append(binds, whatToBind)
 	}
 
 	// TODO: we should skip creating the container again if already exists
@@ -197,7 +201,8 @@ func pullImage(ctx context.Context, s serviceConfig, networkID, networkName stri
 			PublishAllPorts: false,
 			PortBindings:    portBindingMap,
 			NetworkMode:     container.NetworkMode(networkName),
-			RestartPolicy:   restartPolicy},
+			RestartPolicy:   restartPolicy,
+			Binds:           binds},
 		nil,
 		formattedImageName)
 	if err != nil {
