@@ -19,6 +19,7 @@ func PullDockerImage(ctx context.Context, imageName string) {
 	if err != nil {
 		log.Println(err, "unable to intialize docker client")
 	}
+	defer cli.Close()
 	imagePullResp, err := cli.ImagePull(
 		ctx,
 		imageName,

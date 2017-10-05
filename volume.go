@@ -13,6 +13,7 @@ func CreateDockerVolume(ctx context.Context, name, driver string) {
 	if err != nil {
 		log.Println(err, "unable to intialize docker client")
 	}
+	defer cli.Close()
 
 	volume, err := cli.VolumeCreate(
 		ctx,

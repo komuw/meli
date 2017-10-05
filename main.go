@@ -12,7 +12,6 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
@@ -208,14 +207,7 @@ func pullImage(ctx context.Context, s serviceConfig, networkID, networkName stri
 	}
 
 	// 3. Connect container to network
-	err = cli.NetworkConnect(
-		ctx,
-		networkID,
-		containerCreateResp.ID,
-		&network.EndpointSettings{})
-	if err != nil {
-		log.Println(err, "unable to connect container to network")
-	}
+	networkConnect(ctx, networkID, containerCreateResp.ID)
 
 	// 4. Start container
 	err = cli.ContainerStart(
