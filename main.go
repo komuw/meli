@@ -42,14 +42,12 @@ type serviceConfig struct {
 	Restart     string      `yaml:"restart,omitempty"`
 	Build       buildstruct `yaml:"build,omitempty"`
 	Volumes     []string    `yaml:"volumes,omitempty"`
-	//Links          yaml.MaporColonSlice `yaml:"links,omitempty"`
 }
 
 type dockerComposeConfig struct {
 	Version  string                   `yaml:"version,omitempty"`
 	Services map[string]serviceConfig `yaml:"services"`
 	Volumes  map[string]string        `yaml:"volumes,omitempty"`
-	//networks map[string]     `yaml:"networks,omitempty"`
 }
 
 func main() {
