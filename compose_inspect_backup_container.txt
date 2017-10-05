@@ -1,7 +1,7 @@
 [
     {
-        "Id": "6e6fa51f333f3775228e43a63d45165ff8ddd845bb260d5002fc614f07b52b48",
-        "Created": "2017-10-05T11:16:01.816914878Z",
+        "Id": "691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148",
+        "Created": "2017-10-03T15:03:52.918490019Z",
         "Path": "/bin/sh",
         "Args": [
             "-c",
@@ -14,18 +14,18 @@
             "Restarting": false,
             "OOMKilled": false,
             "Dead": false,
-            "Pid": 5717,
+            "Pid": 8087,
             "ExitCode": 0,
             "Error": "",
-            "StartedAt": "2017-10-05T11:16:04.114398719Z",
+            "StartedAt": "2017-10-03T15:03:56.155933122Z",
             "FinishedAt": "0001-01-01T00:00:00Z"
         },
-        "Image": "sha256:3834323b0a5a8924e41f783f36c16fe17e8869411fce9b1d6ad10d9240fb6cb5",
-        "ResolvConfPath": "/var/lib/docker/containers/6e6fa51f333f3775228e43a63d45165ff8ddd845bb260d5002fc614f07b52b48/resolv.conf",
-        "HostnamePath": "/var/lib/docker/containers/6e6fa51f333f3775228e43a63d45165ff8ddd845bb260d5002fc614f07b52b48/hostname",
-        "HostsPath": "/var/lib/docker/containers/6e6fa51f333f3775228e43a63d45165ff8ddd845bb260d5002fc614f07b52b48/hosts",
-        "LogPath": "/var/lib/docker/containers/6e6fa51f333f3775228e43a63d45165ff8ddd845bb260d5002fc614f07b52b48/6e6fa51f333f3775228e43a63d45165ff8ddd845bb260d5002fc614f07b52b48-json.log",
-        "Name": "/containerFromBuild2017-05-14-16-013916589616287113937",
+        "Image": "sha256:f43217bf07ee9059f4b0fc6b5f748b0cc7f80295e0d87bc301254c1042b21736",
+        "ResolvConfPath": "/var/lib/docker/containers/691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148/hostname",
+        "HostsPath": "/var/lib/docker/containers/691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148/hosts",
+        "LogPath": "/var/lib/docker/containers/691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148/691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148-json.log",
+        "Name": "/meli_backup_1",
         "RestartCount": 0,
         "Driver": "aufs",
         "MountLabel": "",
@@ -34,14 +34,14 @@
         "ExecIDs": null,
         "HostConfig": {
             "Binds": [
-                "meli_data-volume:/home:rw"
+                "meli_data-volume:/var:rw"
             ],
             "ContainerIDFile": "",
             "LogConfig": {
                 "Type": "json-file",
                 "Config": {}
             },
-            "NetworkMode": "meli_network_meli",
+            "NetworkMode": "meli_default",
             "PortBindings": {},
             "RestartPolicy": {
                 "Name": "",
@@ -49,7 +49,7 @@
             },
             "AutoRemove": false,
             "VolumeDriver": "",
-            "VolumesFrom": null,
+            "VolumesFrom": [],
             "CapAdd": null,
             "CapDrop": null,
             "Dns": null,
@@ -115,7 +115,7 @@
                 "Type": "volume",
                 "Name": "meli_data-volume",
                 "Source": "/var/lib/docker/volumes/meli_data-volume/_data",
-                "Destination": "/home",
+                "Destination": "/var",
                 "Driver": "local",
                 "Mode": "rw",
                 "RW": true,
@@ -123,7 +123,7 @@
             }
         ],
         "Config": {
-            "Hostname": "6e6fa51f333f",
+            "Hostname": "691b62040e49",
             "Domainname": "",
             "User": "",
             "AttachStdin": false,
@@ -141,23 +141,30 @@
                 "tail -fn3 .dockerenv"
             ],
             "ArgsEscaped": true,
-            "Image": "meli_volumedockerfile",
+            "Image": "meli_backup",
             "Volumes": {
-                "/home": {}
+                "/var": {}
             },
             "WorkingDir": "",
             "Entrypoint": null,
             "OnBuild": null,
-            "Labels": {}
+            "Labels": {
+                "com.docker.compose.config-hash": "f3a1edaa858d7d2f8db279d14d55c619ecdfae19198e54db33c3cd324f369558",
+                "com.docker.compose.container-number": "1",
+                "com.docker.compose.oneoff": "False",
+                "com.docker.compose.project": "meli",
+                "com.docker.compose.service": "backup",
+                "com.docker.compose.version": "1.16.1"
+            }
         },
         "NetworkSettings": {
             "Bridge": "",
-            "SandboxID": "d7dda85b285fe642ea2d8b7f42935e89b5814b2f103d2bfad4419e16f259f91f",
+            "SandboxID": "60fcc2a770b55e2184ed1cd3aea68f809ca4bd4f92bb052a86d8990ef4dcee2d",
             "HairpinMode": false,
             "LinkLocalIPv6Address": "",
             "LinkLocalIPv6PrefixLen": 0,
             "Ports": {},
-            "SandboxKey": "/var/run/docker/netns/d7dda85b285f",
+            "SandboxKey": "/var/run/docker/netns/60fcc2a770b5",
             "SecondaryIPAddresses": null,
             "SecondaryIPv6Addresses": null,
             "EndpointID": "",
@@ -169,21 +176,22 @@
             "IPv6Gateway": "",
             "MacAddress": "",
             "Networks": {
-                "meli_network_meli": {
+                "meli_default": {
                     "IPAMConfig": null,
                     "Links": null,
                     "Aliases": [
-                        "6e6fa51f333f"
+                        "691b62040e49",
+                        "backup"
                     ],
-                    "NetworkID": "c97896847d7f051f35e8f02816ec0a4a3eeae8d18a8cb478f60566f01b42007f",
-                    "EndpointID": "267e4666f6882e1bc570341290bccf557e828e72b2b297ce447fbd3f2f534756",
+                    "NetworkID": "caea2137118c04f6f1414cec9df3d70da6956607a0fbc238fa561c3f8733ba59",
+                    "EndpointID": "1bac8b9433f4a9b377a9d44c330c968a7bb6a298f397e19b044873fda5f20cbe",
                     "Gateway": "172.18.0.1",
-                    "IPAddress": "172.18.0.4",
+                    "IPAddress": "172.18.0.2",
                     "IPPrefixLen": 16,
                     "IPv6Gateway": "",
                     "GlobalIPv6Address": "",
                     "GlobalIPv6PrefixLen": 0,
-                    "MacAddress": "02:42:ac:12:00:04",
+                    "MacAddress": "02:42:ac:12:00:02",
                     "DriverOpts": null
                 }
             }

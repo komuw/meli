@@ -25,6 +25,8 @@ import (
 2. https://docs.docker.com/engine/api/v1.31/
 */
 
+type emptyStruct struct{}
+
 type buildstruct struct {
 	// remember to use caps so that they can be exported
 	Context    string `yaml:"context,omitempty"`
@@ -39,16 +41,15 @@ type serviceConfig struct {
 	Command     string      `yaml:"command,flow,omitempty"`
 	Restart     string      `yaml:"restart,omitempty"`
 	Build       buildstruct `yaml:"build,omitempty"`
-	//Volumes     []string `yaml:"volumes,omitempty"`
-	//VolumesFrom []string `yaml:"volumes_from,omitempty"`
+	Volumes     []string    `yaml:"volumes,omitempty"`
 	//Links          yaml.MaporColonSlice `yaml:"links,omitempty"`
 }
 
 type dockerComposeConfig struct {
 	Version  string                   `yaml:"version,omitempty"`
 	Services map[string]serviceConfig `yaml:"services"`
+	Volumes  map[string]string        `yaml:"volumes,omitempty"`
 	//networks map[string]     `yaml:"networks,omitempty"`
-	//volumes map[string]                  `yaml:"volumes,omitempty"`
 }
 
 func main() {
@@ -72,29 +73,43 @@ func main() {
 		log.Fatal(err, "unable to parse docker-compose file contents")
 	}
 
+	ctx := context.Background()
+
+	// Create top level volumes, if any
+	if len(dockerCyaml.Volumes) > 0 {
+		fmt.Println("len", len(dockerCyaml.Volumes))
+		for k := range dockerCyaml.Volumes {
+			// TODO we need to synchronise here else we'll get a race
+			// but I think we can get away for now because:
+			// 1. there are on average a lot more containers in a compose file
+			// than volumes, so the sync in the for loop for containers is enough
+			// 2. since we intend to stream logs as containers run(see; issues/24);
+			// then meli will be up long enough for the volume creation goroutines to have finished.
+			go CreateDockerVolume(ctx, "meli_"+k, "local")
+		}
+	}
+
 	var wg sync.WaitGroup
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
 		fmt.Println("docker service", v)
-		//go fakepullImage(v, networkID, networkName, &wg)
-		go pullImage(v, networkID, networkName, &wg)
+		//go fakepullImage(ctx, v, networkID, networkName, &wg)
+		go pullImage(ctx, v, networkID, networkName, &wg)
 	}
 	wg.Wait()
 }
 
-func fakepullImage(s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
+func fakepullImage(ctx context.Context, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	fmt.Println()
-
 }
 
-func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
+func pullImage(ctx context.Context, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	fmt.Println()
 	fmt.Println("docker servie:", s)
 	fmt.Println()
 
-	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		log.Fatal(err, "unable to intialize docker client")
@@ -121,7 +136,6 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 	}
 	//2.2 make ports
 	portsMap := make(map[nat.Port]struct{})
-	type emptyStruct struct{}
 	portBindingMap := make(map[nat.Port][]nat.PortBinding)
 	if len(s.Ports) > 0 {
 		for _, v := range s.Ports {
@@ -161,6 +175,17 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 		imageName = BuildDockerImage(ctx, s.Build.Dockerfile)
 	}
 
+	//2.6 add volumes
+	volume := make(map[string]struct{})
+	binds := []string{}
+	if len(s.Volumes) > 0 {
+		vol := fomatServiceVolumes(s.Volumes[0])
+		volume[vol[1]] = emptyStruct{}
+		// TODO: handle other read/write modes
+		whatToBind := "meli_" + vol[0] + ":" + vol[1] + ":rw"
+		binds = append(binds, whatToBind)
+	}
+
 	// TODO: we should skip creating the container again if already exists
 	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
@@ -170,12 +195,14 @@ func pullImage(s serviceConfig, networkID, networkName string, wg *sync.WaitGrou
 			Labels:       labelsMap,
 			Env:          s.Environment,
 			ExposedPorts: portsMap,
-			Cmd:          cmd},
+			Cmd:          cmd,
+			Volumes:      volume},
 		&container.HostConfig{
 			PublishAllPorts: false,
 			PortBindings:    portBindingMap,
 			NetworkMode:     container.NetworkMode(networkName),
-			RestartPolicy:   restartPolicy},
+			RestartPolicy:   restartPolicy,
+			Binds:           binds},
 		nil,
 		formattedImageName)
 	if err != nil {

@@ -1,0 +1,30 @@
+// 1. created via docker compose
+
+docker volume inspect meli_data-volume
+[
+    {
+        "Driver": "local",
+        "Labels": {
+            "com.docker.compose.project": "meli",
+            "com.docker.compose.volume": "data-volume"
+        },
+        "Mountpoint": "/var/lib/docker/volumes/meli_data-volume/_data",
+        "Name": "meli_data-volume",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+
+
+// 2. created via meli
+docker volume inspect meli_data-volume
+[
+    {
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/meli_data-volume/_data",
+        "Name": "meli_data-volume",
+        "Options": {},
+        "Scope": "local"
+    }
+]

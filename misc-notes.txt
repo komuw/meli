@@ -1,91 +1,33 @@
-$ docker-compose up
-Creating network "meli_default" with the default driver
-Pulling nats (nats:latest)...
+So for service level volumes, we need to add:
+- Binds
+- Mounts
+- Volumes
 
-$ docker-compose up -d; docker network inspect container_id
-"Config": {
-    "AttachStderr": false,
-    "ExposedPorts": {
-        "22/tcp": {},
-        "6379/tcp": {}
-    },
-    "Tty": false,
-...
-"HostConfig": {
-    "NetworkMode": "meli_default",
-    "PortBindings": {
-        "22/tcp": [
-            {
-                "HostIp": "",
-                "HostPort": "6400"
-            }
-        ],
-        "6379/tcp": [
-            {
-                "HostIp": "",
-                "HostPort": "6300"
-            }
-        ]
-    },
-    "RestartPolicy": {
-        "Name": "",
-        "MaximumRetryCount": 0
-    },
+// "HostConfig": {
+//     "Binds": [
+//         "meli_data-volume:/home:rw"
+//     ],
+// "Mounts": [
+//     {
+//         "Type": "volume",
+//         "Name": "meli_data-volume",
+//         "Source": "/var/lib/docker/volumes/meli_data-volume/_data",
+//         "Destination": "/home",
+//         "Driver": "local",
+//         "Mode": "rw",
+//         "RW": true,
+//         "Propagation": ""
+//     }
+// ],
+// "Config": {
+//     "Image": "meli_db",
+//     "Volumes": {
+//         "/home": {}
+//     },
 
-$ meli 
-"Config": {
-    "AttachStderr": false,
-    "ExposedPorts": {
-        "22/tcp": {},
-        "6379/tcp": {}
-    },
-    "Tty": false,
 
-// that looks ok. BUT
+Volumes are in container.Config
+Binds are in HostConfig(container.HostConfig)
 
-"HostConfig": {
-    "Binds": null,
-    "ContainerIDFile": "",
-    "LogConfig": {
-        "Type": "json-file",
-        "Config": {}
-    },
-    "NetworkMode": "default",
-    "PortBindings": {
-        "22/tcp": [
-            {
-                "HostIp": "",
-                "HostPort": ""
-            },
-            {
-                "HostIp": "",
-                "HostPort": ""
-            },
-            {
-                "HostIp": "",
-                "HostPort": "6300"
-            },
-            {
-                "HostIp": "",
-                "HostPort": "6400"
-            }
-        ],
-        "6379/tcp": [
-            {
-                "HostIp": "",
-                "HostPort": ""
-            },
-            {
-                "HostIp": "",
-                "HostPort": ""
-            },
-            {
-                "HostIp": "",
-                "HostPort": "6300"
-            }
-        ]
-    },
-    "RestartPolicy": {
-        "Name": "",
-        "MaximumRetryCount": 0
-    },
+Mounts, I'm guessing are an emergent property of the first two. 
+So we'll create the first two, then see if the third emerges.
