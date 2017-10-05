@@ -25,6 +25,8 @@ import (
 2. https://docs.docker.com/engine/api/v1.31/
 */
 
+type emptyStruct struct{}
+
 type buildstruct struct {
 	// remember to use caps so that they can be exported
 	Context    string `yaml:"context,omitempty"`
@@ -91,8 +93,8 @@ func main() {
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
 		fmt.Println("docker service", v)
-		go fakepullImage(ctx, v, networkID, networkName, &wg)
-		//go pullImage(ctx, v, networkID, networkName, &wg)
+		//go fakepullImage(ctx, v, networkID, networkName, &wg)
+		go pullImage(ctx, v, networkID, networkName, &wg)
 	}
 	wg.Wait()
 }
@@ -134,7 +136,6 @@ func pullImage(ctx context.Context, s serviceConfig, networkID, networkName stri
 	}
 	//2.2 make ports
 	portsMap := make(map[nat.Port]struct{})
-	type emptyStruct struct{}
 	portBindingMap := make(map[nat.Port][]nat.PortBinding)
 	if len(s.Ports) > 0 {
 		for _, v := range s.Ports {
@@ -177,21 +178,8 @@ func pullImage(ctx context.Context, s serviceConfig, networkID, networkName stri
 	//2.6 add volumes
 	volume := make(map[string]struct{})
 	if len(s.Volumes) > 0 {
-		//Volumes map[string]struct{}
-
-		x := fomatServiceVolumes(s.Volumes[0])
-		fmt.Println()
-		fmt.Printf("x %+v ", x[1])
-
-		portsMap[port] = emptyStruct{}
-
-		volume
-
-		fmt.Println()
-
-		// "Volumes": {
-		//         "/home": {}
-		//     }
+		vol := fomatServiceVolumes(s.Volumes[0])
+		volume[vol[1]] = emptyStruct{}
 	}
 
 	// TODO: we should skip creating the container again if already exists
@@ -203,7 +191,8 @@ func pullImage(ctx context.Context, s serviceConfig, networkID, networkName stri
 			Labels:       labelsMap,
 			Env:          s.Environment,
 			ExposedPorts: portsMap,
-			Cmd:          cmd},
+			Cmd:          cmd,
+			Volumes:      volume},
 		&container.HostConfig{
 			PublishAllPorts: false,
 			PortBindings:    portBindingMap,

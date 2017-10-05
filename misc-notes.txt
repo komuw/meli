@@ -26,8 +26,8 @@ So for service level volumes, we need to add:
 //     },
 
 
-Binds are in HostConfig(container.HostConfig)
 Volumes are in container.Config
+Binds are in HostConfig(container.HostConfig)
 
 Mounts, I'm guessing are an emergent property of the first two. 
 So we'll create the first two, then see if the third emerges.
