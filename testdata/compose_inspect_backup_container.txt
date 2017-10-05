@@ -1,0 +1,200 @@
+[
+    {
+        "Id": "691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148",
+        "Created": "2017-10-03T15:03:52.918490019Z",
+        "Path": "/bin/sh",
+        "Args": [
+            "-c",
+            "tail -fn3 .dockerenv"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 8087,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2017-10-03T15:03:56.155933122Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:f43217bf07ee9059f4b0fc6b5f748b0cc7f80295e0d87bc301254c1042b21736",
+        "ResolvConfPath": "/var/lib/docker/containers/691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148/hostname",
+        "HostsPath": "/var/lib/docker/containers/691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148/hosts",
+        "LogPath": "/var/lib/docker/containers/691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148/691b62040e49541f5bbc455c2cc7c04a58dc94a3716ab24c86fcc5b6f8c17148-json.log",
+        "Name": "/meli_backup_1",
+        "RestartCount": 0,
+        "Driver": "aufs",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "docker-default",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "meli_data-volume:/var:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "meli_default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": [],
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": -1,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0
+        },
+        "GraphDriver": {
+            "Data": null,
+            "Name": "aufs"
+        },
+        "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "meli_data-volume",
+                "Source": "/var/lib/docker/volumes/meli_data-volume/_data",
+                "Destination": "/var",
+                "Driver": "local",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+        "Config": {
+            "Hostname": "691b62040e49",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "tail -fn3 .dockerenv"
+            ],
+            "ArgsEscaped": true,
+            "Image": "meli_backup",
+            "Volumes": {
+                "/var": {}
+            },
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "com.docker.compose.config-hash": "f3a1edaa858d7d2f8db279d14d55c619ecdfae19198e54db33c3cd324f369558",
+                "com.docker.compose.container-number": "1",
+                "com.docker.compose.oneoff": "False",
+                "com.docker.compose.project": "meli",
+                "com.docker.compose.service": "backup",
+                "com.docker.compose.version": "1.16.1"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "60fcc2a770b55e2184ed1cd3aea68f809ca4bd4f92bb052a86d8990ef4dcee2d",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/60fcc2a770b5",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "meli_default": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": [
+                        "691b62040e49",
+                        "backup"
+                    ],
+                    "NetworkID": "caea2137118c04f6f1414cec9df3d70da6956607a0fbc238fa561c3f8733ba59",
+                    "EndpointID": "1bac8b9433f4a9b377a9d44c330c968a7bb6a298f397e19b044873fda5f20cbe",
+                    "Gateway": "172.18.0.1",
+                    "IPAddress": "172.18.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:12:00:02",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]

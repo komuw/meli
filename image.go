@@ -50,7 +50,7 @@ func BuildDockerImage(ctx context.Context, dockerFile string) string {
 	}
 	dockerFileReader, err := os.Open(dockerFile)
 	if err != nil {
-		log.Println(err, " :unable to open Dockerfile")
+		log.Println(err, " :unable to open Dockerfile, ", dockerFile)
 	}
 	readDockerFile, err := ioutil.ReadAll(dockerFileReader)
 	if err != nil {

@@ -8,3 +8,10 @@ Meli is a Swahili word meaning ship; so think of Meli as a ship carrying your do
 It's currently work in progress.
 
 I only intend to support docker-compose version 3+; https://docs.docker.com/compose/compose-file/compose-versioning/
+
+
+# Usage                   
+`go build -o meli *.go`           
+`cp meli testdata/`                 
+`cd testdata`               
+`./meli`                

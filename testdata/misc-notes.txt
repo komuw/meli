@@ -1,0 +1,33 @@
+So for service level volumes, we need to add:
+- Binds
+- Mounts
+- Volumes
+
+// "HostConfig": {
+//     "Binds": [
+//         "meli_data-volume:/home:rw"
+//     ],
+// "Mounts": [
+//     {
+//         "Type": "volume",
+//         "Name": "meli_data-volume",
+//         "Source": "/var/lib/docker/volumes/meli_data-volume/_data",
+//         "Destination": "/home",
+//         "Driver": "local",
+//         "Mode": "rw",
+//         "RW": true,
+//         "Propagation": ""
+//     }
+// ],
+// "Config": {
+//     "Image": "meli_db",
+//     "Volumes": {
+//         "/home": {}
+//     },
+
+
+Volumes are in container.Config
+Binds are in HostConfig(container.HostConfig)
+
+Mounts, I'm guessing are an emergent property of the first two. 
+So we'll create the first two, then see if the third emerges.
