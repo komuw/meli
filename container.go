@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"strings"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
@@ -104,4 +107,44 @@ func CreateContainer(ctx context.Context, s serviceConfig, networkName, formatte
 	}
 
 	return containerCreateResp
+}
+
+func ContainerStart(ctx context.Context, containerId string) {
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		log.Println(err, "unable to intialize docker client")
+	}
+	defer cli.Close()
+
+	err = cli.ContainerStart(
+		ctx,
+		containerId,
+		types.ContainerStartOptions{})
+	if err != nil {
+		log.Println(err, "unable to start container")
+	}
+}
+
+func ContainerLogs(ctx context.Context, containerId string) {
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		log.Println(err, "unable to intialize docker client")
+	}
+	defer cli.Close()
+
+	containerLogResp, err := cli.ContainerLogs(
+		ctx,
+		containerId,
+		types.ContainerLogsOptions{
+			ShowStdout: true,
+			ShowStderr: true,
+			Timestamps: true})
+	if err != nil {
+		log.Println(err, "unable to get container logs")
+	}
+	defer containerLogResp.Close()
+	_, err = io.Copy(os.Stdout, containerLogResp)
+	if err != nil {
+		log.Println(err, "unable to write to stdout")
+	}
 }

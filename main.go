@@ -3,14 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"sync"
-
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
 
 	"gopkg.in/yaml.v2"
 )
@@ -99,21 +95,11 @@ func fakepullImage(ctx context.Context, s serviceConfig, networkName, networkID 
 
 func pullImage(ctx context.Context, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	fmt.Println()
-	fmt.Println("docker servie:", s)
-	fmt.Println()
-
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		log.Fatal(err, "unable to intialize docker client")
-	}
-	defer cli.Close()
 
 	// 1. Pull Image
 	formattedImageName := fomatImageName("containerFromBuild")
 	if len(s.Image) > 0 {
 		formattedImageName = fomatImageName(s.Image)
-		// TODO move cli.ImagePull into image.go
 		PullDockerImage(ctx, s.Image)
 	}
 
@@ -124,28 +110,8 @@ func pullImage(ctx context.Context, s serviceConfig, networkID, networkName stri
 	networkConnect(ctx, networkID, containerCreateResp.ID)
 
 	// 4. Start container
-	err = cli.ContainerStart(
-		ctx,
-		containerCreateResp.ID,
-		types.ContainerStartOptions{})
-	if err != nil {
-		log.Println(err, "unable to start container")
-	}
+	ContainerStart(ctx, containerCreateResp.ID)
 
 	// 5. Stream container logs to stdOut
-	containerLogResp, err := cli.ContainerLogs(
-		ctx,
-		containerCreateResp.ID,
-		types.ContainerLogsOptions{
-			ShowStdout: true,
-			ShowStderr: true,
-			Timestamps: true})
-	if err != nil {
-		log.Println(err, "unable to get container logs")
-	}
-	defer containerLogResp.Close()
-	_, err = io.Copy(os.Stdout, containerLogResp)
-	if err != nil {
-		log.Println(err, "unable to write to stdout")
-	}
+	ContainerLogs(ctx, containerCreateResp.ID)
 }
