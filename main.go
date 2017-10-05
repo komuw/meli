@@ -79,17 +79,17 @@ func main() {
 	var wg sync.WaitGroup
 	for _, v := range dockerCyaml.Services {
 		wg.Add(1)
-		//go fakepullImage(ctx, v, networkID, networkName, &wg)
-		go pullImage(ctx, v, networkID, networkName, &wg)
+		//go fakestartContainers(ctx, v, networkID, networkName, &wg)
+		go startContainers(ctx, v, networkID, networkName, &wg)
 	}
 	wg.Wait()
 }
 
-func fakepullImage(ctx context.Context, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
+func fakestartContainers(ctx context.Context, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 }
 
-func pullImage(ctx context.Context, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
+func startContainers(ctx context.Context, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	/*
