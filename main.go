@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -99,9 +100,10 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 		4. Start container
 		5. Stream container logs
 	*/
-
+	fmt.Println("1")
 	formattedContainerName := formatContainerName(k)
 	if len(s.Image) > 0 {
+		fmt.Println("2. will pull")
 		err := PullDockerImage(ctx, s.Image)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
@@ -109,6 +111,7 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 			return
 		}
 	}
+	fmt.Println("3. create container")
 	containerCreateResp := CreateContainer(
 		ctx,
 		s,
