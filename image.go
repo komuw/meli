@@ -5,25 +5,36 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/base64"
+	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
+	"os/user"
 	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )
 
-func PullDockerImage(ctx context.Context, imageName string) {
+func PullDockerImage(ctx context.Context, imageName string) error {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		log.Println(err, "unable to intialize docker client")
 	}
 	defer cli.Close()
+
+	GetRegistryAuth, err := GetRegistryAuth(imageName)
+	if err != nil {
+		log.Println(err, "unable to get registry credentials for image, ", imageName)
+		return err
+	}
+
 	imagePullResp, err := cli.ImagePull(
 		ctx,
 		imageName,
-		types.ImagePullOptions{})
+		types.ImagePullOptions{RegistryAuth: GetRegistryAuth})
 	if err != nil {
 		log.Println(err, "unable to pull image")
 	}
@@ -39,6 +50,7 @@ func PullDockerImage(ctx context.Context, imageName string) {
 		log.Println(err, "error in scanning")
 	}
 
+	return nil
 }
 
 func BuildDockerImage(ctx context.Context, dockerFile string) string {
@@ -105,5 +117,59 @@ func BuildDockerImage(ctx context.Context, dockerFile string) string {
 	}
 
 	return imageName
+
+}
+
+func GetRegistryAuth(imageName string) (string, error) {
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal(err, "unable to find current user")
+	}
+	// TODO: the config can be in many places
+	// try to find them and use them; https://github.com/docker/docker-py/blob/e9fab1432b974ceaa888b371e382dfcf2f6556e4/docker/auth.py#L269
+	dockerAuth, err := ioutil.ReadFile(usr.HomeDir + "/.docker/config.json")
+	if err != nil {
+		log.Fatal(err, "unable to read docker auth file, ~/.docker/config.json")
+	}
+
+	type AuthData struct {
+		Auths map[string]map[string]string `json:"auths,omitempty"`
+	}
+	data := &AuthData{}
+	err = json.Unmarshal([]byte(dockerAuth), data)
+	if err != nil {
+		log.Fatal(err, "unable to unmarshal")
+	}
+
+	encodedAuth := "placeholder"
+	// TODO: we are only checking for dockerHub and quay.io
+	// registries, we should probably be exhaustive in future.
+	if strings.Contains(imageName, "quay") {
+		// quay
+		encodedAuth = data.Auths["quay.io"]["auth"]
+	} else {
+		encodedAuth = data.Auths["https://index.docker.io/v1/"]["auth"]
+	}
+
+	if encodedAuth == "" {
+		return "", errors.New("Unable to get credentials to registry. Have you done docker login")
+	}
+
+	yourAuth, err := base64.StdEncoding.DecodeString(encodedAuth)
+	if err != nil {
+		log.Fatal(err, "unable to base64 decode")
+	}
+	userPass := fomatRegistryAuth(string(yourAuth))
+	username := userPass[0]
+	password := userPass[1]
+
+	stringRegistryAuth := `{"username": "DOCKERUSERNAME", "password": "DOCKERPASSWORD", "email": null, "serveraddress": "https://index.docker.io/v1/"}`
+
+	stringRegistryAuth = strings.Replace(stringRegistryAuth, "DOCKERUSERNAME", username, 1)
+	stringRegistryAuth = strings.Replace(stringRegistryAuth, "DOCKERPASSWORD", password, 1)
+
+	RegistryAuth := base64.URLEncoding.EncodeToString([]byte(stringRegistryAuth))
+
+	return RegistryAuth, nil
 
 }

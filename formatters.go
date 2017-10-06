@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-func fomatImageName(imagename string) string {
+func formatContainerName(containerName string) string {
 	// container names are supposed to be unique
-	// since we are using the image name as the container name
+	// since we are using the docker-compose service as the container name
 	// make it unique by adding a time.
 	// TODO: we should skip creating the container again if already exists
 	// instead of creating a uniquely named container name
@@ -22,7 +22,7 @@ func fomatImageName(imagename string) string {
 		}
 		return false
 	}
-	return strings.FieldsFunc(imagename, f)[0] + now.Format("2006-02-15-04-05") + strconv.Itoa(rand.Int())
+	return strings.FieldsFunc(containerName, f)[0] + now.Format("2006-02-15-04-05") + strconv.Itoa(rand.Int())
 }
 
 func fomatLabels(label string) []string {
@@ -68,6 +68,19 @@ func fomatServiceVolumes(volume string) []string {
 	// TODO: we should trim any whitespace before returning.
 	// this will prevent labels like type= web
 	return strings.FieldsFunc(volume, f)
+}
+
+func fomatRegistryAuth(auth string) []string {
+	f := func(c rune) bool {
+		if c == 58 {
+			// 58 is the ':' character
+			return true
+		}
+		return false
+	}
+	// TODO: we should trim any whitespace before returning.
+	// this will prevent labels like type= web
+	return strings.FieldsFunc(auth, f)
 }
 
 type popagateError struct {
