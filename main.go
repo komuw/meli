@@ -103,7 +103,12 @@ func startContainers(ctx context.Context, s serviceConfig, networkID, networkNam
 	formattedImageName := fomatImageName("containerFromBuild")
 	if len(s.Image) > 0 {
 		formattedImageName = fomatImageName(s.Image)
-		PullDockerImage(ctx, s.Image)
+		err := PullDockerImage(ctx, s.Image)
+		if err != nil {
+			// clean exit since we want other goroutines for fetching other images
+			// to continue running
+			return
+		}
 	}
 	containerCreateResp := CreateContainer(
 		ctx,
