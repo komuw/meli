@@ -77,19 +77,19 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
-	for _, v := range dockerCyaml.Services {
+	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
-		//go fakestartContainers(ctx, v, networkID, networkName, &wg)
-		go startContainers(ctx, v, networkID, networkName, &wg)
+		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg)
+		go startContainers(ctx, k, v, networkID, networkName, &wg)
 	}
 	wg.Wait()
 }
 
-func fakestartContainers(ctx context.Context, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
+func fakestartContainers(ctx context.Context, k string, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 }
 
-func startContainers(ctx context.Context, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
+func startContainers(ctx context.Context, k string, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	/*
@@ -100,9 +100,8 @@ func startContainers(ctx context.Context, s serviceConfig, networkID, networkNam
 		5. Stream container logs
 	*/
 
-	formattedImageName := fomatImageName("containerFromBuild")
+	formattedContainerName := formatContainerName(k)
 	if len(s.Image) > 0 {
-		formattedImageName = fomatImageName(s.Image)
 		err := PullDockerImage(ctx, s.Image)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
@@ -114,7 +113,7 @@ func startContainers(ctx context.Context, s serviceConfig, networkID, networkNam
 		ctx,
 		s,
 		networkName,
-		formattedImageName)
+		formattedContainerName)
 	networkConnect(
 		ctx,
 		networkID,

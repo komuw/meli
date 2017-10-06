@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-func fomatImageName(imagename string) string {
+func formatContainerName(containerName string) string {
 	// container names are supposed to be unique
-	// since we are using the image name as the container name
+	// since we are using the docker-compose service as the container name
 	// make it unique by adding a time.
 	// TODO: we should skip creating the container again if already exists
 	// instead of creating a uniquely named container name
@@ -22,7 +22,7 @@ func fomatImageName(imagename string) string {
 		}
 		return false
 	}
-	return strings.FieldsFunc(imagename, f)[0] + now.Format("2006-02-15-04-05") + strconv.Itoa(rand.Int())
+	return strings.FieldsFunc(containerName, f)[0] + now.Format("2006-02-15-04-05") + strconv.Itoa(rand.Int())
 }
 
 func fomatLabels(label string) []string {
