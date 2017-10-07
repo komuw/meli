@@ -108,22 +108,44 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
+			log.Println(err)
 			return
 		}
 	}
 	fmt.Println("3. create container")
-	containerCreateResp := CreateContainer(
+	containerID, err := CreateContainer(
 		ctx,
 		s,
 		networkName,
 		formattedContainerName)
-	networkConnect(
+	if err != nil {
+		// clean exit since we want other goroutines for fetching other images
+		// to continue running
+		log.Println(err)
+		return
+	}
+
+	err = networkConnect(
 		ctx,
 		networkID,
-		containerCreateResp.ID)
-	ContainerStart(
-		ctx, containerCreateResp.ID)
-	ContainerLogs(
+		containerID)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	err = ContainerStart(
+		ctx, containerID)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	err = ContainerLogs(
 		ctx,
-		containerCreateResp.ID)
+		containerID)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }

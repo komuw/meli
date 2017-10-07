@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -52,10 +52,12 @@ func getNetwork(networkName string) (string, error) {
 
 }
 
-func networkConnect(ctx context.Context, networkID, containerID string) {
+func networkConnect(ctx context.Context, networkID, containerID string) error {
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		log.Println(err, "unable to intialize docker client")
+		return &popagateError{
+			originalErr: err,
+			newErr:      errors.New("unable to intialize docker client")}
 	}
 	defer cli.Close()
 	err = cli.NetworkConnect(
@@ -64,8 +66,12 @@ func networkConnect(ctx context.Context, networkID, containerID string) {
 		containerID,
 		&network.EndpointSettings{})
 	if err != nil {
-		log.Println(err, "unable to connect container to network")
+		return &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf("unable to connect container %s to network %s", containerID, networkID)}
+
 	}
+	return nil
 }
 
 func getCwdName(path string) string {
