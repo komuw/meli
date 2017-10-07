@@ -154,7 +154,11 @@ func ContainerLogs(ctx context.Context, containerId string) error {
 		types.ContainerLogsOptions{
 			ShowStdout: true,
 			ShowStderr: true,
-			Timestamps: true})
+			Timestamps: true,
+			Follow:     true,
+			Details:    true,
+			Tail:       "all"})
+
 	if err != nil {
 		if err != nil {
 			return &popagateError{
