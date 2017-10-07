@@ -36,10 +36,11 @@ Usage of meli:
 ```
 
 # Build                   
+`git clone git@github.com:komuW/meli.git`           
 `go build -o meli *.go`           
-`cp meli testdata/`                 
-`cd testdata`               
-`./meli`                
+`cp meli /dir/with/docker-compose-file/`                 
+`cd /dir/with/docker-compose-file/`               
+`./meli -up`                
 
 
 # Benchmarks
