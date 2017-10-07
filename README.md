@@ -43,10 +43,11 @@ Usage of meli:
 
 
 # Benchmarks
-Aaah, everyones favorite vanity metric yet no one seems to know how to conduct one in a consistent and scientific manner.          
-Take any results you see here with a large spoon of salt; They are unscientific and reeks of all that is wrong with most developer benchmarks.             
+Aaah, everyones' favorite vanity metric yet no one seems to know how to conduct one in a consistent and scientific manner.          
+Take any results you see here with a large spoon of salt; They are unscientific and reek of all that is wrong with most developer benchmarks.             
 
-Having made that disclaimer,               
+Having made that disclaimer,                 
+
 test machine:             
 `lsb_release -a`
 ```bash
