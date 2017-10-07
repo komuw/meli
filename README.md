@@ -75,7 +75,7 @@ git master branch head as of commit https://github.com/komuW/meli/commit/c27cb87
 NB: I haven't started making Meli versions since it's still early days.           
 
 Benchmark test:           
-` this docker-compose; https://github.com/komuW/meli/blob/master/testdata/docker-compose.yml`
+[this docker-compose file](https://github.com/komuW/meli/blob/master/testdata/docker-compose.yml)
 
 Benchmark script: 
 for docker-compose:      
