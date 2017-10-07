@@ -77,7 +77,7 @@ NB: I haven't started making Meli versions since it's still early days.
 Benchmark test:           
 [this docker-compose file](https://github.com/komuW/meli/blob/master/testdata/docker-compose.yml)
 
-Benchmark script: 
+Benchmark script:               
 for docker-compose:      
 `docker ps -aq | xargs docker rm -f; docker system prune -af; /usr/bin/time -apv docker-compose up -d`        
 for meli:                
