@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,6 +15,8 @@ import (
 1. https://godoc.org/github.com/moby/moby/client
 2. https://docs.docker.com/engine/api/v1.31/
 */
+
+var Version = "0.0.0.1"
 
 type emptyStruct struct{}
 
@@ -41,6 +44,8 @@ type dockerComposeConfig struct {
 }
 
 func main() {
+	Cli()
+
 	data, err := ioutil.ReadFile("docker-compose.yml")
 	if err != nil {
 		log.Fatal(err, "unable to read docker-compose file")
@@ -83,6 +88,37 @@ func main() {
 		go startContainers(ctx, k, v, networkID, networkName, &wg)
 	}
 	wg.Wait()
+}
+
+func Cli() {
+	var showVersion bool
+	var up bool
+
+	flag.BoolVar(
+		&showVersion,
+		"version",
+		false,
+		"Show version information.")
+	flag.BoolVar(
+		&showVersion,
+		"v",
+		false,
+		"Show version information.")
+	flag.BoolVar(
+		&up,
+		"up",
+		false,
+		"Builds, re/creates, starts, and attaches to containers for a service")
+
+	flag.Parse()
+
+	if showVersion {
+		log.Println("Meli version:", Version)
+		os.Exit(0)
+	}
+	if !up {
+		os.Exit(0)
+	}
 }
 
 func fakestartContainers(ctx context.Context, k string, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
