@@ -30,7 +30,7 @@ func GetAuth(imageName string) (string, string, string, error) {
 	if err != nil {
 		return "", "", "", &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to find current user")}
+			newErr:      errors.New(" :unable to find current user")}
 	}
 	// TODO: the config can be in many places
 	// try to find them and use them; https://github.com/docker/docker-py/blob/e9fab1432b974ceaa888b371e382dfcf2f6556e4/docker/auth.py#L269
@@ -38,7 +38,7 @@ func GetAuth(imageName string) (string, string, string, error) {
 	if err != nil {
 		return "", "", "", &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to read docker auth file, ~/.docker/config.json")}
+			newErr:      errors.New(" :unable to read docker auth file, ~/.docker/config.json")}
 	}
 
 	type AuthData struct {
@@ -49,7 +49,7 @@ func GetAuth(imageName string) (string, string, string, error) {
 	if err != nil {
 		return "", "", "", &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to unmarshal auth info")}
+			newErr:      errors.New(" :unable to unmarshal auth info")}
 	}
 
 	encodedAuth := "placeholder"
@@ -67,14 +67,14 @@ func GetAuth(imageName string) (string, string, string, error) {
 
 	if encodedAuth == "" {
 		return "", "", "", &popagateError{
-			newErr: errors.New("unable to find any auth info in ~/.docker/config.json")}
+			newErr: errors.New(" :unable to find any auth info in ~/.docker/config.json")}
 	}
 
 	yourAuth, err := base64.StdEncoding.DecodeString(encodedAuth)
 	if err != nil {
 		return "", "", "", &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to base64 decode auth info")}
+			newErr:      errors.New(" :unable to base64 decode auth info")}
 	}
 	userPass := fomatRegistryAuth(string(yourAuth))
 	username := userPass[0]

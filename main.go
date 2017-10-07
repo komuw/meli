@@ -47,22 +47,22 @@ func main() {
 
 	data, err := ioutil.ReadFile("docker-compose.yml")
 	if err != nil {
-		log.Fatal(err, "unable to read docker-compose file")
+		log.Fatal(err, " :unable to read docker-compose file")
 	}
 	curentDir, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err, "unable to get the current working directory")
+		log.Fatal(err, " :unable to get the current working directory")
 	}
 	networkName := "meli_network_" + getCwdName(curentDir)
 	networkID, err := GetNetwork(networkName)
 	if err != nil {
-		log.Fatal(err, "unable to create/get network")
+		log.Fatal(err, " :unable to create/get network")
 	}
 
 	var dockerCyaml dockerComposeConfig
 	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
 	if err != nil {
-		log.Fatal(err, "unable to parse docker-compose file contents")
+		log.Fatal(err, " :unable to parse docker-compose file contents")
 	}
 
 	ctx := context.Background()
