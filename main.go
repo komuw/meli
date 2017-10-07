@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -100,19 +99,17 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 		4. Start container
 		5. Stream container logs
 	*/
-	fmt.Println("1")
+
 	formattedContainerName := formatContainerName(k)
 	if len(s.Image) > 0 {
-		fmt.Println("2. will pull")
 		err := PullDockerImage(ctx, s.Image)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
-			log.Println(err)
+			log.Println("\n", err)
 			return
 		}
 	}
-	fmt.Println("3. create container")
 	containerID, err := CreateContainer(
 		ctx,
 		s,
@@ -121,7 +118,7 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 	if err != nil {
 		// clean exit since we want other goroutines for fetching other images
 		// to continue running
-		log.Println(err)
+		log.Println("\n", err)
 		return
 	}
 
@@ -130,14 +127,15 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 		networkID,
 		containerID)
 	if err != nil {
-		log.Println(err)
+		// create whitespace so that error is visible to human
+		log.Println("\n", err)
 		return
 	}
 
 	err = ContainerStart(
 		ctx, containerID)
 	if err != nil {
-		log.Println(err)
+		log.Println("\n", err)
 		return
 	}
 
@@ -145,7 +143,7 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 		ctx,
 		containerID)
 	if err != nil {
-		log.Println(err)
+		log.Println("\n", err)
 		return
 	}
 }
