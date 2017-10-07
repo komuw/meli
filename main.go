@@ -50,7 +50,7 @@ func main() {
 		log.Fatal(err, "unable to get the current working directory")
 	}
 	networkName := "meli_network_" + getCwdName(curentDir)
-	networkID, err := getNetwork(networkName)
+	networkID, err := GetNetwork(networkName)
 	if err != nil {
 		log.Fatal(err, "unable to create/get network")
 	}
@@ -122,7 +122,7 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 		return
 	}
 
-	err = networkConnect(
+	err = ConnectNetwork(
 		ctx,
 		networkID,
 		containerID)

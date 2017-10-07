@@ -12,7 +12,7 @@ import (
 	"errors"
 )
 
-func getNetwork(networkName string) (string, error) {
+func GetNetwork(networkName string) (string, error) {
 	// create/get newtwork
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
@@ -52,7 +52,7 @@ func getNetwork(networkName string) (string, error) {
 
 }
 
-func networkConnect(ctx context.Context, networkID, containerID string) error {
+func ConnectNetwork(ctx context.Context, networkID, containerID string) error {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return &popagateError{
