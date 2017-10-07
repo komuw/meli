@@ -20,7 +20,6 @@ import (
 )
 
 func PullDockerImage(ctx context.Context, imageName string) error {
-	fmt.Println("imagename", imageName)
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		log.Println(err, "unable to intialize docker client")
@@ -106,12 +105,12 @@ func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
 	splitImageName := strings.Split(splitDockerfile[1], "\n")
 	imgFromDockerfile := splitImageName[0]
 
-	username, password, err := GetAuth(imgFromDockerfile)
+	registryURL, username, password, err := GetAuth(imgFromDockerfile)
 	if err != nil {
 		return "", &popagateError{originalErr: err}
 	}
 	AuthConfigs := make(map[string]types.AuthConfig)
-	AuthConfigs["https://index.docker.io/v1/"] = types.AuthConfig{Username: username, Password: password}
+	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}
 
 	imageBuildResponse, err := cli.ImageBuild(
 		ctx,
@@ -148,24 +147,25 @@ func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
 }
 
 func GetRegistryAuth(imageName string) (string, error) {
-	username, password, err := GetAuth(imageName)
+	registryURL, username, password, err := GetAuth(imageName)
 	if err != nil {
 		return "", &popagateError{originalErr: err}
 	}
 
-	stringRegistryAuth := `{"username": "DOCKERUSERNAME", "password": "DOCKERPASSWORD", "email": null, "serveraddress": "https://index.docker.io/v1/"}`
+	stringRegistryAuth := `{"username": "DOCKERUSERNAME", "password": "DOCKERPASSWORD", "email": null, "serveraddress": "DOCKERREGISTRYURL"}`
 
 	stringRegistryAuth = strings.Replace(stringRegistryAuth, "DOCKERUSERNAME", username, 1)
 	stringRegistryAuth = strings.Replace(stringRegistryAuth, "DOCKERPASSWORD", password, 1)
+	stringRegistryAuth = strings.Replace(stringRegistryAuth, "DOCKERREGISTRYURL", registryURL, 1)
 	RegistryAuth := base64.URLEncoding.EncodeToString([]byte(stringRegistryAuth))
 
 	return RegistryAuth, nil
 }
 
-func GetAuth(imageName string) (string, string, error) {
+func GetAuth(imageName string) (string, string, string, error) {
 	usr, err := user.Current()
 	if err != nil {
-		return "", "", &popagateError{
+		return "", "", "", &popagateError{
 			originalErr: err,
 			newErr:      errors.New("unable to find current user")}
 	}
@@ -173,7 +173,7 @@ func GetAuth(imageName string) (string, string, error) {
 	// try to find them and use them; https://github.com/docker/docker-py/blob/e9fab1432b974ceaa888b371e382dfcf2f6556e4/docker/auth.py#L269
 	dockerAuth, err := ioutil.ReadFile(usr.HomeDir + "/.docker/config.json")
 	if err != nil {
-		return "", "", &popagateError{
+		return "", "", "", &popagateError{
 			originalErr: err,
 			newErr:      errors.New("unable to read docker auth file, ~/.docker/config.json")}
 	}
@@ -184,29 +184,32 @@ func GetAuth(imageName string) (string, string, error) {
 	data := &AuthData{}
 	err = json.Unmarshal([]byte(dockerAuth), data)
 	if err != nil {
-		return "", "", &popagateError{
+		return "", "", "", &popagateError{
 			originalErr: err,
 			newErr:      errors.New("unable to unmarshal auth info")}
 	}
 
 	encodedAuth := "placeholder"
+	registryURL := "placeholder"
 	// TODO: we are only checking for dockerHub and quay.io
 	// registries, we should probably be exhaustive in future.
 	if strings.Contains(imageName, "quay") {
 		// quay
 		encodedAuth = data.Auths["quay.io"]["auth"]
+		registryURL = "quay.io"
 	} else {
 		encodedAuth = data.Auths["https://index.docker.io/v1/"]["auth"]
+		registryURL = "https://index.docker.io/v1/"
 	}
 
 	if encodedAuth == "" {
-		return "", "", &popagateError{
+		return "", "", "", &popagateError{
 			newErr: errors.New("unable to find any auth info in ~/.docker/config.json")}
 	}
 
 	yourAuth, err := base64.StdEncoding.DecodeString(encodedAuth)
 	if err != nil {
-		return "", "", &popagateError{
+		return "", "", "", &popagateError{
 			originalErr: err,
 			newErr:      errors.New("unable to base64 decode auth info")}
 	}
@@ -214,6 +217,6 @@ func GetAuth(imageName string) (string, string, error) {
 	username := userPass[0]
 	password := userPass[1]
 
-	return username, password, nil
+	return registryURL, username, password, nil
 
 }
