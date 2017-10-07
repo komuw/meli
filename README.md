@@ -10,6 +10,10 @@ It's currently work in progress.
 I only intend to support docker-compose version 3+; https://docs.docker.com/compose/compose-file/compose-versioning/
 
 
+# Installing          
+Very early test releases are available from the [releases page](https://github.com/komuW/meli/releases)          
+Currently we only have a linux 64bit release, but you can build your own. See the build section below.
+
 # Usage  
 `meli --help`         
 ```bash
