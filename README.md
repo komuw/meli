@@ -85,3 +85,5 @@ docker-compose  User time: 1.61 sec  Elapsed wall clock time: 63.57 sec
 meli            User time: 0.04 sec  Elapsed wall clock time: 28.43 sec
 
 Thus meli appears to be 2.2 times faster than docker-compose(by wall clock).       
+There are still some low hanging fruits performance wise that I'll target in future.        
+But I'm not making a tool to take docker-compose to the races.
