@@ -50,7 +50,7 @@ func main() {
 		log.Fatal(err, "unable to get the current working directory")
 	}
 	networkName := "meli_network_" + getCwdName(curentDir)
-	networkID, err := getNetwork(networkName)
+	networkID, err := GetNetwork(networkName)
 	if err != nil {
 		log.Fatal(err, "unable to create/get network")
 	}
@@ -106,21 +106,44 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
+			log.Println("\n", err)
 			return
 		}
 	}
-	containerCreateResp := CreateContainer(
+	containerID, err := CreateContainer(
 		ctx,
 		s,
 		networkName,
 		formattedContainerName)
-	networkConnect(
+	if err != nil {
+		// clean exit since we want other goroutines for fetching other images
+		// to continue running
+		log.Println("\n", err)
+		return
+	}
+
+	err = ConnectNetwork(
 		ctx,
 		networkID,
-		containerCreateResp.ID)
-	ContainerStart(
-		ctx, containerCreateResp.ID)
-	ContainerLogs(
+		containerID)
+	if err != nil {
+		// create whitespace so that error is visible to human
+		log.Println("\n", err)
+		return
+	}
+
+	err = ContainerStart(
+		ctx, containerID)
+	if err != nil {
+		log.Println("\n", err)
+		return
+	}
+
+	err = ContainerLogs(
 		ctx,
-		containerCreateResp.ID)
+		containerID)
+	if err != nil {
+		log.Println("\n", err)
+		return
+	}
 }

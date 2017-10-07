@@ -5,13 +5,11 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	"os/user"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -53,10 +51,12 @@ func PullDockerImage(ctx context.Context, imageName string) error {
 	return nil
 }
 
-func BuildDockerImage(ctx context.Context, dockerFile string) string {
+func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		log.Println(err, "unable to intialize docker client")
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      errors.New("unable to intialize docker client")}
 	}
 	defer cli.Close()
 	buf := new(bytes.Buffer)
@@ -68,11 +68,15 @@ func BuildDockerImage(ctx context.Context, dockerFile string) string {
 	}
 	dockerFileReader, err := os.Open(dockerFile)
 	if err != nil {
-		log.Println(err, " :unable to open Dockerfile, ", dockerFile)
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf("unable to open Dockerfile %s", dockerFile)}
 	}
 	readDockerFile, err := ioutil.ReadAll(dockerFileReader)
 	if err != nil {
-		log.Println(err, " :unable to read dockerfile")
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      errors.New("unable to read dockerfile")}
 	}
 
 	tarHeader := &tar.Header{
@@ -81,14 +85,30 @@ func BuildDockerImage(ctx context.Context, dockerFile string) string {
 	}
 	err = tw.WriteHeader(tarHeader)
 	if err != nil {
-		log.Println(err, " :unable to write tar header")
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      errors.New("unable to write tar header")}
 	}
 	_, err = tw.Write(readDockerFile)
 	if err != nil {
-		log.Println(err, " :unable to write tar body")
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      errors.New("unable to write tar body")}
 	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 	imageName := "meli_" + strings.ToLower(dockerFile)
+
+	splitDockerfile := strings.Split(string(readDockerFile), " ")
+	splitImageName := strings.Split(splitDockerfile[1], "\n")
+	imgFromDockerfile := splitImageName[0]
+
+	registryURL, username, password, err := GetAuth(imgFromDockerfile)
+	if err != nil {
+		return "", &popagateError{originalErr: err}
+	}
+	AuthConfigs := make(map[string]types.AuthConfig)
+	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}
+
 	imageBuildResponse, err := cli.ImageBuild(
 		ctx,
 		dockerFileTarReader,
@@ -100,9 +120,12 @@ func BuildDockerImage(ctx context.Context, dockerFile string) string {
 			ForceRemove:    true,
 			SuppressOutput: false,
 			Dockerfile:     dockerFile,
-			Context:        dockerFileTarReader})
+			Context:        dockerFileTarReader,
+			AuthConfigs:    AuthConfigs})
 	if err != nil {
-		log.Println(err, " :unable to build docker image")
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      errors.New("unable to build docker image")}
 	}
 	defer imageBuildResponse.Body.Close()
 
@@ -116,60 +139,5 @@ func BuildDockerImage(ctx context.Context, dockerFile string) string {
 		log.Println(err, "error in scanning")
 	}
 
-	return imageName
-
-}
-
-func GetRegistryAuth(imageName string) (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err, "unable to find current user")
-	}
-	// TODO: the config can be in many places
-	// try to find them and use them; https://github.com/docker/docker-py/blob/e9fab1432b974ceaa888b371e382dfcf2f6556e4/docker/auth.py#L269
-	dockerAuth, err := ioutil.ReadFile(usr.HomeDir + "/.docker/config.json")
-	if err != nil {
-		log.Fatal(err, "unable to read docker auth file, ~/.docker/config.json")
-	}
-
-	type AuthData struct {
-		Auths map[string]map[string]string `json:"auths,omitempty"`
-	}
-	data := &AuthData{}
-	err = json.Unmarshal([]byte(dockerAuth), data)
-	if err != nil {
-		log.Fatal(err, "unable to unmarshal")
-	}
-
-	encodedAuth := "placeholder"
-	// TODO: we are only checking for dockerHub and quay.io
-	// registries, we should probably be exhaustive in future.
-	if strings.Contains(imageName, "quay") {
-		// quay
-		encodedAuth = data.Auths["quay.io"]["auth"]
-	} else {
-		encodedAuth = data.Auths["https://index.docker.io/v1/"]["auth"]
-	}
-
-	if encodedAuth == "" {
-		return "", errors.New("Unable to get credentials to registry. Have you done docker login")
-	}
-
-	yourAuth, err := base64.StdEncoding.DecodeString(encodedAuth)
-	if err != nil {
-		log.Fatal(err, "unable to base64 decode")
-	}
-	userPass := fomatRegistryAuth(string(yourAuth))
-	username := userPass[0]
-	password := userPass[1]
-
-	stringRegistryAuth := `{"username": "DOCKERUSERNAME", "password": "DOCKERPASSWORD", "email": null, "serveraddress": "https://index.docker.io/v1/"}`
-
-	stringRegistryAuth = strings.Replace(stringRegistryAuth, "DOCKERUSERNAME", username, 1)
-	stringRegistryAuth = strings.Replace(stringRegistryAuth, "DOCKERPASSWORD", password, 1)
-
-	RegistryAuth := base64.URLEncoding.EncodeToString([]byte(stringRegistryAuth))
-
-	return RegistryAuth, nil
-
+	return imageName, nil
 }
