@@ -139,7 +139,7 @@ func ContainerStart(ctx context.Context, containerId string) error {
 	return nil
 }
 
-func ContainerLogs(ctx context.Context, containerId string) error {
+func ContainerLogs(ctx context.Context, containerId string, showLogs bool) error {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return &popagateError{
@@ -155,7 +155,7 @@ func ContainerLogs(ctx context.Context, containerId string) error {
 			ShowStdout: true,
 			ShowStderr: true,
 			Timestamps: true,
-			Follow:     true,
+			Follow:     showLogs,
 			Details:    true,
 			Tail:       "all"})
 

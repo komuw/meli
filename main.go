@@ -43,7 +43,7 @@ type dockerComposeConfig struct {
 }
 
 func main() {
-	Cli()
+	showLogs := Cli()
 
 	data, err := ioutil.ReadFile("docker-compose.yml")
 	if err != nil {
@@ -83,17 +83,17 @@ func main() {
 	var wg sync.WaitGroup
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
-		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg)
-		go startContainers(ctx, k, v, networkID, networkName, &wg)
+		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg, showLogs)
+		go startContainers(ctx, k, v, networkID, networkName, &wg, showLogs)
 	}
 	wg.Wait()
 }
 
-func fakestartContainers(ctx context.Context, k string, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
+func fakestartContainers(ctx context.Context, k string, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup, showLogs bool) {
 	defer wg.Done()
 }
 
-func startContainers(ctx context.Context, k string, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
+func startContainers(ctx context.Context, k string, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup, showLogs bool) {
 	defer wg.Done()
 
 	/*
@@ -145,7 +145,8 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 
 	err = ContainerLogs(
 		ctx,
-		containerID)
+		containerID,
+		showLogs)
 	if err != nil {
 		log.Println("\n", err)
 		return
