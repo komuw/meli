@@ -86,7 +86,7 @@ for meli:
 the above scripts were ran 3 times for each tool and an average taken. 
 
 Benchmark results(average):                       
-|                | User time(seconds)| Elapsed wall clock time(seconds) |
+|     tool       | User time(seconds)| Elapsed wall clock time(seconds) |
 |:--------------:|:-----------------:|:--------------------------------:|
 | docker-compose | 1.61 sec          | 63.57 sec                        |
 | meli           | 0.04 sec          |   28.43 sec                      |
