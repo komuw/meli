@@ -36,3 +36,52 @@ Usage of meli:
 `cp meli testdata/`                 
 `cd testdata`               
 `./meli`                
+
+
+# Benchmarks
+Aaah, everyones favorite vanity metric yet no one seems to know how to conduct one in a consistent and scientific manner.          
+Take any results you see here with a large spoon of salt; They are unscientific and reeks of all that is wrong with most developer benchmarks.             
+
+Having made that disclaimer,               
+test machine:             
+`lsb_release -a`
+```bash
+Distributor ID:	Ubuntu
+Description:	Ubuntu 16.04 LTS
+Release:	16.04
+Codename:	xenial
+No LSB modules are available.
+```
+`uname -ra`
+```bash
+4.4.0-96-generic #119-Ubuntu SMP Tue Sep 12 14:59:54 UTC 2017 x86_64 x86_64 x86_64 GNU/
+```
+
+docker-compose version:         
+`docker-compose --version`
+```bash
+docker-compose version 1.16.1, build 6d1ac219
+```
+
+Meli version:   
+```bash
+git master branch head as of commit https://github.com/komuW/meli/commit/c27cb879a62ef4a61f7aef261b6b3d437090e4cc
+``` 
+NB: I haven't started making Meli versions since it's still early days.           
+
+Benchmark test:           
+` this docker-compose; https://github.com/komuW/meli/blob/master/testdata/docker-compose.yml`
+
+Benchmark script: 
+for docker-compose:      
+`docker ps -aq | xargs docker rm -f; docker system prune -af; /usr/bin/time -apv docker-compose up -d`        
+for meli:                
+`docker ps -aq | xargs docker rm -f; docker system prune -af; /usr/bin/time -apv meli -up -d`            
+
+the above scripts were ran 3 times for each tool and an average taken. 
+
+Benchmark results(average):   
+docker-compose  User time: 1.61 sec  Elapsed wall clock time: 63.57 sec
+meli            User time: 0.04 sec  Elapsed wall clock time: 28.43 sec
+
+Thus meli appears to be 2.2 times faster than docker-compose(by wall clock).       
