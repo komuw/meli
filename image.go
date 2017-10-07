@@ -19,13 +19,13 @@ import (
 func PullDockerImage(ctx context.Context, imageName string) error {
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		log.Println(err, "unable to intialize docker client")
+		log.Println(err, " :unable to intialize docker client")
 	}
 	defer cli.Close()
 
 	GetRegistryAuth, err := GetRegistryAuth(imageName)
 	if err != nil {
-		log.Println(err, "unable to get registry credentials for image, ", imageName)
+		log.Println(err, " :unable to get registry credentials for image, ", imageName)
 		return err
 	}
 
@@ -34,7 +34,7 @@ func PullDockerImage(ctx context.Context, imageName string) error {
 		imageName,
 		types.ImagePullOptions{RegistryAuth: GetRegistryAuth})
 	if err != nil {
-		log.Println(err, "unable to pull image")
+		log.Println(err, " :unable to pull image")
 	}
 	defer imagePullResp.Close()
 
@@ -56,7 +56,7 @@ func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to intialize docker client")}
+			newErr:      errors.New(" :unable to intialize docker client")}
 	}
 	defer cli.Close()
 	buf := new(bytes.Buffer)
@@ -70,13 +70,13 @@ func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
-			newErr:      fmt.Errorf("unable to open Dockerfile %s", dockerFile)}
+			newErr:      fmt.Errorf(" :unable to open Dockerfile %s", dockerFile)}
 	}
 	readDockerFile, err := ioutil.ReadAll(dockerFileReader)
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to read dockerfile")}
+			newErr:      errors.New(" :unable to read dockerfile")}
 	}
 
 	tarHeader := &tar.Header{
@@ -87,13 +87,13 @@ func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to write tar header")}
+			newErr:      errors.New(" :unable to write tar header")}
 	}
 	_, err = tw.Write(readDockerFile)
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to write tar body")}
+			newErr:      errors.New(" :unable to write tar body")}
 	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 	imageName := "meli_" + strings.ToLower(dockerFile)
@@ -125,7 +125,7 @@ func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to build docker image")}
+			newErr:      errors.New(" :unable to build docker image")}
 	}
 	defer imageBuildResponse.Body.Close()
 

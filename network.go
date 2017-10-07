@@ -17,14 +17,14 @@ func GetNetwork(networkName string) (string, error) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		return "", &popagateError{originalErr: err, newErr: errors.New("unable to intialize docker client")}
+		return "", &popagateError{originalErr: err, newErr: errors.New(" :unable to intialize docker client")}
 	}
 	defer cli.Close()
 
 	// return early if network exists
 	netList, err := cli.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
-		return "", &popagateError{originalErr: err, newErr: errors.New("unable to intialize docker client")}
+		return "", &popagateError{originalErr: err, newErr: errors.New(" :unable to intialize docker client")}
 
 	}
 	for _, v := range netList {
@@ -46,7 +46,7 @@ func GetNetwork(networkName string) (string, error) {
 		networkName,
 		typeNetworkCreate)
 	if err != nil {
-		return "", &popagateError{originalErr: err, newErr: errors.New("unable to create docker network")}
+		return "", &popagateError{originalErr: err, newErr: errors.New(" :unable to create docker network")}
 	}
 	return networkCreateResponse.ID, nil
 
@@ -57,7 +57,7 @@ func ConnectNetwork(ctx context.Context, networkID, containerID string) error {
 	if err != nil {
 		return &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to intialize docker client")}
+			newErr:      errors.New(" :unable to intialize docker client")}
 	}
 	defer cli.Close()
 	err = cli.NetworkConnect(
@@ -68,7 +68,7 @@ func ConnectNetwork(ctx context.Context, networkID, containerID string) error {
 	if err != nil {
 		return &popagateError{
 			originalErr: err,
-			newErr:      fmt.Errorf("unable to connect container %s to network %s", containerID, networkID)}
+			newErr:      fmt.Errorf(" :unable to connect container %s to network %s", containerID, networkID)}
 
 	}
 	return nil
@@ -76,7 +76,7 @@ func ConnectNetwork(ctx context.Context, networkID, containerID string) error {
 
 func getCwdName(path string) string {
 	//TODO: investigate if this will work cross platform
-	// it might be unable to handle paths in windows OS
+	// it might be  :unable to handle paths in windows OS
 	f := func(c rune) bool {
 		if c == 47 {
 			// 47 is the '/' character

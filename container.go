@@ -20,7 +20,7 @@ func CreateContainer(ctx context.Context, s serviceConfig, networkName, formatte
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to intialize docker client")}
+			newErr:      errors.New(" :unable to intialize docker client")}
 	}
 	defer cli.Close()
 
@@ -43,7 +43,7 @@ func CreateContainer(ctx context.Context, s serviceConfig, networkName, formatte
 			port, err := nat.NewPort("tcp", containerport)
 			myPortBinding := nat.PortBinding{HostPort: hostport}
 			if err != nil {
-				log.Println(err, "unable to create a nat.Port")
+				log.Println(err, " :unable to create a nat.Port")
 			}
 			portsMap[port] = emptyStruct{}
 			portBindingMap[port] = []nat.PortBinding{myPortBinding}
@@ -110,7 +110,7 @@ func CreateContainer(ctx context.Context, s serviceConfig, networkName, formatte
 		if err != nil {
 			return "", &popagateError{
 				originalErr: err,
-				newErr:      errors.New("unable to create container")}
+				newErr:      errors.New(" :unable to create container")}
 		}
 	}
 
@@ -122,7 +122,7 @@ func ContainerStart(ctx context.Context, containerId string) error {
 	if err != nil {
 		return &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to intialize docker client")}
+			newErr:      errors.New(" :unable to intialize docker client")}
 	}
 	defer cli.Close()
 
@@ -133,18 +133,18 @@ func ContainerStart(ctx context.Context, containerId string) error {
 	if err != nil {
 		return &popagateError{
 			originalErr: err,
-			newErr:      fmt.Errorf("unable to start container %s", containerId)}
+			newErr:      fmt.Errorf(" :unable to start container %s", containerId)}
 
 	}
 	return nil
 }
 
-func ContainerLogs(ctx context.Context, containerId string) error {
+func ContainerLogs(ctx context.Context, containerId string, showLogs bool) error {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return &popagateError{
 			originalErr: err,
-			newErr:      errors.New("unable to intialize docker client")}
+			newErr:      errors.New(" :unable to intialize docker client")}
 	}
 	defer cli.Close()
 
@@ -155,7 +155,7 @@ func ContainerLogs(ctx context.Context, containerId string) error {
 			ShowStdout: true,
 			ShowStderr: true,
 			Timestamps: true,
-			Follow:     true,
+			Follow:     showLogs,
 			Details:    true,
 			Tail:       "all"})
 
@@ -163,7 +163,7 @@ func ContainerLogs(ctx context.Context, containerId string) error {
 		if err != nil {
 			return &popagateError{
 				originalErr: err,
-				newErr:      fmt.Errorf("unable to get container logs %s", containerId)}
+				newErr:      fmt.Errorf(" :unable to get container logs %s", containerId)}
 		}
 	}
 	defer containerLogResp.Close()

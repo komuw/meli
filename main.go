@@ -15,6 +15,8 @@ import (
 2. https://docs.docker.com/engine/api/v1.31/
 */
 
+var Version = "0.0.0.1"
+
 type emptyStruct struct{}
 
 type buildstruct struct {
@@ -41,24 +43,26 @@ type dockerComposeConfig struct {
 }
 
 func main() {
+	showLogs := Cli()
+
 	data, err := ioutil.ReadFile("docker-compose.yml")
 	if err != nil {
-		log.Fatal(err, "unable to read docker-compose file")
+		log.Fatal(err, " :unable to read docker-compose file")
 	}
 	curentDir, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err, "unable to get the current working directory")
+		log.Fatal(err, " :unable to get the current working directory")
 	}
 	networkName := "meli_network_" + getCwdName(curentDir)
 	networkID, err := GetNetwork(networkName)
 	if err != nil {
-		log.Fatal(err, "unable to create/get network")
+		log.Fatal(err, " :unable to create/get network")
 	}
 
 	var dockerCyaml dockerComposeConfig
 	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
 	if err != nil {
-		log.Fatal(err, "unable to parse docker-compose file contents")
+		log.Fatal(err, " :unable to parse docker-compose file contents")
 	}
 
 	ctx := context.Background()
@@ -79,17 +83,17 @@ func main() {
 	var wg sync.WaitGroup
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
-		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg)
-		go startContainers(ctx, k, v, networkID, networkName, &wg)
+		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg, showLogs)
+		go startContainers(ctx, k, v, networkID, networkName, &wg, showLogs)
 	}
 	wg.Wait()
 }
 
-func fakestartContainers(ctx context.Context, k string, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup) {
+func fakestartContainers(ctx context.Context, k string, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup, showLogs bool) {
 	defer wg.Done()
 }
 
-func startContainers(ctx context.Context, k string, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup) {
+func startContainers(ctx context.Context, k string, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup, showLogs bool) {
 	defer wg.Done()
 
 	/*
@@ -141,7 +145,8 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 
 	err = ContainerLogs(
 		ctx,
-		containerID)
+		containerID,
+		showLogs)
 	if err != nil {
 		log.Println("\n", err)
 		return
