@@ -22,9 +22,9 @@ import (
 var version = "master"
 
 func main() {
-	followLogs := cli.Cli()
+	followLogs, dockerComposeFile := cli.Cli()
 
-	data, err := ioutil.ReadFile("docker-compose.yml")
+	data, err := ioutil.ReadFile(dockerComposeFile)
 	if err != nil {
 		log.Fatal(err, " :unable to read docker-compose file")
 	}

@@ -6,11 +6,12 @@ import (
 	"os"
 )
 
-func Cli() bool {
+func Cli() (bool, string) {
 	// TODO; use a more sensible cli lib.
 	var showVersion bool
 	var up bool
 	var d bool
+	var dockerComposeFile string = "docker-compose.yml"
 	var followLogs = true
 
 	flag.BoolVar(
@@ -33,6 +34,11 @@ func Cli() bool {
 		"d",
 		false,
 		"Run containers in the background")
+	flag.StringVar(
+		&dockerComposeFile,
+		"f",
+		"docker-compose.yml",
+		"path to docker-compose.yml file. By default, meli checks the current directory.")
 
 	flag.Parse()
 
@@ -48,5 +54,5 @@ func Cli() bool {
 		followLogs = false
 	}
 
-	return followLogs
+	return followLogs, dockerComposeFile
 }
