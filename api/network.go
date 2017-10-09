@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"context"
@@ -74,7 +74,7 @@ func ConnectNetwork(ctx context.Context, networkID, containerID string) error {
 	return nil
 }
 
-func getCwdName(path string) string {
+func GetCwdName(path string) string {
 	//TODO: investigate if this will work cross platform
 	// it might be  :unable to handle paths in windows OS
 	f := func(c rune) bool {

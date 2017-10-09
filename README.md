@@ -1,4 +1,7 @@
-# meli
+# meli            
+
+[![CircleCI](https://circleci.com/gh/komuW/meli.svg?style=svg)](https://circleci.com/gh/komuW/meli)        
+
 
 Meli is supposed to be a faster alternative to docker-compose. Faster in the sense that, Meli will try to pull as many services(docker containers) 
 as it can in parallel.
@@ -15,7 +18,6 @@ If you want to exec in to a running container, use docker; if you want to run an
 
 # Installing          
 Very early test releases are available from the [releases page](https://github.com/komuW/meli/releases)          
-Currently we only have a linux 64bit release, but you can build your own. See the build section below.
 
 # Usage  
 `meli --help`         
@@ -99,3 +101,4 @@ Benchmark results(average):
 Thus, meli appears to be 2.2 times faster than docker-compose(by wall clock time).       
 There are still some low hanging fruits, performance wise, that I'll target in future.        
 But I'm not making a tool to take docker-compose to the races.
+

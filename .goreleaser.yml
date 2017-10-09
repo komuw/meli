@@ -1,0 +1,10 @@
+build:
+  main: main.go
+  binary: meli
+  goos:
+    - darwin
+    - linux
+    - windows
+  goarch:
+    - amd64
+    - 386

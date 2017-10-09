@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"sync"
+
+	"github.com/komuw/meli/api"
+	"github.com/komuw/meli/cli"
 
 	"gopkg.in/yaml.v2"
 )
@@ -15,35 +19,10 @@ import (
 2. https://docs.docker.com/engine/api/v1.31/
 */
 
-var Version = "0.0.0.1"
-
-type emptyStruct struct{}
-
-type buildstruct struct {
-	// remember to use caps so that they can be exported
-	Context    string `yaml:"context,omitempty"`
-	Dockerfile string `yaml:"dockerfile,omitempty"`
-}
-
-type serviceConfig struct {
-	Image       string      `yaml:"image,omitempty"`
-	Ports       []string    `yaml:"ports,omitempty"`
-	Labels      []string    `yaml:"labels,omitempty"`
-	Environment []string    `yaml:"environment,omitempty"`
-	Command     string      `yaml:"command,flow,omitempty"`
-	Restart     string      `yaml:"restart,omitempty"`
-	Build       buildstruct `yaml:"build,omitempty"`
-	Volumes     []string    `yaml:"volumes,omitempty"`
-}
-
-type dockerComposeConfig struct {
-	Version  string                   `yaml:"version,omitempty"`
-	Services map[string]serviceConfig `yaml:"services"`
-	Volumes  map[string]string        `yaml:"volumes,omitempty"`
-}
+var version = "master"
 
 func main() {
-	followLogs := Cli()
+	followLogs := cli.Cli()
 
 	data, err := ioutil.ReadFile("docker-compose.yml")
 	if err != nil {
@@ -53,13 +32,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err, " :unable to get the current working directory")
 	}
-	networkName := "meli_network_" + getCwdName(curentDir)
-	networkID, err := GetNetwork(networkName)
+	networkName := "meli_network_" + api.GetCwdName(curentDir)
+	networkID, err := api.GetNetwork(networkName)
 	if err != nil {
 		log.Fatal(err, " :unable to create/get network")
 	}
 
-	var dockerCyaml dockerComposeConfig
+	var dockerCyaml api.DockerComposeConfig
 	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
 	if err != nil {
 		log.Fatal(err, " :unable to parse docker-compose file contents")
@@ -76,7 +55,7 @@ func main() {
 			// than volumes, so the sync in the for loop for containers is enough
 			// 2. since we intend to stream logs as containers run(see; issues/24);
 			// then meli will be up long enough for the volume creation goroutines to have finished.
-			go CreateDockerVolume(ctx, "meli_"+k, "local")
+			go api.CreateDockerVolume(ctx, "meli_"+k, "local")
 		}
 	}
 
@@ -89,11 +68,12 @@ func main() {
 	wg.Wait()
 }
 
-func fakestartContainers(ctx context.Context, k string, s serviceConfig, networkName, networkID string, wg *sync.WaitGroup, followLogs bool) {
+func fakestartContainers(ctx context.Context, k string, s api.ServiceConfig, networkName, networkID string, wg *sync.WaitGroup, followLogs bool) {
 	defer wg.Done()
+	fmt.Println("cool")
 }
 
-func startContainers(ctx context.Context, k string, s serviceConfig, networkID, networkName string, wg *sync.WaitGroup, followLogs bool) {
+func startContainers(ctx context.Context, k string, s api.ServiceConfig, networkID, networkName string, wg *sync.WaitGroup, followLogs bool) {
 	defer wg.Done()
 
 	/*
@@ -104,9 +84,9 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 		5. Stream container logs
 	*/
 
-	formattedContainerName := formatContainerName(k)
+	formattedContainerName := api.FormatContainerName(k)
 	if len(s.Image) > 0 {
-		err := PullDockerImage(ctx, s.Image)
+		err := api.PullDockerImage(ctx, s.Image)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
@@ -114,7 +94,7 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 			return
 		}
 	}
-	containerID, err := CreateContainer(
+	containerID, err := api.CreateContainer(
 		ctx,
 		s,
 		networkName,
@@ -126,7 +106,7 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 		return
 	}
 
-	err = ConnectNetwork(
+	err = api.ConnectNetwork(
 		ctx,
 		networkID,
 		containerID)
@@ -136,14 +116,15 @@ func startContainers(ctx context.Context, k string, s serviceConfig, networkID, 
 		return
 	}
 
-	err = ContainerStart(
-		ctx, containerID)
+	err = api.ContainerStart(
+		ctx,
+		containerID)
 	if err != nil {
 		log.Println("\n", err)
 		return
 	}
 
-	err = ContainerLogs(
+	err = api.ContainerLogs(
 		ctx,
 		containerID,
 		followLogs)
