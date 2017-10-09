@@ -63,9 +63,6 @@ func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
 
-	if dockerFile == "" {
-		dockerFile = "Dockerfile"
-	}
 	dockerFileReader, err := os.Open(dockerFile)
 	if err != nil {
 		return "", &popagateError{

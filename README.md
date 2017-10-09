@@ -26,6 +26,8 @@ Usage of meli:
   -up
     	Builds, re/creates, starts, and attaches to containers for a service.
         -d option runs containers in the background
+  -f string
+    	path to docker-compose.yml file. (default "docker-compose.yml")
   -v	Show version information.
   -version
     	Show version information.
@@ -42,10 +44,8 @@ Usage of meli:
 
 # Build                   
 `git clone git@github.com:komuW/meli.git`           
-`go build -o meli *.go`           
-`cp meli /dir/with/docker-compose-file/`                 
-`cd /dir/with/docker-compose-file/`               
-`./meli -up`                
+`go build -o meli main.go`           
+`./meli -up -f /path/to/docker-compose-file.yml`                
 
 
 # Benchmarks

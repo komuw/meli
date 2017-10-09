@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -63,17 +62,38 @@ func main() {
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
 		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg, followLogs,  dockerComposeFile)
-		go startContainers(ctx, k, v, networkID, networkName, &wg, followLogs, dockerComposeFile)
+		go startContainers(
+			ctx,
+			k,
+			v,
+			networkID,
+			networkName,
+			&wg,
+			followLogs,
+			dockerComposeFile)
 	}
 	wg.Wait()
 }
 
-func fakestartContainers(ctx context.Context, k string, s api.ServiceConfig, networkName, networkID string, wg *sync.WaitGroup, followLogs bool, dockerComposeFile string) {
+func fakestartContainers(
+	ctx context.Context,
+	k string,
+	s api.ServiceConfig,
+	networkName, networkID string,
+	wg *sync.WaitGroup,
+	followLogs bool,
+	dockerComposeFile string) {
 	defer wg.Done()
-	fmt.Println("cool")
 }
 
-func startContainers(ctx context.Context, k string, s api.ServiceConfig, networkID, networkName string, wg *sync.WaitGroup, followLogs bool, dockerComposeFile string) {
+func startContainers(
+	ctx context.Context,
+	k string,
+	s api.ServiceConfig,
+	networkID, networkName string,
+	wg *sync.WaitGroup,
+	followLogs bool,
+	dockerComposeFile string) {
 	defer wg.Done()
 
 	/*

@@ -38,7 +38,7 @@ func Cli() (bool, string) {
 		&dockerComposeFile,
 		"f",
 		"docker-compose.yml",
-		"path to docker-compose.yml file. By default, meli checks the current directory.")
+		"path to docker-compose.yml file.")
 
 	flag.Parse()
 
