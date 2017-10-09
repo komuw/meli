@@ -18,7 +18,6 @@ If you want to exec in to a running container, use docker; if you want to run an
 
 # Installing          
 Very early test releases are available from the [releases page](https://github.com/komuW/meli/releases)          
-Currently we only have a linux 64bit release, but you can build your own. See the build section below.
 
 # Usage  
 `meli --help`         
