@@ -1,4 +1,7 @@
-# meli
+# meli            
+
+[![CircleCI](https://circleci.com/gh/komuW/meli.svg?style=svg)](https://circleci.com/gh/komuW/meli)        
+
 
 Meli is supposed to be a faster alternative to docker-compose. Faster in the sense that, Meli will try to pull as many services(docker containers) 
 as it can in parallel.
