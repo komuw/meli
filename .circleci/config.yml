@@ -19,7 +19,7 @@ jobs:
       - run: go get -u github.com/golang/dep/cmd/dep
       - run: go get -u github.com/goreleaser/goreleaser
       - run: dep ensure; dep prune
+      #- run: go run main.go -up -d -f testdata/docker-compose.yml
       - run: go get -v -t -d ./...
       - run: go test -v ./...
-      - run: git checkout . && git clean -fd
       - run: goreleaser --parallelism 1 --rm-dist -config .goreleaser.yml --skip-validate
