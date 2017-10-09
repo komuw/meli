@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func formatContainerName(containerName string) string {
+func FormatContainerName(containerName string) string {
 	// container names are supposed to be unique
 	// since we are using the docker-compose service as the container name
 	// make it unique by adding a time.

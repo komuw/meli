@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"bufio"
@@ -15,7 +15,7 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-func CreateContainer(ctx context.Context, s serviceConfig, networkName, formattedImageName string) (string, error) {
+func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formattedImageName string) (string, error) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return "", &popagateError{
@@ -45,7 +45,7 @@ func CreateContainer(ctx context.Context, s serviceConfig, networkName, formatte
 			if err != nil {
 				log.Println(err, " :unable to create a nat.Port")
 			}
-			portsMap[port] = emptyStruct{}
+			portsMap[port] = EmptyStruct{}
 			portBindingMap[port] = []nat.PortBinding{myPortBinding}
 		}
 	}
@@ -69,7 +69,7 @@ func CreateContainer(ctx context.Context, s serviceConfig, networkName, formatte
 	}
 	//2.5 build image
 	imageName := s.Image
-	if s.Build != (buildstruct{}) {
+	if s.Build != (Buildstruct{}) {
 		imageName, err = BuildDockerImage(ctx, s.Build.Dockerfile)
 		if err != nil {
 			return "", &popagateError{originalErr: err}
@@ -81,7 +81,7 @@ func CreateContainer(ctx context.Context, s serviceConfig, networkName, formatte
 	binds := []string{}
 	if len(s.Volumes) > 0 {
 		vol := fomatServiceVolumes(s.Volumes[0])
-		volume[vol[1]] = emptyStruct{}
+		volume[vol[1]] = EmptyStruct{}
 		// TODO: handle other read/write modes
 		whatToBind := "meli_" + vol[0] + ":" + vol[1] + ":rw"
 		binds = append(binds, whatToBind)

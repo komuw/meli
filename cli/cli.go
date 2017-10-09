@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"flag"
@@ -37,7 +37,7 @@ func Cli() bool {
 	flag.Parse()
 
 	if showVersion {
-		log.Println("Meli version:", Version)
+		log.Println("Meli version:", "To be released soon..")
 		os.Exit(0)
 	}
 	if !up {
