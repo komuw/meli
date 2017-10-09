@@ -62,8 +62,8 @@ func main() {
 	var wg sync.WaitGroup
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
-		go fakestartContainers(ctx, k, v, networkID, networkName, &wg, followLogs)
-		//go startContainers(ctx, k, v, networkID, networkName, &wg, followLogs)
+		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg, followLogs)
+		go startContainers(ctx, k, v, networkID, networkName, &wg, followLogs)
 	}
 	wg.Wait()
 }
