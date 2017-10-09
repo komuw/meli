@@ -11,7 +11,7 @@ func Cli() bool {
 	var showVersion bool
 	var up bool
 	var d bool
-	var showLogs = true
+	var followLogs = true
 
 	flag.BoolVar(
 		&showVersion,
@@ -45,8 +45,8 @@ func Cli() bool {
 		os.Exit(0)
 	}
 	if d {
-		showLogs = false
+		followLogs = false
 	}
 
-	return showLogs
+	return followLogs
 }
