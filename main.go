@@ -62,18 +62,18 @@ func main() {
 	var wg sync.WaitGroup
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
-		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg, followLogs)
-		go startContainers(ctx, k, v, networkID, networkName, &wg, followLogs)
+		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg, followLogs,  dockerComposeFile)
+		go startContainers(ctx, k, v, networkID, networkName, &wg, followLogs, dockerComposeFile)
 	}
 	wg.Wait()
 }
 
-func fakestartContainers(ctx context.Context, k string, s api.ServiceConfig, networkName, networkID string, wg *sync.WaitGroup, followLogs bool) {
+func fakestartContainers(ctx context.Context, k string, s api.ServiceConfig, networkName, networkID string, wg *sync.WaitGroup, followLogs bool, dockerComposeFile string) {
 	defer wg.Done()
 	fmt.Println("cool")
 }
 
-func startContainers(ctx context.Context, k string, s api.ServiceConfig, networkID, networkName string, wg *sync.WaitGroup, followLogs bool) {
+func startContainers(ctx context.Context, k string, s api.ServiceConfig, networkID, networkName string, wg *sync.WaitGroup, followLogs bool, dockerComposeFile string) {
 	defer wg.Done()
 
 	/*
@@ -90,7 +90,7 @@ func startContainers(ctx context.Context, k string, s api.ServiceConfig, network
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
-			log.Println("\n", err)
+			log.Printf("\n\t service=%s error=%s", k, err)
 			return
 		}
 	}
@@ -98,11 +98,12 @@ func startContainers(ctx context.Context, k string, s api.ServiceConfig, network
 		ctx,
 		s,
 		networkName,
-		formattedContainerName)
+		formattedContainerName,
+		dockerComposeFile)
 	if err != nil {
 		// clean exit since we want other goroutines for fetching other images
 		// to continue running
-		log.Println("\n", err)
+		log.Printf("\n\t service=%s error=%s", k, err)
 		return
 	}
 
@@ -112,7 +113,7 @@ func startContainers(ctx context.Context, k string, s api.ServiceConfig, network
 		containerID)
 	if err != nil {
 		// create whitespace so that error is visible to human
-		log.Println("\n", err)
+		log.Printf("\n\t service=%s error=%s", k, err)
 		return
 	}
 
@@ -120,7 +121,7 @@ func startContainers(ctx context.Context, k string, s api.ServiceConfig, network
 		ctx,
 		containerID)
 	if err != nil {
-		log.Println("\n", err)
+		log.Printf("\n\t service=%s error=%s", k, err)
 		return
 	}
 
@@ -129,7 +130,7 @@ func startContainers(ctx context.Context, k string, s api.ServiceConfig, network
 		containerID,
 		followLogs)
 	if err != nil {
-		log.Println("\n", err)
+		log.Printf("\n\t service=%s error=%s", k, err)
 		return
 	}
 }

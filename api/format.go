@@ -83,6 +83,19 @@ func fomatRegistryAuth(auth string) []string {
 	return strings.FieldsFunc(auth, f)
 }
 
+func formatComposePath(path string) []string {
+	f := func(c rune) bool {
+		// TODO; check if this is cross platform
+		if c == 47 {
+			// 47 is the '/' character
+			return true
+		}
+		return false
+	}
+	// TODO: we should trim any whitespace before returning.
+	return strings.FieldsFunc(path, f)
+}
+
 type popagateError struct {
 	originalErr error
 	newErr      error

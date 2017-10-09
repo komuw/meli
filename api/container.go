@@ -15,7 +15,7 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formattedImageName string) (string, error) {
+func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formattedImageName, dockerComposeFile string) (string, error) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return "", &popagateError{
@@ -70,7 +70,9 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 	//2.5 build image
 	imageName := s.Image
 	if s.Build != (Buildstruct{}) {
-		imageName, err = BuildDockerImage(ctx, s.Build.Dockerfile)
+		pathToDockerFile := formatComposePath(dockerComposeFile)[0]
+		dockerFile := pathToDockerFile + "/" + s.Build.Dockerfile
+		imageName, err = BuildDockerImage(ctx, dockerFile)
 		if err != nil {
 			return "", &popagateError{originalErr: err}
 		}
