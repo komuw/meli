@@ -15,7 +15,7 @@ import (
 2. https://docs.docker.com/engine/api/v1.31/
 */
 
-var Version = "0.0.0.1"
+var version = "master"
 
 type emptyStruct struct{}
 

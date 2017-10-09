@@ -1,0 +1,13 @@
+build:
+  main: main.go
+  binary: meli
+  goos:
+    - darwin
+    - linux
+    - windows
+    - freebsd
+    - netbsd
+    - openbsd
+  goarch:
+    - amd64
+    - 386
