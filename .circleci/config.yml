@@ -12,7 +12,7 @@ jobs:
     #### expecting it in the form of
     ####   /go/src/github.com/circleci/go-tool
     ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: /go/src/github.com/komuW/meli
+    working_directory: /go/src/github.com/komuw/meli
     steps:
       - checkout
       # specify any bash command here prefixed with `run: `
@@ -21,7 +21,6 @@ jobs:
       - run: dep ensure; dep prune
       - run: go build --race -o meli main.go
       - run: ./meli -up -d -f testdata/docker-compose.yml
-      - run: go get -v -t -d ./...
       - run: go test -timeout 3m -race -v ./...
 
       - deploy:
