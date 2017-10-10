@@ -22,5 +22,10 @@ jobs:
       - run: go build --race -o meli main.go
       - run: ./meli -up -d -f testdata/docker-compose.yml
       - run: go get -v -t -d ./...
-      - run: go test -v ./...
-      - run: goreleaser --parallelism 1 --rm-dist -config .goreleaser.yml --skip-validate
+      - run: go test -timeout 3m -race -v ./...
+
+      - deploy:
+          command: goreleaser --rm-dist -config .goreleaser.yml --skip-validate
+          filters:
+            branches:
+              only: master
