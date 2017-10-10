@@ -15,7 +15,8 @@ jobs:
     working_directory: /go/src/github.com/komuw/meli
     steps:
       - checkout
-      # specify any bash command here prefixed with `run: `
+      - setup_remote_docker
+
       - run: go get -u github.com/golang/dep/cmd/dep
       - run: go get -u github.com/goreleaser/goreleaser
       - run: dep ensure; dep prune
