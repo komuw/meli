@@ -37,6 +37,6 @@ jobs:
           name: do a github release on master
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              git checkout. && git clean -fd
+              git checkout . && git clean -fd
               goreleaser --rm-dist -config .goreleaser.yml
             fi
