@@ -75,7 +75,9 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 			dockerFile = "Dockerfile"
 		}
 		pathToDockerFile := formatComposePath(dockerComposeFile)[0]
-		dockerFile = pathToDockerFile + "/" + dockerFile
+		if pathToDockerFile != "docker-compose.yml" {
+			dockerFile = pathToDockerFile + "/" + dockerFile
+		}
 		imageName, err = BuildDockerImage(ctx, dockerFile)
 		if err != nil {
 			return "", &popagateError{originalErr: err}
