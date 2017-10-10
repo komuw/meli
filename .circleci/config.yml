@@ -31,6 +31,7 @@ jobs:
       - run: dep ensure; dep prune
       - run: go build --race -o meli main.go
       - run: ./meli -up -d -f testdata/docker-compose.yml
+      - run: cp meli testdata/ && ./meli -up -d
       - run: go test -timeout 3m -race -v ./...
 
       - deploy:
