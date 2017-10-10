@@ -3,3 +3,6 @@ debug
 
 # go-pry debug stuff
 .main.gopry
+
+# goreleaser distribution folder.
+/dist/
