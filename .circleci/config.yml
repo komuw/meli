@@ -37,5 +37,5 @@ jobs:
           name: do a github release on master
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              goreleaser --rm-dist -config .goreleaser.yml --skip-validate
+              goreleaser --rm-dist -config .goreleaser.yml
             fi
