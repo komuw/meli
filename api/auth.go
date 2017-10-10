@@ -36,6 +36,8 @@ func GetAuth(imageName string) (string, string, string, error) {
 	// try to find them and use them; https://github.com/docker/docker-py/blob/e9fab1432b974ceaa888b371e382dfcf2f6556e4/docker/auth.py#L269
 	dockerAuth, err := ioutil.ReadFile(usr.HomeDir + "/.docker/config.json")
 	if err != nil {
+		// TODO: if we are unable to read the file, we should
+		// fallback to using the dockerHub registry and username and password as empty strings
 		return "", "", "", &popagateError{
 			originalErr: err,
 			newErr:      errors.New(" :unable to read docker auth file, ~/.docker/config.json")}
