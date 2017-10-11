@@ -28,7 +28,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 	labelsMap := make(map[string]string)
 	if len(s.Labels) > 0 {
 		for _, v := range s.Labels {
-			onelabel := fomatLabels(v)
+			onelabel := FormatLabels(v)
 			labelsMap[onelabel[0]] = onelabel[1]
 		}
 	}
@@ -37,7 +37,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 	portBindingMap := make(map[nat.Port][]nat.PortBinding)
 	if len(s.Ports) > 0 {
 		for _, v := range s.Ports {
-			oneport := fomatPorts(v)
+			oneport := FormatPorts(v)
 			hostport := oneport[0]
 			containerport := oneport[1]
 			port, err := nat.NewPort("tcp", containerport)
@@ -74,7 +74,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 		if dockerFile == "" {
 			dockerFile = "Dockerfile"
 		}
-		pathToDockerFile := formatComposePath(dockerComposeFile)[0]
+		pathToDockerFile := FormatComposePath(dockerComposeFile)[0]
 		if pathToDockerFile != "docker-compose.yml" {
 			dockerFile = pathToDockerFile + "/" + dockerFile
 		}
@@ -88,7 +88,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 	volume := make(map[string]struct{})
 	binds := []string{}
 	if len(s.Volumes) > 0 {
-		vol := fomatServiceVolumes(s.Volumes[0])
+		vol := FormatServiceVolumes(s.Volumes[0])
 		volume[vol[1]] = EmptyStruct{}
 		// TODO: handle other read/write modes
 		whatToBind := "meli_" + vol[0] + ":" + vol[1] + ":rw"
