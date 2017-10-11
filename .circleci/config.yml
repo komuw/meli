@@ -32,7 +32,7 @@ jobs:
       - run: go build --race -o meli main.go
       - run: ./meli -up -d -f testdata/docker-compose.yml
       - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
-      - run: go test -timeout 3m -race -v ./...
+      - run: go test -timeout 3m -race -cover -v ./...
 
       - deploy:
           name: do a github release on master
