@@ -7,21 +7,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
 
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
 )
 
-type ImagePuller interface {
-	ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error)
-}
-
-func PullDockerImage(ctx context.Context, imageName string, cli ImagePuller) error {
+func PullDockerImage(ctx context.Context, imageName string, cli ImagePullerBuilder) error {
 	GetRegistryAuth, err := GetRegistryAuth(imageName)
 	if err != nil {
 		log.Println(err, " :unable to get registry credentials for image, ", imageName)
@@ -50,7 +44,7 @@ func PullDockerImage(ctx context.Context, imageName string, cli ImagePuller) err
 	return nil
 }
 
-func BuildDockerImage(ctx context.Context, dockerFile string, cli *client.Client) (string, error) {
+func BuildDockerImage(ctx context.Context, dockerFile string, cli ImagePullerBuilder) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
