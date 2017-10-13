@@ -15,7 +15,7 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formattedImageName, dockerComposeFile string, cli *client.Client) (string, error) {
+func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formattedImageName, dockerComposeFile string, cli ContainerFacer) (string, error) {
 	// 2.1 make labels
 	labelsMap := make(map[string]string)
 	if len(s.Labels) > 0 {

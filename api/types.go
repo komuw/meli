@@ -5,6 +5,8 @@ import (
 	"io"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/network"
 )
 
 type EmptyStruct struct{}
@@ -37,4 +39,12 @@ type ImagePullerBuilder interface {
 	// https://medium.com/@zach_4342/dependency-injection-in-golang-e587c69478a8
 	ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error)
 	ImageBuild(ctx context.Context, buildContext io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error)
+}
+
+type ContainerFacer interface {
+	// we implement this interface so that we can be able to mock it in tests
+	// https://medium.com/@zach_4342/dependency-injection-in-golang-e587c69478a8
+	ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error)
+	ImageBuild(ctx context.Context, buildContext io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error)
+	ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, containerName string) (container.ContainerCreateCreatedBody, error)
 }
