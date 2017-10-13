@@ -13,16 +13,9 @@ import (
 	"strings"
 
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
 )
 
-func PullDockerImage(ctx context.Context, imageName string) error {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		log.Println(err, " :unable to intialize docker client")
-	}
-	defer cli.Close()
-
+func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) error {
 	GetRegistryAuth, err := GetRegistryAuth(imageName)
 	if err != nil {
 		log.Println(err, " :unable to get registry credentials for image, ", imageName)
@@ -51,14 +44,7 @@ func PullDockerImage(ctx context.Context, imageName string) error {
 	return nil
 }
 
-func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to intialize docker client")}
-	}
-	defer cli.Close()
+func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
