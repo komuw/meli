@@ -121,7 +121,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 	return containerCreateResp.ID, nil
 }
 
-func ContainerStart(ctx context.Context, containerId string, cli *client.Client) error {
+func ContainerStart(ctx context.Context, containerId string, cli MeliAPiClient) error {
 	err := cli.ContainerStart(
 		ctx,
 		containerId,

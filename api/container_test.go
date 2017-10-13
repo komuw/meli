@@ -35,6 +35,23 @@ func TestCreateContainer(t *testing.T) {
 	}
 }
 
+func TestContainerStart(t *testing.T) {
+	tt := []struct {
+		input       string
+		expectedErr error
+	}{
+		{"myContainerId", nil},
+	}
+	var ctx = context.Background()
+	cli := &MockDockerClient{}
+	for _, v := range tt {
+		err := ContainerStart(ctx, v.input, cli)
+		if err != nil {
+			t.Errorf("\nran ContainerStart(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
+		}
+	}
+}
+
 func BenchmarkCreateContainer(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
@@ -46,5 +63,13 @@ func BenchmarkCreateContainer(b *testing.B) {
 			"myImage",
 			"dockerfile",
 			cli)
+	}
+}
+
+func BenchmarkContainerStart(b *testing.B) {
+	var ctx = context.Background()
+	cli := &MockDockerClient{}
+	for n := 0; n < b.N; n++ {
+		_ = ContainerStart(ctx, "containerId", cli)
 	}
 }
