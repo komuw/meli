@@ -1,23 +1,9 @@
 package api
 
 import (
-	"bytes"
 	"context"
-	"io"
-	"io/ioutil"
 	"testing"
-
-	"github.com/docker/docker/api/types"
 )
-
-type MockDockerClient struct{}
-
-func (m *MockDockerClient) ImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) (io.ReadCloser, error) {
-	return ioutil.NopCloser(bytes.NewBuffer([]byte("Pulling from library/testImage"))), nil
-}
-func (m *MockDockerClient) ImageBuild(ctx context.Context, buildContext io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error) {
-	return types.ImageBuildResponse{Body: ioutil.NopCloser(bytes.NewBuffer([]byte("BUILT library/testImage"))), OSType: "linux baby!"}, nil
-}
 
 func TestGetPullDockerImage(t *testing.T) {
 	tt := []struct {

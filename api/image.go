@@ -15,7 +15,7 @@ import (
 	"github.com/docker/docker/api/types"
 )
 
-func PullDockerImage(ctx context.Context, imageName string, cli ImagePullerBuilder) error {
+func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) error {
 	GetRegistryAuth, err := GetRegistryAuth(imageName)
 	if err != nil {
 		log.Println(err, " :unable to get registry credentials for image, ", imageName)
@@ -44,7 +44,7 @@ func PullDockerImage(ctx context.Context, imageName string, cli ImagePullerBuild
 	return nil
 }
 
-func BuildDockerImage(ctx context.Context, dockerFile string, cli ImagePullerBuilder) (string, error) {
+func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()

@@ -1,8 +1,10 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"io"
+	"io/ioutil"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -34,17 +36,22 @@ type DockerComposeConfig struct {
 	Volumes  map[string]string        `yaml:"volumes,omitempty"`
 }
 
-type ImagePullerBuilder interface {
-	// we implement this interface so that we can be able to mock it in tests
-	// https://medium.com/@zach_4342/dependency-injection-in-golang-e587c69478a8
-	ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error)
-	ImageBuild(ctx context.Context, buildContext io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error)
-}
-
-type ContainerFacer interface {
+type MeliAPiClient interface {
 	// we implement this interface so that we can be able to mock it in tests
 	// https://medium.com/@zach_4342/dependency-injection-in-golang-e587c69478a8
 	ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error)
 	ImageBuild(ctx context.Context, buildContext io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error)
 	ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, containerName string) (container.ContainerCreateCreatedBody, error)
+}
+
+type MockDockerClient struct{}
+
+func (m *MockDockerClient) ImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) (io.ReadCloser, error) {
+	return ioutil.NopCloser(bytes.NewBuffer([]byte("Pulling from library/testImage"))), nil
+}
+func (m *MockDockerClient) ImageBuild(ctx context.Context, buildContext io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error) {
+	return types.ImageBuildResponse{Body: ioutil.NopCloser(bytes.NewBuffer([]byte("BUILT library/testImage"))), OSType: "linux baby!"}, nil
+}
+func (m *MockDockerClient) ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, containerName string) (container.ContainerCreateCreatedBody, error) {
+	return container.ContainerCreateCreatedBody{ID: "myContainerId001"}, nil
 }
