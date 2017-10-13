@@ -25,7 +25,7 @@ func FormatContainerName(containerName string) string {
 	return strings.FieldsFunc(containerName, f)[0] + now.Format("2006-02-15-04-05") + strconv.Itoa(rand.Int())
 }
 
-func fomatLabels(label string) []string {
+func FormatLabels(label string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -41,7 +41,7 @@ func fomatLabels(label string) []string {
 	return strings.FieldsFunc(label, f)
 }
 
-func fomatPorts(port string) []string {
+func FormatPorts(port string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -57,7 +57,7 @@ func fomatPorts(port string) []string {
 	return strings.FieldsFunc(port, f)
 }
 
-func fomatServiceVolumes(volume string) []string {
+func FormatServiceVolumes(volume string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -70,7 +70,7 @@ func fomatServiceVolumes(volume string) []string {
 	return strings.FieldsFunc(volume, f)
 }
 
-func fomatRegistryAuth(auth string) []string {
+func FormatRegistryAuth(auth string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -83,7 +83,7 @@ func fomatRegistryAuth(auth string) []string {
 	return strings.FieldsFunc(auth, f)
 }
 
-func formatComposePath(path string) []string {
+func FormatComposePath(path string) []string {
 	f := func(c rune) bool {
 		// TODO; check if this is cross platform
 		if c == 47 {

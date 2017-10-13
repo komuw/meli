@@ -75,7 +75,7 @@ func GetAuth(imageName string) (string, string, string, error) {
 			originalErr: err,
 			newErr:      errors.New(" :unable to base64 decode auth info")}
 	}
-	userPass := fomatRegistryAuth(string(yourAuth))
+	userPass := FormatRegistryAuth(string(yourAuth))
 	username := userPass[0]
 	password := userPass[1]
 
