@@ -36,7 +36,8 @@ jobs:
       - run: docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker system prune -af
       - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
       - run: echo "number of running containersII(expected=7), actual=" && docker ps -q | wc -l
-      - run: go test -timeout 3m -race -cover -v ./...
+      - run: go test -timeout 1m -race -cover -v ./...
+      - run: go test -timeout 1m -race -run=XXX -bench=. ./...
 
       - deploy:
           name: do a github release on master
