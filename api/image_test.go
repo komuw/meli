@@ -1,9 +1,13 @@
 package api
 
 import (
+	"bytes"
 	"context"
+	"io"
+	"io/ioutil"
 	"testing"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )
 
@@ -17,6 +21,12 @@ func BenchmarkPullDockerImage(b *testing.B) {
 	}
 }
 
+// https://medium.com/@zach_4342/dependency-injection-in-golang-e587c69478a8
+type MockDockerClient struct{}
+
+func (m *MockDockerClient) ImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) (io.ReadCloser, error) {
+	return ioutil.NopCloser(bytes.NewBuffer([]byte("Pulling from library/testImage"))), nil
+}
 func TestGetPullDockerImage(t *testing.T) {
 	tt := []struct {
 		input       string
@@ -25,9 +35,7 @@ func TestGetPullDockerImage(t *testing.T) {
 		{"busybox", nil},
 	}
 	var ctx = context.Background()
-	var cli, _ = client.NewEnvClient()
-	defer cli.Close()
-
+	cli := &MockDockerClient{}
 	for _, v := range tt {
 		err := PullDockerImage(ctx, v.input, cli)
 		if err != nil {
