@@ -59,6 +59,7 @@ func TestContainerLogs(t *testing.T) {
 		expectedErr error
 	}{
 		{"myContainerId", true, nil},
+		{"myContainerId", false, nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
