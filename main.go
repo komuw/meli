@@ -45,6 +45,11 @@ func main() {
 	}
 
 	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		log.Fatal(err, " :unable to intialize docker client")
+	}
+	defer cli.Close()
 
 	// Create top level volumes, if any
 	if len(dockerCyaml.Volumes) > 0 {
@@ -71,7 +76,8 @@ func main() {
 			networkName,
 			&wg,
 			followLogs,
-			dockerComposeFile)
+			dockerComposeFile,
+			cli)
 	}
 	wg.Wait()
 }
@@ -94,7 +100,8 @@ func startContainers(
 	networkID, networkName string,
 	wg *sync.WaitGroup,
 	followLogs bool,
-	dockerComposeFile string) {
+	dockerComposeFile string,
+	cli *client.Client) {
 	defer wg.Done()
 
 	/*
@@ -107,12 +114,7 @@ func startContainers(
 
 	formattedContainerName := api.FormatContainerName(k)
 	if len(s.Image) > 0 {
-		cli, err := client.NewEnvClient()
-		if err != nil {
-			log.Println(err, " :unable to intialize docker client")
-		}
-		defer cli.Close()
-		err = api.PullDockerImage(ctx, s.Image, cli)
+		err := api.PullDockerImage(ctx, s.Image, cli)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
