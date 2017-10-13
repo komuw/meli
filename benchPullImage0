@@ -1,9 +1,0 @@
-?   	github.com/komuw/meli	[no test files]
-goos: linux
-goarch: amd64
-pkg: github.com/komuw/meli/api
-BenchmarkPullDockerImage-4   	       3	4,547,016,458 ns/op
-                                            4,283,273,385 ns/op
-											4,494,602,643 ns/op
-											4,286,635,319 ns/op
--

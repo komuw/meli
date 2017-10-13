@@ -15,15 +15,7 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formattedImageName, dockerComposeFile string) (string, error) {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to intialize docker client")}
-	}
-	defer cli.Close()
-
+func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formattedImageName, dockerComposeFile string, cli *client.Client) (string, error) {
 	// 2.1 make labels
 	labelsMap := make(map[string]string)
 	if len(s.Labels) > 0 {
@@ -68,7 +60,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 
 	}
 	//2.5 build image
-	imageName := s.Image
+	imageNamePtr := &s.Image
 	if s.Build != (Buildstruct{}) {
 		dockerFile := s.Build.Dockerfile
 		if dockerFile == "" {
@@ -78,11 +70,15 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 		if pathToDockerFile != "docker-compose.yml" {
 			dockerFile = pathToDockerFile + "/" + dockerFile
 		}
-		imageName, err = BuildDockerImage(ctx, dockerFile)
+		imageName, err := BuildDockerImage(ctx, dockerFile, cli)
 		if err != nil {
 			return "", &popagateError{originalErr: err}
 		}
+		// done this way so that we can manipulate the value of the
+		// imageName inside this scope
+		imageNamePtr = &imageName
 	}
+	imageName := *imageNamePtr
 
 	//2.6 add volumes
 	volume := make(map[string]struct{})
@@ -125,16 +121,8 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 	return containerCreateResp.ID, nil
 }
 
-func ContainerStart(ctx context.Context, containerId string) error {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to intialize docker client")}
-	}
-	defer cli.Close()
-
-	err = cli.ContainerStart(
+func ContainerStart(ctx context.Context, containerId string, cli *client.Client) error {
+	err := cli.ContainerStart(
 		ctx,
 		containerId,
 		types.ContainerStartOptions{})
@@ -147,15 +135,7 @@ func ContainerStart(ctx context.Context, containerId string) error {
 	return nil
 }
 
-func ContainerLogs(ctx context.Context, containerId string, followLogs bool) error {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to intialize docker client")}
-	}
-	defer cli.Close()
-
+func ContainerLogs(ctx context.Context, containerId string, followLogs bool, cli *client.Client) error {
 	containerLogResp, err := cli.ContainerLogs(
 		ctx,
 		containerId,

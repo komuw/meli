@@ -17,12 +17,6 @@ import (
 )
 
 func PullDockerImage(ctx context.Context, imageName string, cli *client.Client) error {
-	// cli, err := client.NewEnvClient()
-	// if err != nil {
-	// 	log.Println(err, " :unable to intialize docker client")
-	// }
-	// defer cli.Close()
-
 	GetRegistryAuth, err := GetRegistryAuth(imageName)
 	if err != nil {
 		log.Println(err, " :unable to get registry credentials for image, ", imageName)
@@ -51,14 +45,7 @@ func PullDockerImage(ctx context.Context, imageName string, cli *client.Client) 
 	return nil
 }
 
-func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to intialize docker client")}
-	}
-	defer cli.Close()
+func BuildDockerImage(ctx context.Context, dockerFile string, cli *client.Client) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()

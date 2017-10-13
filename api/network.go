@@ -12,15 +12,8 @@ import (
 	"errors"
 )
 
-func GetNetwork(networkName string) (string, error) {
-	// create/get newtwork
-	ctx := context.Background()
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return "", &popagateError{originalErr: err, newErr: errors.New(" :unable to intialize docker client")}
-	}
-	defer cli.Close()
-
+// GetNetwork gets or creates newtwork(if it doesn't exist yet.)
+func GetNetwork(ctx context.Context, networkName string, cli *client.Client) (string, error) {
 	// return early if network exists
 	netList, err := cli.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
@@ -52,15 +45,8 @@ func GetNetwork(networkName string) (string, error) {
 
 }
 
-func ConnectNetwork(ctx context.Context, networkID, containerID string) error {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to intialize docker client")}
-	}
-	defer cli.Close()
-	err = cli.NetworkConnect(
+func ConnectNetwork(ctx context.Context, networkID, containerID string, cli *client.Client) error {
+	err := cli.NetworkConnect(
 		ctx,
 		networkID,
 		containerID,

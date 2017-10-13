@@ -28,15 +28,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err, " :unable to read docker-compose file")
 	}
-	curentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err, " :unable to get the current working directory")
-	}
-	networkName := "meli_network_" + api.GetCwdName(curentDir)
-	networkID, err := api.GetNetwork(networkName)
-	if err != nil {
-		log.Fatal(err, " :unable to create/get network")
-	}
 
 	var dockerCyaml api.DockerComposeConfig
 	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
@@ -50,6 +41,15 @@ func main() {
 		log.Fatal(err, " :unable to intialize docker client")
 	}
 	defer cli.Close()
+	curentDir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err, " :unable to get the current working directory")
+	}
+	networkName := "meli_network_" + api.GetCwdName(curentDir)
+	networkID, err := api.GetNetwork(ctx, networkName, cli)
+	if err != nil {
+		log.Fatal(err, " :unable to create/get network")
+	}
 
 	// Create top level volumes, if any
 	if len(dockerCyaml.Volumes) > 0 {
@@ -127,7 +127,8 @@ func startContainers(
 		s,
 		networkName,
 		formattedContainerName,
-		dockerComposeFile)
+		dockerComposeFile,
+		cli)
 	if err != nil {
 		// clean exit since we want other goroutines for fetching other images
 		// to continue running
@@ -138,7 +139,8 @@ func startContainers(
 	err = api.ConnectNetwork(
 		ctx,
 		networkID,
-		containerID)
+		containerID,
+		cli)
 	if err != nil {
 		// create whitespace so that error is visible to human
 		log.Printf("\n\t service=%s error=%s", k, err)
@@ -147,7 +149,8 @@ func startContainers(
 
 	err = api.ContainerStart(
 		ctx,
-		containerID)
+		containerID,
+		cli)
 	if err != nil {
 		log.Printf("\n\t service=%s error=%s", k, err)
 		return
@@ -156,7 +159,8 @@ func startContainers(
 	err = api.ContainerLogs(
 		ctx,
 		containerID,
-		followLogs)
+		followLogs,
+		cli)
 	if err != nil {
 		log.Printf("\n\t service=%s error=%s", k, err)
 		return
