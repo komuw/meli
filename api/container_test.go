@@ -52,6 +52,24 @@ func TestContainerStart(t *testing.T) {
 	}
 }
 
+func TestContainerLogs(t *testing.T) {
+	tt := []struct {
+		containerID string
+		followLogs  bool
+		expectedErr error
+	}{
+		{"myContainerId", true, nil},
+	}
+	var ctx = context.Background()
+	cli := &MockDockerClient{}
+	for _, v := range tt {
+		err := ContainerLogs(ctx, v.containerID, v.followLogs, cli)
+		if err != nil {
+			t.Errorf("\nran ContainerLogs(%#+v) \ngot %s \nwanted %#+v", v.containerID, err, v.expectedErr)
+		}
+	}
+}
+
 func BenchmarkCreateContainer(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
@@ -71,5 +89,13 @@ func BenchmarkContainerStart(b *testing.B) {
 	cli := &MockDockerClient{}
 	for n := 0; n < b.N; n++ {
 		_ = ContainerStart(ctx, "containerId", cli)
+	}
+}
+
+func BenchmarkContainerLogs(b *testing.B) {
+	var ctx = context.Background()
+	cli := &MockDockerClient{}
+	for n := 0; n < b.N; n++ {
+		_ = ContainerLogs(ctx, "containerID", true, cli)
 	}
 }

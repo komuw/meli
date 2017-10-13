@@ -11,7 +11,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/strslice"
-	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 )
 
@@ -135,7 +134,7 @@ func ContainerStart(ctx context.Context, containerId string, cli MeliAPiClient) 
 	return nil
 }
 
-func ContainerLogs(ctx context.Context, containerId string, followLogs bool, cli *client.Client) error {
+func ContainerLogs(ctx context.Context, containerId string, followLogs bool, cli MeliAPiClient) error {
 	containerLogResp, err := cli.ContainerLogs(
 		ctx,
 		containerId,

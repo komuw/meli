@@ -43,6 +43,7 @@ type MeliAPiClient interface {
 	ImageBuild(ctx context.Context, buildContext io.Reader, options types.ImageBuildOptions) (types.ImageBuildResponse, error)
 	ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, containerName string) (container.ContainerCreateCreatedBody, error)
 	ContainerStart(ctx context.Context, containerID string, options types.ContainerStartOptions) error
+	ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error)
 }
 
 type MockDockerClient struct{}
@@ -59,4 +60,8 @@ func (m *MockDockerClient) ContainerCreate(ctx context.Context, config *containe
 
 func (m *MockDockerClient) ContainerStart(ctx context.Context, containerID string, options types.ContainerStartOptions) error {
 	return nil
+}
+
+func (m *MockDockerClient) ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error) {
+	return ioutil.NopCloser(bytes.NewBuffer([]byte("SHOWING LOGS for library/testImage"))), nil
 }
