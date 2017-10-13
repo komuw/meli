@@ -16,12 +16,12 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func PullDockerImage(ctx context.Context, imageName string) error {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		log.Println(err, " :unable to intialize docker client")
-	}
-	defer cli.Close()
+func PullDockerImage(ctx context.Context, imageName string, cli *client.Client) error {
+	// cli, err := client.NewEnvClient()
+	// if err != nil {
+	// 	log.Println(err, " :unable to intialize docker client")
+	// }
+	// defer cli.Close()
 
 	GetRegistryAuth, err := GetRegistryAuth(imageName)
 	if err != nil {

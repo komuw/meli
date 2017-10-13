@@ -7,6 +7,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/docker/docker/client"
 	"github.com/komuw/meli/api"
 	"github.com/komuw/meli/cli"
 
@@ -106,7 +107,12 @@ func startContainers(
 
 	formattedContainerName := api.FormatContainerName(k)
 	if len(s.Image) > 0 {
-		err := api.PullDockerImage(ctx, s.Image)
+		cli, err := client.NewEnvClient()
+		if err != nil {
+			log.Println(err, " :unable to intialize docker client")
+		}
+		defer cli.Close()
+		err = api.PullDockerImage(ctx, s.Image, cli)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
