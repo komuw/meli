@@ -101,4 +101,3 @@ Benchmark results(average):
 Thus, meli appears to be 2.2 times faster than docker-compose(by wall clock time).       
 There are still some low hanging fruits, performance wise, that I'll target in future.        
 But I'm not making a tool to take docker-compose to the races.
-
