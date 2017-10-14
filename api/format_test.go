@@ -51,6 +51,36 @@ func TestFormatServiceVolumes(t *testing.T) {
 	}
 }
 
+func TestFormatRegistryAuth(t *testing.T) {
+	tt := []struct {
+		input    string
+		expected []string
+	}{
+		{"myUsername:myPassword001", []string{"myUsername", "myPassword001"}},
+	}
+	for _, v := range tt {
+		actual := FormatRegistryAuth(v.input)
+		if !reflect.DeepEqual(actual, v.expected) {
+			t.Errorf("\nran FormatRegistryAuth(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+		}
+	}
+}
+
+func TestFormatComposePath(t *testing.T) {
+	tt := []struct {
+		input    string
+		expected []string
+	}{
+		{"testdata/dockerFile", []string{"testdata", "dockerFile"}},
+	}
+	for _, v := range tt {
+		actual := FormatComposePath(v.input)
+		if !reflect.DeepEqual(actual, v.expected) {
+			t.Errorf("\nran FormatComposePath(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+		}
+	}
+}
+
 func BenchmarkFormatLabels(b *testing.B) {
 	// run the FormatLabels function b.N times
 	for n := 0; n < b.N; n++ {
