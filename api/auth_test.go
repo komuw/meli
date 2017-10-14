@@ -1,6 +1,6 @@
 package api
 
-// import "testing"
+import "testing"
 
 // func TestGetRegistryAuth(t *testing.T) {
 // 	tt := []struct {
@@ -20,3 +20,29 @@ package api
 // 		}
 // 	}
 // }
+
+func TestGetAuth(t *testing.T) {
+	tt := []struct {
+		input       string
+		expected    string
+		expectedErr error
+	}{
+		{"myImageName", "https://index.docker.io/v1/", nil},
+		{"quay.io/quayImage", "quay.io", nil},
+	}
+	for _, v := range tt {
+		registryURL, _, _, err := GetAuth(v.input)
+		if err != nil {
+			t.Errorf("\nran GetAuth(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
+		}
+		if registryURL != v.expected {
+			t.Errorf("\nran GetAuth(%#+v) \ngot %#+v \nwanted %#+v", v.input, registryURL, v.expected)
+		}
+	}
+}
+
+func BenchmarkGetAuth(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		_, _, _, _ = GetAuth("myImageName")
+	}
+}

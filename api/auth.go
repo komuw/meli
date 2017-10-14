@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+// TODO, currently the functions in this file are called
+// once for every service/image in the docker-compose file
+// for perf, we only need to call this funcs once during startup
+// ALTHOUGH, we may not be able to do that since the registry auth
+// depends on from which hub(quay,docker etc) that an image is from
 func GetRegistryAuth(imageName string) (string, error) {
 	registryURL, username, password, err := GetAuth(imageName)
 	if err != nil {
