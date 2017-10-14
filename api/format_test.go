@@ -31,7 +31,22 @@ func TestFormatPorts(t *testing.T) {
 	for _, v := range tt {
 		actual := FormatPorts(v.input)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nran FormatLabels(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nran TestFormatPorts(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+		}
+	}
+}
+
+func TestFormatServiceVolumes(t *testing.T) {
+	tt := []struct {
+		input    string
+		expected []string
+	}{
+		{"data-volume:/home", []string{"data-volume", "/home"}},
+	}
+	for _, v := range tt {
+		actual := FormatServiceVolumes(v.input)
+		if !reflect.DeepEqual(actual, v.expected) {
+			t.Errorf("\nran FormatServiceVolumes(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
@@ -46,6 +61,12 @@ func BenchmarkFormatLabels(b *testing.B) {
 func BenchmarkFormatPorts(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_ = FormatPorts("6300:6379")
+	}
+}
+
+func BenchmarkFormatServiceVolumes(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		_ = FormatServiceVolumes("data-volume:/home")
 	}
 }
 
