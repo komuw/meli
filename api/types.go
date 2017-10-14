@@ -44,6 +44,9 @@ type MeliAPiClient interface {
 	ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, containerName string) (container.ContainerCreateCreatedBody, error)
 	ContainerStart(ctx context.Context, containerID string, options types.ContainerStartOptions) error
 	ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error)
+	NetworkList(ctx context.Context, options types.NetworkListOptions) ([]types.NetworkResource, error)
+	NetworkCreate(ctx context.Context, name string, options types.NetworkCreate) (types.NetworkCreateResponse, error)
+	NetworkConnect(ctx context.Context, networkID, containerID string, config *network.EndpointSettings) error
 }
 
 type MockDockerClient struct{}
@@ -64,4 +67,15 @@ func (m *MockDockerClient) ContainerStart(ctx context.Context, containerID strin
 
 func (m *MockDockerClient) ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error) {
 	return ioutil.NopCloser(bytes.NewBuffer([]byte("SHOWING LOGS for library/testImage"))), nil
+}
+
+func (m *MockDockerClient) NetworkList(ctx context.Context, options types.NetworkListOptions) ([]types.NetworkResource, error) {
+	return []types.NetworkResource{}, nil
+}
+func (m *MockDockerClient) NetworkCreate(ctx context.Context, name string, options types.NetworkCreate) (types.NetworkCreateResponse, error) {
+	return types.NetworkCreateResponse{ID: "myNetworkId002"}, nil
+}
+
+func (m *MockDockerClient) NetworkConnect(ctx context.Context, networkID, containerID string, config *network.EndpointSettings) error {
+	return nil
 }

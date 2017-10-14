@@ -7,13 +7,12 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/client"
 
 	"errors"
 )
 
 // GetNetwork gets or creates newtwork(if it doesn't exist yet.)
-func GetNetwork(ctx context.Context, networkName string, cli *client.Client) (string, error) {
+func GetNetwork(ctx context.Context, networkName string, cli MeliAPiClient) (string, error) {
 	// return early if network exists
 	netList, err := cli.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
@@ -45,7 +44,7 @@ func GetNetwork(ctx context.Context, networkName string, cli *client.Client) (st
 
 }
 
-func ConnectNetwork(ctx context.Context, networkID, containerID string, cli *client.Client) error {
+func ConnectNetwork(ctx context.Context, networkID, containerID string, cli MeliAPiClient) error {
 	err := cli.NetworkConnect(
 		ctx,
 		networkID,
