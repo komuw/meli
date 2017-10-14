@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
+	volumetypes "github.com/docker/docker/api/types/volume"
 )
 
 type EmptyStruct struct{}
@@ -47,6 +48,7 @@ type MeliAPiClient interface {
 	NetworkList(ctx context.Context, options types.NetworkListOptions) ([]types.NetworkResource, error)
 	NetworkCreate(ctx context.Context, name string, options types.NetworkCreate) (types.NetworkCreateResponse, error)
 	NetworkConnect(ctx context.Context, networkID, containerID string, config *network.EndpointSettings) error
+	VolumeCreate(ctx context.Context, options volumetypes.VolumesCreateBody) (types.Volume, error)
 }
 
 type MockDockerClient struct{}
@@ -78,4 +80,8 @@ func (m *MockDockerClient) NetworkCreate(ctx context.Context, name string, optio
 
 func (m *MockDockerClient) NetworkConnect(ctx context.Context, networkID, containerID string, config *network.EndpointSettings) error {
 	return nil
+}
+
+func (m *MockDockerClient) VolumeCreate(ctx context.Context, options volumetypes.VolumesCreateBody) (types.Volume, error) {
+	return types.Volume{Name: "MyVolume007"}, nil
 }

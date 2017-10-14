@@ -51,6 +51,7 @@ func BenchmarkGetNetwork(b *testing.B) {
 		_, _ = GetNetwork(ctx, "myNetWorkName", cli)
 	}
 }
+
 func BenchmarkConnectNetwork(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
