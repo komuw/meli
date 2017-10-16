@@ -2,13 +2,12 @@ package api
 
 import (
 	"archive/tar"
-	"bufio"
 	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 
@@ -16,12 +15,11 @@ import (
 )
 
 func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) error {
-	GetRegistryAuth, err := GetRegistryAuth(imageName)
-	if err != nil {
-		return &popagateError{
-			originalErr: err,
-			newErr:      fmt.Errorf(" :unable to get registry credentials for image %s", imageName)}
+	result, _ := AuthInfo.Load("dockerhub")
+	if strings.Contains(imageName, "quay") {
+		result, _ = AuthInfo.Load("quay")
 	}
+	GetRegistryAuth := result.(map[string]string)["RegistryAuth"]
 
 	imagePullResp, err := cli.ImagePull(
 		ctx,
@@ -34,15 +32,9 @@ func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) e
 	}
 	defer imagePullResp.Close()
 
-	scanner := bufio.NewScanner(imagePullResp)
-	for scanner.Scan() {
-		output := strings.Replace(scanner.Text(), "u003e", ">", -1)
-		log.Println(output)
-	}
-	err = scanner.Err()
-	if err != nil {
-		log.Println(err, "error in scanning")
-	}
+	// supplying your own buffer is perfomant than letting the system do it for you
+	buff := make([]byte, 2048)
+	io.CopyBuffer(os.Stdout, imagePullResp, buff)
 
 	return nil
 }
@@ -88,10 +80,15 @@ func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient)
 	splitImageName := strings.Split(splitDockerfile[1], "\n")
 	imgFromDockerfile := splitImageName[0]
 
-	registryURL, username, password, err := GetAuth(imgFromDockerfile)
-	if err != nil {
-		return "", &popagateError{originalErr: err}
+	result, _ := AuthInfo.Load("dockerhub")
+	if strings.Contains(imgFromDockerfile, "quay") {
+		result, _ = AuthInfo.Load("quay")
 	}
+	authInfo := result.(map[string]string)
+	registryURL := authInfo["registryURL"]
+	username := authInfo["username"]
+	password := authInfo["password"]
+
 	AuthConfigs := make(map[string]types.AuthConfig)
 	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}
 
@@ -115,15 +112,8 @@ func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient)
 	}
 	defer imageBuildResponse.Body.Close()
 
-	scanner := bufio.NewScanner(imageBuildResponse.Body)
-	for scanner.Scan() {
-		output := strings.Replace(scanner.Text(), "u003e", ">", -1)
-		log.Println(output)
-	}
-	err = scanner.Err()
-	if err != nil {
-		log.Println(err, "error in scanning")
-	}
+	buff := make([]byte, 2048)
+	io.CopyBuffer(os.Stdout, imageBuildResponse.Body, buff)
 
 	return imageName, nil
 }
