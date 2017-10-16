@@ -2,7 +2,14 @@ package api
 
 import (
 	"context"
+	"log"
 	"testing"
+
+	"github.com/sanity-io/litter"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/client"
 )
 
 func TestCreateContainer(t *testing.T) {
@@ -99,4 +106,20 @@ func BenchmarkContainerLogs(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_ = ContainerLogs(ctx, "containerID", true, cli)
 	}
+}
+
+func TestContainerList(t *testing.T) {
+	var ctx = context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		log.Fatal(err, " :unable to intialize docker client")
+	}
+	defer cli.Close()
+
+	filters := filters.NewArgs()
+	filters.Add("label", "meli_service=meli_buildservice")
+	listOpts := types.ContainerListOptions{Quiet: true, All: true, Filters: filters}
+	containers, err := cli.ContainerList(ctx, listOpts)
+	t.Log("err", err)
+	litter.Dump(containers)
 }

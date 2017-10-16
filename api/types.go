@@ -49,6 +49,7 @@ type MeliAPiClient interface {
 	NetworkCreate(ctx context.Context, name string, options types.NetworkCreate) (types.NetworkCreateResponse, error)
 	NetworkConnect(ctx context.Context, networkID, containerID string, config *network.EndpointSettings) error
 	VolumeCreate(ctx context.Context, options volumetypes.VolumesCreateBody) (types.Volume, error)
+	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
 }
 
 type MockDockerClient struct{}
@@ -84,4 +85,8 @@ func (m *MockDockerClient) NetworkConnect(ctx context.Context, networkID, contai
 
 func (m *MockDockerClient) VolumeCreate(ctx context.Context, options volumetypes.VolumesCreateBody) (types.Volume, error) {
 	return types.Volume{Name: "MyVolume007"}, nil
+}
+
+func (m *MockDockerClient) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
+	return []types.Container{ID: "myExistingContainerId00912"}, nil
 }

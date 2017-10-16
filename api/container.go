@@ -10,6 +10,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/go-connections/nat"
 )
@@ -23,6 +24,22 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 			labelsMap[onelabel[0]] = onelabel[1]
 		}
 	}
+
+	// reuse container if already running
+	meliService := labelsMap["meli_service"]
+	filters := filters.NewArgs()
+	filters.Add("label", fmt.Sprintf("meli_service=%s", meliService))
+	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		Quiet:   true,
+		All:     true,
+		Filters: filters})
+	if err != nil {
+		log.Println(" :unable to list containers")
+	}
+	if len(containers) > 0 {
+		return containers[0].ID, nil
+	}
+
 	//2.2 make ports
 	portsMap := make(map[nat.Port]struct{})
 	portBindingMap := make(map[nat.Port][]nat.PortBinding)
@@ -110,11 +127,9 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 		nil,
 		formattedImageName)
 	if err != nil {
-		if err != nil {
-			return "", &popagateError{
-				originalErr: err,
-				newErr:      errors.New(" :unable to create container")}
-		}
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      errors.New(" :unable to create container")}
 	}
 
 	return containerCreateResp.ID, nil
