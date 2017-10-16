@@ -2,11 +2,11 @@ package api
 
 import (
 	"archive/tar"
-	"bufio"
 	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -31,15 +31,9 @@ func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) e
 	}
 	defer imagePullResp.Close()
 
-	scanner := bufio.NewScanner(imagePullResp)
-	for scanner.Scan() {
-		output := strings.Replace(scanner.Text(), "u003e", ">", -1)
-		log.Println(output)
-	}
-	err = scanner.Err()
-	if err != nil {
-		log.Println(err, "error in scanning")
-	}
+	// supplying your own buffer is perfomant than letting the system do it for you
+	buff := make([]byte, 2048)
+	io.CopyBuffer(os.Stdout, imagePullResp, buff)
 
 	return nil
 }
@@ -117,15 +111,8 @@ func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient)
 	}
 	defer imageBuildResponse.Body.Close()
 
-	scanner := bufio.NewScanner(imageBuildResponse.Body)
-	for scanner.Scan() {
-		output := strings.Replace(scanner.Text(), "u003e", ">", -1)
-		log.Println(output)
-	}
-	err = scanner.Err()
-	if err != nil {
-		log.Println(err, "error in scanning")
-	}
+	buff := make([]byte, 2048)
+	io.CopyBuffer(os.Stdout, imageBuildResponse.Body, buff)
 
 	return imageName, nil
 }
