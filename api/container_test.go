@@ -5,8 +5,6 @@ import (
 	"log"
 	"testing"
 
-	"github.com/sanity-io/litter"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -119,7 +117,7 @@ func TestContainerList(t *testing.T) {
 	filters := filters.NewArgs()
 	filters.Add("label", "meli_service=meli_buildservice")
 	listOpts := types.ContainerListOptions{Quiet: true, All: true, Filters: filters}
-	containers, err := cli.ContainerList(ctx, listOpts)
+	_, err = cli.ContainerList(ctx, listOpts)
 	t.Log("err", err)
-	litter.Dump(containers)
+	//litter.Dump(containers)
 }
