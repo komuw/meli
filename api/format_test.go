@@ -5,6 +5,23 @@ import (
 	"testing"
 )
 
+func TestFormatContainerName(t *testing.T) {
+	tt := []struct {
+		input    string
+		expected string
+	}{
+		{"redis", "redis"},
+		{"nats:", "nats"},
+		{"yolo:ala", "yolo"},
+	}
+	for _, v := range tt {
+		actual := FormatContainerName(v.input)
+		if actual != v.expected {
+			t.Errorf("\nran FormatContainerName(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+		}
+	}
+}
+
 func TestFormatLabels(t *testing.T) {
 	tt := []struct {
 		input    string
