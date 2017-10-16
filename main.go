@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -67,6 +68,7 @@ func main() {
 	var wg sync.WaitGroup
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
+		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", k))
 		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg, followLogs,  dockerComposeFile)
 		go startContainers(
 			ctx,
