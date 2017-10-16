@@ -18,8 +18,9 @@ import (
 func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) error {
 	GetRegistryAuth, err := GetRegistryAuth(imageName)
 	if err != nil {
-		log.Println(err, " :unable to get registry credentials for image, ", imageName)
-		return err
+		return &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf(" :unable to get registry credentials for image %s", imageName)}
 	}
 
 	imagePullResp, err := cli.ImagePull(
@@ -27,7 +28,9 @@ func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) e
 		imageName,
 		types.ImagePullOptions{RegistryAuth: GetRegistryAuth})
 	if err != nil {
-		log.Println(err, " :unable to pull image")
+		return &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf(" :unable to pull image %s", imageName)}
 	}
 	defer imagePullResp.Close()
 
