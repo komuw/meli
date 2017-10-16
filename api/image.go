@@ -16,10 +16,11 @@ import (
 )
 
 func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) error {
-	GetRegistryAuth := AuthInfo["dockerhub"]["RegistryAuth"]
+	result, _ := AuthInfo.Load("dockerhub")
 	if strings.Contains(imageName, "quay") {
-		GetRegistryAuth = AuthInfo["quay"]["RegistryAuth"]
+		result, _ = AuthInfo.Load("quay")
 	}
+	GetRegistryAuth := result.(map[string]string)["RegistryAuth"]
 
 	imagePullResp, err := cli.ImagePull(
 		ctx,
@@ -84,15 +85,14 @@ func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient)
 	splitImageName := strings.Split(splitDockerfile[1], "\n")
 	imgFromDockerfile := splitImageName[0]
 
-	registryURL := AuthInfo["dockerhub"]["registryURL"]
-	username := AuthInfo["dockerhub"]["username"]
-	password := AuthInfo["dockerhub"]["password"]
-
+	result, _ := AuthInfo.Load("dockerhub")
 	if strings.Contains(imgFromDockerfile, "quay") {
-		registryURL = AuthInfo["quay"]["registryURL"]
-		username = AuthInfo["quay"]["username"]
-		password = AuthInfo["quay"]["password"]
+		result, _ = AuthInfo.Load("quay")
 	}
+	authInfo := result.(map[string]string)
+	registryURL := authInfo["registryURL"]
+	username := authInfo["username"]
+	password := authInfo["password"]
 
 	AuthConfigs := make(map[string]types.AuthConfig)
 	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}

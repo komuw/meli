@@ -3,11 +3,23 @@ package api
 import "testing"
 
 func TestGetAuth(t *testing.T) {
-	if len(AuthInfo) != 0 {
-		t.Errorf("AuthInfo should be empty, it is %d", len(AuthInfo))
+	_, okDocker := AuthInfo.Load("dockerhub")
+	_, okQuay := AuthInfo.Load("quay")
+
+	if okDocker != false {
+		t.Errorf("AuthInfo should not be loaded, we got %t", okDocker)
 	}
+	if okQuay != false {
+		t.Errorf("AuthInfo should not be loaded, we got %t", okQuay)
+	}
+
 	GetAuth()
-	if len(AuthInfo) != 2 {
-		t.Errorf("AuthInfo should be len 2, it is %d", len(AuthInfo))
+	_, okDocker = AuthInfo.Load("dockerhub")
+	_, okQuay = AuthInfo.Load("quay")
+	if okDocker != true {
+		t.Errorf("AuthInfo should be loaded, we got %t", okDocker)
+	}
+	if okQuay != true {
+		t.Errorf("AuthInfo should be loaded, we got %t", okQuay)
 	}
 }

@@ -49,7 +49,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 	//2.4 create restart policy
 	restartPolicy := container.RestartPolicy{}
 	if s.Restart != "" {
-		// AuthInfou cannot set MaximumRetryCount for the following restart policies;
+		// You cannot set MaximumRetryCount for the following restart policies;
 		// always, no, unless-stopped
 		if s.Restart == "on-failure" {
 			restartPolicy = container.RestartPolicy{Name: s.Restart, MaximumRetryCount: 3}

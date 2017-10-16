@@ -6,16 +6,16 @@ import (
 	"io/ioutil"
 	"os/user"
 	"strings"
+	"sync"
 )
 
-var AuthInfo = make(map[string]map[string]string)
+var AuthInfo sync.Map
 
 func GetAuth() {
 	usr, err := user.Current()
 	if err != nil {
-		// unable to find user
-		AuthInfo["quay"] = map[string]string{"registryURL": "", "username": "", "password": ""}
-		AuthInfo["dockerhub"] = map[string]string{"registryURL": "", "username": "", "password": ""}
+		AuthInfo.Store("quay", map[string]string{"registryURL": "", "username": "", "password": ""})
+		AuthInfo.Store("dockerhub", map[string]string{"registryURL": "", "username": "", "password": ""})
 		return
 	}
 
@@ -24,8 +24,8 @@ func GetAuth() {
 	dockerAuth, err := ioutil.ReadFile(usr.HomeDir + "/.docker/config.json")
 	if err != nil {
 		// we'll just try accessing the public access docker hubs/quay
-		AuthInfo["quay"] = map[string]string{"registryURL": "", "username": "", "password": ""}
-		AuthInfo["dockerhub"] = map[string]string{"registryURL": "", "username": "", "password": ""}
+		AuthInfo.Store("quay", map[string]string{"registryURL": "", "username": "", "password": ""})
+		AuthInfo.Store("dockerhub", map[string]string{"registryURL": "", "username": "", "password": ""})
 		return
 	}
 
@@ -35,8 +35,8 @@ func GetAuth() {
 	data := &AuthData{}
 	err = json.Unmarshal([]byte(dockerAuth), data)
 	if err != nil {
-		AuthInfo["quay"] = map[string]string{"registryURL": "", "username": "", "password": ""}
-		AuthInfo["dockerhub"] = map[string]string{"registryURL": "", "username": "", "password": ""}
+		AuthInfo.Store("quay", map[string]string{"registryURL": "", "username": "", "password": ""})
+		AuthInfo.Store("dockerhub", map[string]string{"registryURL": "", "username": "", "password": ""})
 		return
 	}
 
@@ -48,18 +48,18 @@ func GetAuth() {
 	quayRegistryURL := "quay.io"
 
 	if dockerEncodedAuth == "" {
-		AuthInfo["dockerhub"] = map[string]string{"registryURL": "", "username": "", "password": ""}
+		AuthInfo.Store("dockerhub", map[string]string{"registryURL": "", "username": "", "password": ""})
 	}
 	if quayEncodedAuth == "" {
-		AuthInfo["quay"] = map[string]string{"registryURL": "", "username": "", "password": ""}
+		AuthInfo.Store("quay", map[string]string{"registryURL": "", "username": "", "password": ""})
 	}
 	dockerAuth, err = base64.StdEncoding.DecodeString(dockerEncodedAuth)
 	if err != nil {
-		AuthInfo["dockerhub"] = map[string]string{"registryURL": "", "username": "", "password": ""}
+		AuthInfo.Store("dockerhub", map[string]string{"registryURL": "", "username": "", "password": ""})
 	}
 	quayAuth, err := base64.StdEncoding.DecodeString(quayEncodedAuth)
 	if err != nil {
-		AuthInfo["quay"] = map[string]string{"registryURL": "", "username": "", "password": ""}
+		AuthInfo.Store("quay", map[string]string{"registryURL": "", "username": "", "password": ""})
 	}
 
 	dockerUserPass := FormatRegistryAuth(string(dockerAuth))
@@ -82,7 +82,7 @@ func GetAuth() {
 	quayStringRegistryAuth = strings.Replace(quayStringRegistryAuth, "quayREGISTRYURL", quayRegistryURL, 1)
 	quayRegistryAuth := base64.URLEncoding.EncodeToString([]byte(quayStringRegistryAuth))
 
-	AuthInfo["dockerhub"] = map[string]string{"registryURL": dockerRegistryURL, "username": dockerUsername, "password": dockerPassword, "RegistryAuth": dockerRegistryAuth}
-	AuthInfo["quay"] = map[string]string{"registryURL": quayRegistryURL, "username": quayUsername, "password": quayPassword, "RegistryAuth": quayRegistryAuth}
+	AuthInfo.Store("dockerhub", map[string]string{"registryURL": dockerRegistryURL, "username": dockerUsername, "password": dockerPassword, "RegistryAuth": dockerRegistryAuth})
+	AuthInfo.Store("quay", map[string]string{"registryURL": quayRegistryURL, "username": quayUsername, "password": quayPassword, "RegistryAuth": quayRegistryAuth})
 
 }
