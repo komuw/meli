@@ -12,6 +12,7 @@ func TestFormatContainerName(t *testing.T) {
 	}{
 		{"redis", "redis"},
 		{"nats:", "nats"},
+		{"yolo:ala", "yolo"},
 	}
 	for _, v := range tt {
 		actual := FormatContainerName(v.input)
