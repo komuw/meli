@@ -88,5 +88,5 @@ func (m *MockDockerClient) VolumeCreate(ctx context.Context, options volumetypes
 }
 
 func (m *MockDockerClient) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
-	return []types.Container{ID: "myExistingContainerId00912"}, nil
+	return []types.Container{types.Container{ID: "myExistingContainerId00912"}}, nil
 }
