@@ -1,22 +1,13 @@
 package api
 
-// import "testing"
+import "testing"
 
-// func TestGetRegistryAuth(t *testing.T) {
-// 	tt := []struct {
-// 		input       string
-// 		expected    string
-// 		expectedErr error
-// 	}{
-// 		{"ImageName", "RegistryAuth", nil},
-// 	}
-// 	for _, v := range tt {
-// 		actual, err := GetRegistryAuth(v.input)
-// 		if err != nil {
-// 			t.Errorf("\nran GetRegistryAuth(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expected)
-// 		}
-// 		if actual != v.expected {
-// 			t.Errorf("\nran GetRegistryAuth(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
-// 		}
-// 	}
-// }
+func TestGetAuth(t *testing.T) {
+	if len(AuthInfo) != 0 {
+		t.Errorf("AuthInfo should be empty, it is %d", len(AuthInfo))
+	}
+	GetAuth()
+	if len(AuthInfo) != 2 {
+		t.Errorf("AuthInfo should be len 2, it is %d", len(AuthInfo))
+	}
+}
