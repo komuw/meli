@@ -70,7 +70,7 @@ func main() {
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
 		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", k))
-		//go fakestartContainers(ctx, k, v, networkID, networkName, &wg, followLogs,  dockerComposeFile)
+
 		go startContainers(
 			ctx,
 			k,
@@ -83,17 +83,6 @@ func main() {
 			cli)
 	}
 	wg.Wait()
-}
-
-func fakestartContainers(
-	ctx context.Context,
-	k string,
-	s api.ServiceConfig,
-	networkName, networkID string,
-	wg *sync.WaitGroup,
-	followLogs bool,
-	dockerComposeFile string) {
-	defer wg.Done()
 }
 
 func startContainers(
