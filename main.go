@@ -50,7 +50,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err, " :unable to create/get network")
 	}
-	go GetAuth()
+	go api.GetAuth()
 
 	// Create top level volumes, if any
 	if len(dockerCyaml.Volumes) > 0 {
