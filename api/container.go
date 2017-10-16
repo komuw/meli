@@ -15,7 +15,7 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formattedImageName, dockerComposeFile string, cli MeliAPiClient) (string, error) {
+func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formattedImageName, dockerComposeFile string, cli MeliAPiClient) (bool, string, error) {
 	// 2.1 make labels
 	labelsMap := make(map[string]string)
 	if len(s.Labels) > 0 {
@@ -37,7 +37,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 		log.Println(" :unable to list containers")
 	}
 	if len(containers) > 0 {
-		return containers[0].ID, nil
+		return true, containers[0].ID, nil
 	}
 
 	//2.2 make ports
@@ -88,7 +88,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 		}
 		imageName, err := BuildDockerImage(ctx, dockerFile, cli)
 		if err != nil {
-			return "", &popagateError{originalErr: err}
+			return false, "", &popagateError{originalErr: err}
 		}
 		// done this way so that we can manipulate the value of the
 		// imageName inside this scope
@@ -127,12 +127,12 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 		nil,
 		formattedImageName)
 	if err != nil {
-		return "", &popagateError{
+		return false, "", &popagateError{
 			originalErr: err,
 			newErr:      errors.New(" :unable to create container")}
 	}
 
-	return containerCreateResp.ID, nil
+	return false, containerCreateResp.ID, nil
 }
 
 func ContainerStart(ctx context.Context, containerId string, cli MeliAPiClient) error {

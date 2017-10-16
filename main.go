@@ -124,7 +124,7 @@ func startContainers(
 			return
 		}
 	}
-	containerID, err := api.CreateContainer(
+	alreadyCreated, containerID, err := api.CreateContainer(
 		ctx,
 		s,
 		networkName,
@@ -138,15 +138,17 @@ func startContainers(
 		return
 	}
 
-	err = api.ConnectNetwork(
-		ctx,
-		networkID,
-		containerID,
-		cli)
-	if err != nil {
-		// create whitespace so that error is visible to human
-		log.Printf("\n\t service=%s error=%s", k, err)
-		return
+	if !alreadyCreated {
+		err = api.ConnectNetwork(
+			ctx,
+			networkID,
+			containerID,
+			cli)
+		if err != nil {
+			// create whitespace so that error is visible to human
+			log.Printf("\n\t service=%s error=%s", k, err)
+			return
+		}
 	}
 
 	err = api.ContainerStart(

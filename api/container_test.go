@@ -24,18 +24,21 @@ func TestCreateContainer(t *testing.T) {
 			"myNetworkName",
 			"myImageName",
 			"DockerFile",
-			"myContainerId001",
+			"myExistingContainerId00912",
 			nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		actual, err := CreateContainer(ctx, v.s, v.networkName, v.imgName, v.dockerComposeFile, cli)
+		alreadyCreated, actual, err := CreateContainer(ctx, v.s, v.networkName, v.imgName, v.dockerComposeFile, cli)
 		if err != nil {
 			t.Errorf("\nran CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.s, err, v.expectedErr)
 		}
 		if actual != v.expected {
 			t.Errorf("\nran CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.s, actual, v.expected)
+		}
+		if alreadyCreated != true {
+			t.Errorf("\nran CreateContainer(%#+v) \ngot %#+v \nwanted %#+v", v.s, alreadyCreated, true)
 		}
 	}
 }
@@ -80,7 +83,7 @@ func BenchmarkCreateContainer(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for n := 0; n < b.N; n++ {
-		_, _ = CreateContainer(
+		_, _, _ = CreateContainer(
 			ctx,
 			ServiceConfig{Image: "busybox", Restart: "unless-stopped"},
 			"mynetwork",
