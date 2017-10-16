@@ -1,11 +1,12 @@
 package api
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -170,14 +171,9 @@ func ContainerLogs(ctx context.Context, containerId string, followLogs bool, cli
 	}
 	defer containerLogResp.Close()
 
-	scanner := bufio.NewScanner(containerLogResp)
-	for scanner.Scan() {
-		output := strings.Replace(scanner.Text(), "u003e", ">", -1)
-		log.Println(output)
-	}
-	err = scanner.Err()
-	if err != nil {
-		log.Println(err, "error in scanning")
-	}
+	// supplying your own buffer is perfomant than letting the system do it for you
+	buff := make([]byte, 2048)
+	io.CopyBuffer(os.Stdout, containerLogResp, buff)
+
 	return nil
 }
