@@ -44,10 +44,6 @@ func TestGetBuildDockerImage(t *testing.T) {
 }
 
 func BenchmarkPullDockerImage(b *testing.B) {
-	// 153,701 ns/op
-	// 150,209 ns/op
-	// 152,565 ns/op
-
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	GetAuth()
