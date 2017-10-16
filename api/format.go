@@ -2,19 +2,12 @@ package api
 
 import (
 	"fmt"
-	"math/rand"
-	"strconv"
 	"strings"
-	"time"
 )
 
 func FormatContainerName(containerName string) string {
 	// container names are supposed to be unique
-	// since we are using the docker-compose service as the container name
-	// make it unique by adding a time.
-	// TODO: we should skip creating the container again if already exists
-	// instead of creating a uniquely named container name
-	now := time.Now()
+	// we are using the docker-compose service as the container name
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -22,10 +15,10 @@ func FormatContainerName(containerName string) string {
 		}
 		return false
 	}
-	return strings.FieldsFunc(containerName, f)[0] + now.Format("2006-02-15-04-05") + strconv.Itoa(rand.Int())
+	return strings.FieldsFunc(containerName, f)[0]
 }
 
-func fomatLabels(label string) []string {
+func FormatLabels(label string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -41,7 +34,7 @@ func fomatLabels(label string) []string {
 	return strings.FieldsFunc(label, f)
 }
 
-func fomatPorts(port string) []string {
+func FormatPorts(port string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -57,7 +50,7 @@ func fomatPorts(port string) []string {
 	return strings.FieldsFunc(port, f)
 }
 
-func fomatServiceVolumes(volume string) []string {
+func FormatServiceVolumes(volume string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -70,7 +63,7 @@ func fomatServiceVolumes(volume string) []string {
 	return strings.FieldsFunc(volume, f)
 }
 
-func fomatRegistryAuth(auth string) []string {
+func FormatRegistryAuth(auth string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -83,7 +76,7 @@ func fomatRegistryAuth(auth string) []string {
 	return strings.FieldsFunc(auth, f)
 }
 
-func formatComposePath(path string) []string {
+func FormatComposePath(path string) []string {
 	f := func(c rune) bool {
 		// TODO; check if this is cross platform
 		if c == 47 {

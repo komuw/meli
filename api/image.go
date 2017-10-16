@@ -2,63 +2,44 @@ package api
 
 import (
 	"archive/tar"
-	"bufio"
 	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
 )
 
-func PullDockerImage(ctx context.Context, imageName string) error {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		log.Println(err, " :unable to intialize docker client")
+func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) error {
+	result, _ := AuthInfo.Load("dockerhub")
+	if strings.Contains(imageName, "quay") {
+		result, _ = AuthInfo.Load("quay")
 	}
-	defer cli.Close()
-
-	GetRegistryAuth, err := GetRegistryAuth(imageName)
-	if err != nil {
-		log.Println(err, " :unable to get registry credentials for image, ", imageName)
-		return err
-	}
+	GetRegistryAuth := result.(map[string]string)["RegistryAuth"]
 
 	imagePullResp, err := cli.ImagePull(
 		ctx,
 		imageName,
 		types.ImagePullOptions{RegistryAuth: GetRegistryAuth})
 	if err != nil {
-		log.Println(err, " :unable to pull image")
+		return &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf(" :unable to pull image %s", imageName)}
 	}
 	defer imagePullResp.Close()
 
-	scanner := bufio.NewScanner(imagePullResp)
-	for scanner.Scan() {
-		output := strings.Replace(scanner.Text(), "u003e", ">", -1)
-		log.Println(output)
-	}
-	err = scanner.Err()
-	if err != nil {
-		log.Println(err, "error in scanning")
-	}
+	// supplying your own buffer is perfomant than letting the system do it for you
+	buff := make([]byte, 2048)
+	io.CopyBuffer(os.Stdout, imagePullResp, buff)
 
 	return nil
 }
 
-func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to intialize docker client")}
-	}
-	defer cli.Close()
+func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
@@ -99,10 +80,15 @@ func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
 	splitImageName := strings.Split(splitDockerfile[1], "\n")
 	imgFromDockerfile := splitImageName[0]
 
-	registryURL, username, password, err := GetAuth(imgFromDockerfile)
-	if err != nil {
-		return "", &popagateError{originalErr: err}
+	result, _ := AuthInfo.Load("dockerhub")
+	if strings.Contains(imgFromDockerfile, "quay") {
+		result, _ = AuthInfo.Load("quay")
 	}
+	authInfo := result.(map[string]string)
+	registryURL := authInfo["registryURL"]
+	username := authInfo["username"]
+	password := authInfo["password"]
+
 	AuthConfigs := make(map[string]types.AuthConfig)
 	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}
 
@@ -126,15 +112,8 @@ func BuildDockerImage(ctx context.Context, dockerFile string) (string, error) {
 	}
 	defer imageBuildResponse.Body.Close()
 
-	scanner := bufio.NewScanner(imageBuildResponse.Body)
-	for scanner.Scan() {
-		output := strings.Replace(scanner.Text(), "u003e", ">", -1)
-		log.Println(output)
-	}
-	err = scanner.Err()
-	if err != nil {
-		log.Println(err, "error in scanning")
-	}
+	buff := make([]byte, 2048)
+	io.CopyBuffer(os.Stdout, imageBuildResponse.Body, buff)
 
 	return imageName, nil
 }
