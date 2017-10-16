@@ -1,22 +1,25 @@
 package api
 
-// import "testing"
+import "testing"
 
-// func TestGetRegistryAuth(t *testing.T) {
-// 	tt := []struct {
-// 		input       string
-// 		expected    string
-// 		expectedErr error
-// 	}{
-// 		{"ImageName", "RegistryAuth", nil},
-// 	}
-// 	for _, v := range tt {
-// 		actual, err := GetRegistryAuth(v.input)
-// 		if err != nil {
-// 			t.Errorf("\nran GetRegistryAuth(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expected)
-// 		}
-// 		if actual != v.expected {
-// 			t.Errorf("\nran GetRegistryAuth(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
-// 		}
-// 	}
-// }
+func TestGetAuth(t *testing.T) {
+	_, okDocker := AuthInfo.Load("dockerhub")
+	_, okQuay := AuthInfo.Load("quay")
+
+	if okDocker != false {
+		t.Errorf("AuthInfo should not be loaded, we got %t", okDocker)
+	}
+	if okQuay != false {
+		t.Errorf("AuthInfo should not be loaded, we got %t", okQuay)
+	}
+
+	GetAuth()
+	_, okDocker = AuthInfo.Load("dockerhub")
+	_, okQuay = AuthInfo.Load("quay")
+	if okDocker != true {
+		t.Errorf("AuthInfo should be loaded, we got %t", okDocker)
+	}
+	if okQuay != true {
+		t.Errorf("AuthInfo should be loaded, we got %t", okQuay)
+	}
+}
