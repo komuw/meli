@@ -50,6 +50,7 @@ func BenchmarkPullDockerImage(b *testing.B) {
 
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
+	GetAuth()
 	for n := 0; n < b.N; n++ {
 		_ = PullDockerImage(ctx, "busybox", cli)
 	}
