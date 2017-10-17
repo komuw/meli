@@ -33,6 +33,20 @@ Usage of meli:
     	Show version information.
 ```
 
+`cat docker-compose.yml`                 
+```bash
+version: '3'
+services:
+  redis:
+    image: 'redis:3.0-alpine'
+    environment:
+      - RACK_ENV=development
+      - type=database
+    ports:
+      - "6300:6379"
+      - "6400:22"
+```           
+
 `meli -up`          
 ```bash 
 2017/10/07 14:30:11 {"status":"Pulling from library/redis","id":"3.0-alpine"}
