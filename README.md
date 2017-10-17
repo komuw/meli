@@ -89,10 +89,8 @@ docker-compose version 1.16.1, build 6d1ac219
 ```
 
 Meli version:   
-```bash
-git master branch head as of commit https://github.com/komuW/meli/commit/c27cb879a62ef4a61f7aef261b6b3d437090e4cc
-``` 
-NB: I haven't started making Meli versions since it's still early days.           
+[version 0.0.5](https://github.com/komuW/meli/releases/tag/v0.0.5)
+           
 
 Benchmark test:           
 [this docker-compose file](https://github.com/komuW/meli/blob/master/testdata/docker-compose.yml)
