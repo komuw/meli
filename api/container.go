@@ -104,7 +104,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 		vol := FormatServiceVolumes(s.Volumes[0])
 		volume[vol[1]] = EmptyStruct{}
 		// TODO: handle other read/write modes
-		whatToBind := "meli_" + vol[0] + ":" + vol[1] + ":rw"
+		whatToBind := vol[0] + ":" + vol[1] + ":rw"
 		binds = append(binds, whatToBind)
 	}
 

@@ -31,12 +31,14 @@ services:
 
   # we will backup this conatiners /home directory
   # using the service below called backup
+  # also mount hosts /var/run/docker.sock into container at same path
   db:
     build:
       context: .
       dockerfile: volumeDockerfile
     volumes:
       - data-volume:/home
+      - /var/run/docker.sock:/var/run/docker.sock
 
   # backup the db services /home dir
   # into this containers /var dir
