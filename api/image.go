@@ -126,6 +126,8 @@ func BuildDockerImage(ctx context.Context, k, dockerFile string, cli MeliAPiClie
 	AuthConfigs := make(map[string]types.AuthConfig)
 	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}
 
+	// TODO: we need to read the context passed in the docker-compose context key for a service
+	// rather than assume the context is the dir the Dockerfile is in.
 	err = filepath.Walk(dockerContextPath, walkFnClosure(dockerContextPath, tw, buf))
 	if err != nil {
 		return "", &popagateError{
