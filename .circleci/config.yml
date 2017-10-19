@@ -39,6 +39,10 @@ jobs:
       - run: go test -timeout 1m -race -cover -v ./...
       - run: go test -timeout 1m -race -run=XXX -bench=. ./...
 
+      # benchmark against docker-compose
+      - run: ls -lsa
+      - run: pip install -U docker-compose
+
       - deploy:
           name: do a github release on master
           command: |
