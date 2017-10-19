@@ -83,6 +83,8 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 		if dockerFile == "" {
 			dockerFile = "Dockerfile"
 		}
+		// TODO: we should probably use the filepath stdlib module
+		// so that atleast it can guarantee us os agnotic'ness
 		pathToDockerFile := FormatComposePath(dockerComposeFile)[0]
 		if pathToDockerFile != "docker-compose.yml" {
 			dockerFile = pathToDockerFile + "/" + dockerFile
