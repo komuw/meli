@@ -46,9 +46,9 @@ jobs:
       - run: rm meli
       - run: go build -o meli main.go
       - run: docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker system prune -af
-      - run: /usr/bin/time -apv docker-compose up -d -f testdata/docker-compose.yml
+      - run: time -apv docker-compose up -d -f testdata/docker-compose.yml
       - run: docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker system prune -af
-      - run: /usr/bin/time -apv ./meli -up -d -f testdata/docker-compose.yml
+      - run: time -apv ./meli -up -d -f testdata/docker-compose.yml
 
       - deploy:
           name: do a github release on master
