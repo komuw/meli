@@ -8,6 +8,7 @@ import (
 func TestCreateContainer(t *testing.T) {
 	tt := []struct {
 		s                 ServiceConfig
+		k                 string
 		networkName       string
 		imgName           string
 		dockerComposeFile string
@@ -16,6 +17,7 @@ func TestCreateContainer(t *testing.T) {
 	}{
 		{
 			ServiceConfig{Image: "busybox", Restart: "unless-stopped"},
+			"myservice",
 			"myNetworkName",
 			"myImageName",
 			"DockerFile",
@@ -25,7 +27,7 @@ func TestCreateContainer(t *testing.T) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		alreadyCreated, actual, err := CreateContainer(ctx, v.s, v.networkName, v.imgName, v.dockerComposeFile, cli)
+		alreadyCreated, actual, err := CreateContainer(ctx, v.s, v.k, v.networkName, v.imgName, v.dockerComposeFile, cli)
 		if err != nil {
 			t.Errorf("\nran CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.s, err, v.expectedErr)
 		}
@@ -81,6 +83,7 @@ func BenchmarkCreateContainer(b *testing.B) {
 		_, _, _ = CreateContainer(
 			ctx,
 			ServiceConfig{Image: "busybox", Restart: "unless-stopped"},
+			"myservice",
 			"mynetwork",
 			"myImage",
 			"dockerfile",
