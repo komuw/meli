@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 )
 
@@ -60,7 +61,14 @@ func FormatServiceVolumes(volume string) []string {
 	}
 	// TODO: we should trim any whitespace before returning.
 	// this will prevent labels like type= web
-	return strings.FieldsFunc(volume, f)
+	x := strings.FieldsFunc(volume, f)
+	if strings.Contains(x[0], "./") {
+		fmt.Println(x[0])
+		path, err := filepath.Abs(x[0])
+		fmt.Println("x0, path, err", x[0], path, err)
+	}
+
+	return x
 }
 
 func FormatRegistryAuth(auth string) []string {

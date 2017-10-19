@@ -1,1 +1,1 @@
-FROM testonbuild
+FROM komuw/busyboxonbuild
