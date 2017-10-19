@@ -29,7 +29,7 @@ func TestGetBuildDockerImage(t *testing.T) {
 		expected    string
 		expectedErr error
 	}{
-		{"myservicename", "../testdata/Dockerfile", "meli_../testdata/dockerfile", nil},
+		{"myservicename", "../testdata/Dockerfile", "meli_myservicename", nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
