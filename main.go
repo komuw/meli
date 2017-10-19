@@ -20,10 +20,14 @@ import (
 2. https://docs.docker.com/engine/api/v1.31/
 */
 
-var version = "master"
+var version string
 
 func main() {
-	followLogs, dockerComposeFile := cli.Cli()
+	showVersion, followLogs, dockerComposeFile := cli.Cli()
+	if showVersion {
+		log.Println("Meli version: ", version)
+		os.Exit(0)
+	}
 
 	data, err := ioutil.ReadFile(dockerComposeFile)
 	if err != nil {

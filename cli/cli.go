@@ -6,12 +6,12 @@ import (
 	"os"
 )
 
-func Cli() (bool, string) {
+func Cli() (bool, bool, string) {
 	// TODO; use a more sensible cli lib.
 	var showVersion bool
 	var up bool
 	var d bool
-	var dockerComposeFile string = "docker-compose.yml"
+	var dockerComposeFile = "docker-compose.yml"
 	var followLogs = true
 
 	flag.BoolVar(
@@ -43,8 +43,7 @@ func Cli() (bool, string) {
 	flag.Parse()
 
 	if showVersion {
-		log.Println("Meli version:", "To be released soon..")
-		os.Exit(0)
+		return true, followLogs, ""
 	}
 	if !up {
 		log.Println("to use Meli, run: \n\n\t meli -up")
@@ -54,5 +53,5 @@ func Cli() (bool, string) {
 		followLogs = false
 	}
 
-	return followLogs, dockerComposeFile
+	return false, followLogs, dockerComposeFile
 }
