@@ -101,11 +101,13 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 	volume := make(map[string]struct{})
 	binds := []string{}
 	if len(s.Volumes) > 0 {
-		vol := FormatServiceVolumes(s.Volumes[0])
-		volume[vol[1]] = EmptyStruct{}
-		// TODO: handle other read/write modes
-		whatToBind := vol[0] + ":" + vol[1] + ":rw"
-		binds = append(binds, whatToBind)
+		for _, v := range s.Volumes {
+			vol := FormatServiceVolumes(v)
+			volume[vol[1]] = EmptyStruct{}
+			// TODO: handle other read/write modes
+			whatToBind := vol[0] + ":" + vol[1] + ":rw"
+			binds = append(binds, whatToBind)
+		}
 	}
 
 	// TODO: we should skip creating the container again if already exists
