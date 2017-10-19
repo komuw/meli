@@ -46,7 +46,7 @@ jobs:
       - run: rm meli
       - run: go build -o meli main.go
       - run: docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker system prune -af
-      - run: time docker-compose up -d -f testdata/docker-compose.yml
+      - run: time docker-compose -f testdata/docker-compose.yml up -d
       - run: docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker system prune -af
       - run: time ./meli -up -d -f testdata/docker-compose.yml
 
