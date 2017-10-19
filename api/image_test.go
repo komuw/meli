@@ -24,21 +24,22 @@ func TestGetPullDockerImage(t *testing.T) {
 
 func TestGetBuildDockerImage(t *testing.T) {
 	tt := []struct {
-		input       string
+		serviceName string
+		dockerFile  string
 		expected    string
 		expectedErr error
 	}{
-		{"../testdata/Dockerfile", "meli_../testdata/dockerfile", nil},
+		{"myservicename", "../testdata/Dockerfile", "meli_myservicename", nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		actual, err := BuildDockerImage(ctx, v.input, cli)
+		actual, err := BuildDockerImage(ctx, v.serviceName, v.dockerFile, cli)
 		if err != nil {
-			t.Errorf("\nran BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
+			t.Errorf("\nran BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dockerFile, err, v.expectedErr)
 		}
 		if actual != v.expected {
-			t.Errorf("\nran BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nran BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dockerFile, actual, v.expected)
 		}
 	}
 }
@@ -56,6 +57,6 @@ func BenchmarkBuildDockerImage(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for n := 0; n < b.N; n++ {
-		_, _ = BuildDockerImage(ctx, "meli_../testdata/dockerfile", cli)
+		_, _ = BuildDockerImage(ctx, "meliserice", "meli_../testdata/dockerfile", cli)
 	}
 }

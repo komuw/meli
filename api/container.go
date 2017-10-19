@@ -16,7 +16,7 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formattedImageName, dockerComposeFile string, cli MeliAPiClient) (bool, string, error) {
+func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, formattedImageName, dockerComposeFile string, cli MeliAPiClient) (bool, string, error) {
 	// 2.1 make labels
 	labelsMap := make(map[string]string)
 	if len(s.Labels) > 0 {
@@ -83,11 +83,13 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 		if dockerFile == "" {
 			dockerFile = "Dockerfile"
 		}
+		// TODO: we should probably use the filepath stdlib module
+		// so that atleast it can guarantee us os agnotic'ness
 		pathToDockerFile := FormatComposePath(dockerComposeFile)[0]
 		if pathToDockerFile != "docker-compose.yml" {
 			dockerFile = pathToDockerFile + "/" + dockerFile
 		}
-		imageName, err := BuildDockerImage(ctx, dockerFile, cli)
+		imageName, err := BuildDockerImage(ctx, k, dockerFile, cli)
 		if err != nil {
 			return false, "", &popagateError{originalErr: err}
 		}
@@ -101,11 +103,13 @@ func CreateContainer(ctx context.Context, s ServiceConfig, networkName, formatte
 	volume := make(map[string]struct{})
 	binds := []string{}
 	if len(s.Volumes) > 0 {
-		vol := FormatServiceVolumes(s.Volumes[0])
-		volume[vol[1]] = EmptyStruct{}
-		// TODO: handle other read/write modes
-		whatToBind := vol[0] + ":" + vol[1] + ":rw"
-		binds = append(binds, whatToBind)
+		for _, v := range s.Volumes {
+			vol := FormatServiceVolumes(v, dockerComposeFile)
+			volume[vol[1]] = EmptyStruct{}
+			// TODO: handle other read/write modes
+			whatToBind := vol[0] + ":" + vol[1] + ":rw"
+			binds = append(binds, whatToBind)
+		}
 	}
 
 	// TODO: we should skip creating the container again if already exists

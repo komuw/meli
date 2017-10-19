@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 )
 
@@ -50,7 +51,7 @@ func FormatPorts(port string) []string {
 	return strings.FieldsFunc(port, f)
 }
 
-func FormatServiceVolumes(volume string) []string {
+func FormatServiceVolumes(volume, dockerComposeFile string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -60,7 +61,15 @@ func FormatServiceVolumes(volume string) []string {
 	}
 	// TODO: we should trim any whitespace before returning.
 	// this will prevent labels like type= web
-	return strings.FieldsFunc(volume, f)
+	hostAndContainerPath := strings.FieldsFunc(volume, f)
+	if strings.Contains(hostAndContainerPath[0], "./") {
+		dockerComposeFileDir := filepath.Dir(dockerComposeFile)
+		dockerComposeFilePath, _ := filepath.Abs(hostAndContainerPath[0])
+		hostPath := filepath.Join(dockerComposeFilePath, dockerComposeFileDir)
+		hostAndContainerPath[0] = hostPath
+	}
+
+	return hostAndContainerPath
 }
 
 func FormatRegistryAuth(auth string) []string {

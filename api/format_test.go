@@ -55,15 +55,16 @@ func TestFormatPorts(t *testing.T) {
 
 func TestFormatServiceVolumes(t *testing.T) {
 	tt := []struct {
-		input    string
-		expected []string
+		volume            string
+		dockerComposeFile string
+		expected          []string
 	}{
-		{"data-volume:/home", []string{"data-volume", "/home"}},
+		{"data-volume:/home", "composefile", []string{"data-volume", "/home"}},
 	}
 	for _, v := range tt {
-		actual := FormatServiceVolumes(v.input)
+		actual := FormatServiceVolumes(v.volume, v.dockerComposeFile)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nran FormatServiceVolumes(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nran FormatServiceVolumes(%#+v) \ngot %#+v \nwanted %#+v", v.volume, actual, v.expected)
 		}
 	}
 }
@@ -113,7 +114,7 @@ func BenchmarkFormatPorts(b *testing.B) {
 
 func BenchmarkFormatServiceVolumes(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_ = FormatServiceVolumes("data-volume:/home")
+		_ = FormatServiceVolumes("data-volume:/home", "composeFile")
 	}
 }
 

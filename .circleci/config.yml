@@ -31,13 +31,24 @@ jobs:
       - run: dep ensure; dep prune
       - run: go build --race -o meli main.go
       - run: ./meli -up -d -f testdata/docker-compose.yml
-      - run: echo "number of running containersI(expected=7), actual=" && docker ps -q | wc -l
+      - run: echo "number of running containersI(expected=8), actual=" && docker ps -q | wc -l
       # stop the containers running from the previous command
-      - run: docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker system prune -af
+      - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
       - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
-      - run: echo "number of running containersII(expected=7), actual=" && docker ps -q | wc -l
+      - run: echo "number of running containersII(expected=8), actual=" && docker ps -q | wc -l
       - run: go test -timeout 1m -race -cover -v ./...
-      - run: go test -timeout 1m -race -run=XXX -bench=. ./...
+      #- run: go test -timeout 1m -race -run=XXX -bench=. ./...
+
+      # benchmark against docker-compose
+      - run: sudo apt -y install python-pip
+      - run: sudo pip install -U pip && sudo pip install -U docker-compose
+      - run: docker-compose version
+      - run: rm meli
+      - run: go build -o meli main.go
+      - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+      - run: time docker-compose -f testdata/docker-compose.yml up -d
+      - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+      - run: time ./meli -up -d -f testdata/docker-compose.yml
 
       - deploy:
           name: do a github release on master

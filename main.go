@@ -117,6 +117,7 @@ func startContainers(
 	alreadyCreated, containerID, err := api.CreateContainer(
 		ctx,
 		s,
+		k,
 		networkName,
 		formattedContainerName,
 		dockerComposeFile,

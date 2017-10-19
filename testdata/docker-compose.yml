@@ -48,5 +48,14 @@ services:
     volumes:
       - data-volume:/var
 
+  onbuildcopy:
+    build:
+      context: .
+      dockerfile: OnbuildCopyDockerfile
+    command: tail -f /usr/src/app/OnbuildCopyDockerfile
+    volumes:
+      - ./:/mydir
+      - /var/run/docker.sock:/var/run/docker.sock
+
 volumes:
   data-volume:
