@@ -40,17 +40,13 @@ jobs:
       #- run: go test -timeout 1m -race -run=XXX -bench=. ./...
 
       # benchmark against docker-compose
-      - run:
-          name: Install Docker Compose
-          command: |
-            set -x
-            curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
-      - run: /usr/local/bin/docker-compose version
+      - run: sudo apt -y install python-pip
+      - run: sudo pip install -U pip && sudo pip install -U docker-compose
+      - run: docker-compose version
       - run: rm meli
       - run: go build -o meli main.go
       - run: docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker system prune -af
-      - run: /usr/bin/time -apv /usr/local/bin/docker-compose up -d -f testdata/docker-compose.yml
+      - run: /usr/bin/time -apv docker-compose up -d -f testdata/docker-compose.yml
       - run: docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker system prune -af
       - run: /usr/bin/time -apv ./meli -up -d -f testdata/docker-compose.yml
 
