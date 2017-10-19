@@ -102,9 +102,8 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 	binds := []string{}
 	if len(s.Volumes) > 0 {
 		for _, v := range s.Volumes {
-			vol := FormatServiceVolumes(v)
+			vol := FormatServiceVolumes(v, dockerComposeFile)
 			volume[vol[1]] = EmptyStruct{}
-
 			// TODO: handle other read/write modes
 			whatToBind := vol[0] + ":" + vol[1] + ":rw"
 			binds = append(binds, whatToBind)
