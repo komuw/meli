@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -39,12 +40,62 @@ func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) e
 	return nil
 }
 
-func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient) (string, error) {
+func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			// todo: maybe we should return nil
+			return err
+		}
+
+		tarHeader, err := tar.FileInfoHeader(info, info.Name())
+		if err != nil {
+			return err
+		}
+		// update the name to correctly reflect the desired destination when untaring
+		// https://medium.com/@skdomino/taring-untaring-files-in-go-6b07cf56bc07
+		tarHeader.Name = strings.TrimPrefix(strings.Replace(path, src, "", -1), string(filepath.Separator))
+		err = tw.WriteHeader(tarHeader)
+		if err != nil {
+			return err
+		}
+		// return on directories since there will be no content to tar
+		if info.Mode().IsDir() {
+			return nil
+		}
+
+		// open files for taring
+		f, err := os.Open(path)
+		defer f.Close()
+		if err != nil {
+			return err
+		}
+		readFile, err := ioutil.ReadAll(f)
+		if err != nil {
+			return err
+		}
+		_, err = tw.Write(readFile)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+}
+
+func BuildDockerImage(ctx context.Context, k, dockerFile string, cli MeliAPiClient) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
 
-	dockerFileReader, err := os.Open(dockerFile)
+	dockerFilePath, err := filepath.Abs(dockerFile)
+	if err != nil {
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf(" :unable to get path to Dockerfile %s", dockerFile)}
+	}
+	dockerContextPath := filepath.Dir(dockerFilePath)
+	dockerFileName := filepath.Base(dockerFile)
+
+	dockerFileReader, err := os.Open(dockerFilePath)
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
@@ -57,24 +108,7 @@ func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient)
 			newErr:      errors.New(" :unable to read dockerfile")}
 	}
 
-	tarHeader := &tar.Header{
-		Name: dockerFile,
-		Size: int64(len(readDockerFile)),
-	}
-	err = tw.WriteHeader(tarHeader)
-	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to write tar header")}
-	}
-	_, err = tw.Write(readDockerFile)
-	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to write tar body")}
-	}
-	dockerFileTarReader := bytes.NewReader(buf.Bytes())
-	imageName := "meli_" + strings.ToLower(dockerFile)
+	imageName := "meli_" + strings.ToLower(k)
 
 	splitDockerfile := strings.Split(string(readDockerFile), " ")
 	splitImageName := strings.Split(splitDockerfile[1], "\n")
@@ -92,6 +126,14 @@ func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient)
 	AuthConfigs := make(map[string]types.AuthConfig)
 	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}
 
+	err = filepath.Walk(dockerContextPath, walkFnClosure(dockerContextPath, tw, buf))
+	if err != nil {
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf(" :unable to walk dockefile context path %s", dockerFile)}
+	}
+	dockerFileTarReader := bytes.NewReader(buf.Bytes())
+
 	imageBuildResponse, err := cli.ImageBuild(
 		ctx,
 		dockerFileTarReader,
@@ -102,7 +144,7 @@ func BuildDockerImage(ctx context.Context, dockerFile string, cli MeliAPiClient)
 			Remove:         true, //remove intermediary containers after build
 			ForceRemove:    true,
 			SuppressOutput: false,
-			Dockerfile:     dockerFile,
+			Dockerfile:     dockerFileName,
 			Context:        dockerFileTarReader,
 			AuthConfigs:    AuthConfigs})
 	if err != nil {

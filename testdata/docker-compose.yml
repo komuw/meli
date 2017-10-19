@@ -48,5 +48,12 @@ services:
     volumes:
       - data-volume:/var
 
+  onBuildCopy:
+    build:
+      context: .
+      dockerfile: OnbuildCopyDockerfile
+    volumes:
+      - ./:/usr/src/app
+
 volumes:
   data-volume:
