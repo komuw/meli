@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/MichaelTJones/walk"
 	"github.com/docker/docker/api/types"
 )
 
@@ -40,7 +41,7 @@ func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) e
 	return nil
 }
 
-func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkFunc {
+func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) walk.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			// todo: maybe we should return nil
@@ -128,7 +129,7 @@ func BuildDockerImage(ctx context.Context, k, dockerFile string, cli MeliAPiClie
 
 	// TODO: we need to read the context passed in the docker-compose context key for a service
 	// rather than assume the context is the dir the Dockerfile is in.
-	err = filepath.Walk(dockerContextPath, walkFnClosure(dockerContextPath, tw, buf))
+	err = walk.Walk(dockerContextPath, walkFnClosure(dockerContextPath, tw, buf))
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
