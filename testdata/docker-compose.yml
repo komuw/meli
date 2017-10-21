@@ -47,6 +47,9 @@ services:
       context: .
     volumes:
       - data-volume:/var
+    links:
+      - redis # we wont do anything about this since it is impled by default
+      - db:eminem
 
   onbuildcopy:
     build:
