@@ -49,7 +49,7 @@ services:
       - data-volume:/var
     links:
       - redis # we wont do anything about this since it is impled by default
-      - db:eminem
+      - db:eminem.com
 
   onbuildcopy:
     build:
