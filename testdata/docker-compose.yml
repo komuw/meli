@@ -60,5 +60,9 @@ services:
       - ./:/mydir
       - /var/run/docker.sock:/var/run/docker.sock
 
+  quayservice:
+    image: 'quay.io/komuw/busybox'
+    command: tail -fn10 .dockerenv
+
 volumes:
   data-volume:
