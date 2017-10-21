@@ -29,6 +29,7 @@ type ServiceConfig struct {
 	Restart     string      `yaml:"restart,omitempty"`
 	Build       Buildstruct `yaml:"build,omitempty"`
 	Volumes     []string    `yaml:"volumes,omitempty"`
+	Links       []string    `yaml:"links,omitempty"`
 }
 
 type DockerComposeConfig struct {

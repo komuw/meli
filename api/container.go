@@ -124,11 +124,22 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 			Cmd:          cmd,
 			Volumes:      volume},
 		&container.HostConfig{
+			DNS: []string{
+				"8.8.8.8",
+				"8.8.4.4",
+				"2001:4860:4860::8888",
+				"2001:4860:4860::8844"},
+			DNSSearch: []string{
+				"8.8.8.8",
+				"8.8.4.4",
+				"2001:4860:4860::8888",
+				"2001:4860:4860::8844"},
 			PublishAllPorts: false,
 			PortBindings:    portBindingMap,
 			NetworkMode:     container.NetworkMode(networkName),
 			RestartPolicy:   restartPolicy,
-			Binds:           binds},
+			Binds:           binds,
+			Links:           s.Links},
 		nil,
 		formattedImageName)
 	if err != nil {
