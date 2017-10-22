@@ -75,7 +75,7 @@ func main() {
 		wg.Add(1)
 		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", k))
 
-		ala := &api.XYZ{
+		ala := &api.DockerContainer{
 			ServiceName:       k,
 			ServiceConfig:     v,
 			NetworkID:         networkID,
@@ -87,7 +87,7 @@ func main() {
 	wg.Wait()
 }
 
-func startContainers(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, xyz *api.XYZ) {
+func startContainers(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, dc *api.DockerContainer) {
 	defer wg.Done()
 
 	/*
@@ -98,41 +98,41 @@ func startContainers(ctx context.Context, cli *client.Client, wg *sync.WaitGroup
 		5. Stream container logs
 	*/
 
-	if len(xyz.ServiceConfig.Image) > 0 {
-		err := api.PullDockerImage(ctx, cli, xyz)
+	if len(dc.ServiceConfig.Image) > 0 {
+		err := api.PullDockerImage(ctx, cli, dc)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
-			log.Printf("\n\t service=%s error=%s", xyz.ServiceName, err)
+			log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 			return
 		}
 	}
-	alreadyCreated, _, err := api.CreateContainer(ctx, cli, xyz)
+	alreadyCreated, _, err := api.CreateContainer(ctx, cli, dc)
 	if err != nil {
 		// clean exit since we want other goroutines for fetching other images
 		// to continue running
-		log.Printf("\n\t service=%s error=%s", xyz.ServiceName, err)
+		log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
 
 	if !alreadyCreated {
-		err = api.ConnectNetwork(ctx, cli, xyz)
+		err = api.ConnectNetwork(ctx, cli, dc)
 		if err != nil {
 			// create whitespace so that error is visible to human
-			log.Printf("\n\t service=%s error=%s", xyz.ServiceName, err)
+			log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 			return
 		}
 	}
 
-	err = api.ContainerStart(ctx, cli, xyz)
+	err = api.ContainerStart(ctx, cli, dc)
 	if err != nil {
-		log.Printf("\n\t service=%s error=%s", xyz.ServiceName, err)
+		log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
 
-	err = api.ContainerLogs(ctx, cli, xyz)
+	err = api.ContainerLogs(ctx, cli, dc)
 	if err != nil {
-		log.Printf("\n\t service=%s error=%s", xyz.ServiceName, err)
+		log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
 }

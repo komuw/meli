@@ -7,30 +7,31 @@ import (
 
 func TestGetPullDockerImage(t *testing.T) {
 	tt := []struct {
-		input       string
+		dc         *DockerContainer
 		expectedErr error
 	}{
-		{"busybox", nil},
-	}
+		{&DockerContainer{ServiceConfig: ServiceConfig{Image: "busybox"}}, nil}}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		err := PullDockerImage(ctx, v.input, cli)
+		err := PullDockerImage(ctx, cli, v.dc)
 		if err != nil {
-			t.Errorf("\nCalled PullDockerImage(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
+			t.Errorf("\nCalled PullDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
 		}
 	}
 }
 
 func TestGetBuildDockerImage(t *testing.T) {
 	tt := []struct {
-		serviceName string
-		dockerFile  string
+		dc         *DockerContainer
 		expected    string
 		expectedErr error
-	}{
-		{"myservicename", "../testdata/Dockerfile", "meli_myservicename", nil},
-	}
+	}{&DockerContainer{
+		ServiceName: "myservicename",
+		ServiceConfig: ServiceConfig{
+			Build: Buildstruct{
+				Dockerfile: "../testdata/Dockerfile"}}}, "meli_myservicename", nil}
+
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {

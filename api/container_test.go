@@ -7,12 +7,12 @@ import (
 
 func TestCreateContainer(t *testing.T) {
 	tt := []struct {
-		xyz         *XYZ
+		dc         *DockerContainer
 		expected    string
 		expectedErr error
 	}{
 		{
-			&XYZ{
+			&DockerContainer{
 				ServiceConfig:     ServiceConfig{Image: "busybox", Restart: "unless-stopped"},
 				ServiceName:       "myservice",
 				NetworkName:       "myNetworkName",
@@ -25,51 +25,51 @@ func TestCreateContainer(t *testing.T) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		//CreateContainer(ctx context.Context, cli MeliAPiClient, xyz *XYZ)
-		alreadyCreated, actual, err := CreateContainer(ctx, cli, v.xyz)
+		//CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer)
+		alreadyCreated, actual, err := CreateContainer(ctx, cli, v.dc)
 		if err != nil {
-			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.xyz, err, v.expectedErr)
+			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
 		}
 		if actual != v.expected {
-			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.xyz, actual, v.expected)
+			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.dc, actual, v.expected)
 		}
 		if alreadyCreated != true {
-			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %#+v \nwanted %#+v", v.xyz, alreadyCreated, true)
+			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %#+v \nwanted %#+v", v.dc, alreadyCreated, true)
 		}
 	}
 }
 
 func TestContainerStart(t *testing.T) {
 	tt := []struct {
-		xyz         *XYZ
+		dc         *DockerContainer
 		expectedErr error
 	}{
-		{&XYZ{ContainerID: "myContainerId"}, nil},
+		{&DockerContainer{ContainerID: "myContainerId"}, nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		err := ContainerStart(ctx, cli, v.xyz)
+		err := ContainerStart(ctx, cli, v.dc)
 		if err != nil {
-			t.Errorf("\nCalled ContainerStart(%#+v) \ngot %s \nwanted %#+v", v.xyz, err, v.expectedErr)
+			t.Errorf("\nCalled ContainerStart(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
 		}
 	}
 }
 
 func TestContainerLogs(t *testing.T) {
 	tt := []struct {
-		xyz         *XYZ
+		dc         *DockerContainer
 		expectedErr error
 	}{
-		{&XYZ{ContainerID: "myContainerId", FollowLogs: true}, nil},
-		{&XYZ{ContainerID: "myContainerId", FollowLogs: false}, nil},
+		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: true}, nil},
+		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: false}, nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		err := ContainerLogs(ctx, cli, v.xyz)
+		err := ContainerLogs(ctx, cli, v.dc)
 		if err != nil {
-			t.Errorf("\nCalled ContainerLogs(%#+v) \ngot %s \nwanted %#+v", v.xyz, err, v.expectedErr)
+			t.Errorf("\nCalled ContainerLogs(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
 		}
 	}
 }
@@ -77,7 +77,7 @@ func TestContainerLogs(t *testing.T) {
 func BenchmarkCreateContainer(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
-	xyz := &XYZ{
+	dc := &DockerContainer{
 		ServiceConfig:     ServiceConfig{Image: "busybox", Restart: "unless-stopped"},
 		ServiceName:       "myservice",
 		NetworkName:       "myNetworkName",
@@ -85,7 +85,7 @@ func BenchmarkCreateContainer(b *testing.B) {
 		ContainerID:       "myExistingContainerId00912",
 	}
 	for n := 0; n < b.N; n++ {
-		_, _, _ = CreateContainer(ctx, cli, xyz)
+		_, _, _ = CreateContainer(ctx, cli, dc)
 	}
 }
 
@@ -93,7 +93,7 @@ func BenchmarkContainerStart(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for n := 0; n < b.N; n++ {
-		_ = ContainerStart(ctx, cli, &XYZ{ContainerID: "containerId"})
+		_ = ContainerStart(ctx, cli, &DockerContainer{ContainerID: "containerId"})
 	}
 }
 
@@ -101,6 +101,6 @@ func BenchmarkContainerLogs(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for n := 0; n < b.N; n++ {
-		_ = ContainerLogs(ctx, cli, &XYZ{ContainerID: "containerId"})
+		_ = ContainerLogs(ctx, cli, &DockerContainer{ContainerID: "containerId"})
 	}
 }

@@ -44,16 +44,16 @@ func GetNetwork(ctx context.Context, networkName string, cli MeliAPiClient) (str
 
 }
 
-func ConnectNetwork(ctx context.Context, cli MeliAPiClient, xyz *XYZ) error {
+func ConnectNetwork(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) error {
 	err := cli.NetworkConnect(
 		ctx,
-		xyz.NetworkID,
-		xyz.ContainerID,
+		dc.NetworkID,
+		dc.ContainerID,
 		&network.EndpointSettings{})
 	if err != nil {
 		return &popagateError{
 			originalErr: err,
-			newErr:      fmt.Errorf(" :unable to connect container %s to network %s", xyz.ContainerID, xyz.NetworkID)}
+			newErr:      fmt.Errorf(" :unable to connect container %s to network %s", dc.ContainerID, dc.NetworkID)}
 
 	}
 	return nil

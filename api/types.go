@@ -38,7 +38,7 @@ type DockerComposeConfig struct {
 	Volumes  map[string]string        `yaml:"volumes,omitempty"`
 }
 
-type XYZ struct {
+type DockerContainer struct {
 	ServiceName       string
 	ServiceConfig     ServiceConfig
 	NetworkID         string
@@ -49,8 +49,8 @@ type XYZ struct {
 	// this assumes that there can only be one container per docker-compose service
 }
 
-func (xyz *XYZ) UpdateContainerID(containerID string) {
-	xyz.ContainerID = containerID
+func (dc *DockerContainer) UpdateContainerID(containerID string) {
+	dc.ContainerID = containerID
 }
 
 type MeliAPiClient interface {
