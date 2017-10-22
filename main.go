@@ -75,29 +75,19 @@ func main() {
 		wg.Add(1)
 		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", k))
 
-		go startContainers(
-			ctx,
-			k,
-			v,
-			networkID,
-			networkName,
-			&wg,
-			followLogs,
-			dockerComposeFile,
-			cli)
+		ala := &api.XYZ{
+			ServiceName:       k,
+			ServiceConfig:     v,
+			NetworkID:         networkID,
+			NetworkName:       networkName,
+			FollowLogs:        followLogs,
+			DockerComposeFile: dockerComposeFile}
+		go startContainers(ctx, cli, &wg, ala)
 	}
 	wg.Wait()
 }
 
-func startContainers(
-	ctx context.Context,
-	k string,
-	s api.ServiceConfig,
-	networkID, networkName string,
-	wg *sync.WaitGroup,
-	followLogs bool,
-	dockerComposeFile string,
-	cli *client.Client) {
+func startContainers(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, xyz *api.XYZ) {
 	defer wg.Done()
 
 	/*
@@ -108,60 +98,41 @@ func startContainers(
 		5. Stream container logs
 	*/
 
-	formattedContainerName := api.FormatContainerName(k)
-	if len(s.Image) > 0 {
-		err := api.PullDockerImage(ctx, s.Image, cli)
+	if len(xyz.ServiceConfig.Image) > 0 {
+		err := api.PullDockerImage(ctx, cli, xyz)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
-			log.Printf("\n\t service=%s error=%s", k, err)
+			log.Printf("\n\t service=%s error=%s", xyz.ServiceName, err)
 			return
 		}
 	}
-	alreadyCreated, containerID, err := api.CreateContainer(
-		ctx,
-		s,
-		k,
-		networkName,
-		formattedContainerName,
-		dockerComposeFile,
-		cli)
+	alreadyCreated, _, err := api.CreateContainer(ctx, cli, xyz)
 	if err != nil {
 		// clean exit since we want other goroutines for fetching other images
 		// to continue running
-		log.Printf("\n\t service=%s error=%s", k, err)
+		log.Printf("\n\t service=%s error=%s", xyz.ServiceName, err)
 		return
 	}
 
 	if !alreadyCreated {
-		err = api.ConnectNetwork(
-			ctx,
-			networkID,
-			containerID,
-			cli)
+		err = api.ConnectNetwork(ctx, cli, xyz)
 		if err != nil {
 			// create whitespace so that error is visible to human
-			log.Printf("\n\t service=%s error=%s", k, err)
+			log.Printf("\n\t service=%s error=%s", xyz.ServiceName, err)
 			return
 		}
 	}
 
-	err = api.ContainerStart(
-		ctx,
-		containerID,
-		cli)
+	err = api.ContainerStart(ctx, cli, xyz)
 	if err != nil {
-		log.Printf("\n\t service=%s error=%s", k, err)
+		log.Printf("\n\t service=%s error=%s", xyz.ServiceName, err)
 		return
 	}
 
-	err = api.ContainerLogs(
-		ctx,
-		containerID,
-		followLogs,
-		cli)
+	err = api.ContainerLogs(ctx, cli, xyz)
 	if err != nil {
-		log.Printf("\n\t service=%s error=%s", k, err)
+		log.Printf("\n\t service=%s error=%s", xyz.ServiceName, err)
 		return
 	}
 }

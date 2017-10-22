@@ -16,11 +16,15 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, formattedImageName, dockerComposeFile string, cli MeliAPiClient) (bool, string, error) {
+//func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, formattedImageName, dockerComposeFile string, cli MeliAPiClient) (bool, string, error) {
+
+func CreateContainer(ctx context.Context, cli MeliAPiClient, xyz *XYZ) (bool, string, error) {
+	formattedImageName := FormatImageName(xyz.ServiceName)
+
 	// 2.1 make labels
 	labelsMap := make(map[string]string)
-	if len(s.Labels) > 0 {
-		for _, v := range s.Labels {
+	if len(xyz.ServiceConfig.Labels) > 0 {
+		for _, v := range xyz.ServiceConfig.Labels {
 			onelabel := FormatLabels(v)
 			labelsMap[onelabel[0]] = onelabel[1]
 		}
@@ -44,8 +48,8 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 	//2.2 make ports
 	portsMap := make(map[nat.Port]struct{})
 	portBindingMap := make(map[nat.Port][]nat.PortBinding)
-	if len(s.Ports) > 0 {
-		for _, v := range s.Ports {
+	if len(xyz.ServiceConfig.Ports) > 0 {
+		for _, v := range xyz.ServiceConfig.Ports {
 			oneport := FormatPorts(v)
 			hostport := oneport[0]
 			containerport := oneport[1]
@@ -60,36 +64,26 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 	}
 	//2.3 create command
 	cmd := strslice.StrSlice{}
-	if s.Command != "" {
-		sliceCommand := strings.Fields(s.Command)
+	if xyz.ServiceConfig.Command != "" {
+		sliceCommand := strings.Fields(xyz.ServiceConfig.Command)
 		cmd = strslice.StrSlice(sliceCommand)
 	}
 	//2.4 create restart policy
 	restartPolicy := container.RestartPolicy{}
-	if s.Restart != "" {
+	if xyz.ServiceConfig.Restart != "" {
 		// You cannot set MaximumRetryCount for the following restart policies;
 		// always, no, unless-stopped
-		if s.Restart == "on-failure" {
-			restartPolicy = container.RestartPolicy{Name: s.Restart, MaximumRetryCount: 3}
+		if xyz.ServiceConfig.Restart == "on-failure" {
+			restartPolicy = container.RestartPolicy{Name: xyz.ServiceConfig.Restart, MaximumRetryCount: 3}
 		} else {
-			restartPolicy = container.RestartPolicy{Name: s.Restart}
+			restartPolicy = container.RestartPolicy{Name: xyz.ServiceConfig.Restart}
 		}
 
 	}
 	//2.5 build image
-	imageNamePtr := &s.Image
-	if s.Build != (Buildstruct{}) {
-		dockerFile := s.Build.Dockerfile
-		if dockerFile == "" {
-			dockerFile = "Dockerfile"
-		}
-		// TODO: we should probably use the filepath stdlib module
-		// so that atleast it can guarantee us os agnotic'ness
-		pathToDockerFile := FormatComposePath(dockerComposeFile)[0]
-		if pathToDockerFile != "docker-compose.yml" {
-			dockerFile = pathToDockerFile + "/" + dockerFile
-		}
-		imageName, err := BuildDockerImage(ctx, k, dockerFile, cli)
+	imageNamePtr := &xyz.ServiceConfig.Image
+	if xyz.ServiceConfig.Build != (Buildstruct{}) {
+		imageName, err := BuildDockerImage(ctx, cli, xyz)
 		if err != nil {
 			return false, "", &popagateError{originalErr: err}
 		}
@@ -102,9 +96,9 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 	//2.6 add volumes
 	volume := make(map[string]struct{})
 	binds := []string{}
-	if len(s.Volumes) > 0 {
-		for _, v := range s.Volumes {
-			vol := FormatServiceVolumes(v, dockerComposeFile)
+	if len(xyz.ServiceConfig.Volumes) > 0 {
+		for _, v := range xyz.ServiceConfig.Volumes {
+			vol := FormatServiceVolumes(v, xyz.DockerComposeFile)
 			volume[vol[1]] = EmptyStruct{}
 			// TODO: handle other read/write modes
 			whatToBind := vol[0] + ":" + vol[1] + ":rw"
@@ -119,7 +113,7 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 		&container.Config{
 			Image:        imageName,
 			Labels:       labelsMap,
-			Env:          s.Environment,
+			Env:          xyz.ServiceConfig.Environment,
 			ExposedPorts: portsMap,
 			Cmd:          cmd,
 			Volumes:      volume},
@@ -136,10 +130,10 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 				"2001:4860:4860::8844"},
 			PublishAllPorts: false,
 			PortBindings:    portBindingMap,
-			NetworkMode:     container.NetworkMode(networkName),
+			NetworkMode:     container.NetworkMode(xyz.NetworkName),
 			RestartPolicy:   restartPolicy,
 			Binds:           binds,
-			Links:           s.Links},
+			Links:           xyz.ServiceConfig.Links},
 		nil,
 		formattedImageName)
 	if err != nil {
@@ -148,32 +142,33 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 			newErr:      errors.New(" :unable to create container")}
 	}
 
+	xyz.UpdateContainerID(containerCreateResp.ID)
 	return false, containerCreateResp.ID, nil
 }
 
-func ContainerStart(ctx context.Context, containerId string, cli MeliAPiClient) error {
+func ContainerStart(ctx context.Context, cli MeliAPiClient, xyz *XYZ) error {
 	err := cli.ContainerStart(
 		ctx,
-		containerId,
+		xyz.ContainerID,
 		types.ContainerStartOptions{})
 	if err != nil {
 		return &popagateError{
 			originalErr: err,
-			newErr:      fmt.Errorf(" :unable to start container %s", containerId)}
+			newErr:      fmt.Errorf(" :unable to start container %s", xyz.ContainerID)}
 
 	}
 	return nil
 }
 
-func ContainerLogs(ctx context.Context, containerId string, followLogs bool, cli MeliAPiClient) error {
+func ContainerLogs(ctx context.Context, cli MeliAPiClient, xyz *XYZ) error {
 	containerLogResp, err := cli.ContainerLogs(
 		ctx,
-		containerId,
+		xyz.ContainerID,
 		types.ContainerLogsOptions{
 			ShowStdout: true,
 			ShowStderr: true,
 			Timestamps: true,
-			Follow:     followLogs,
+			Follow:     xyz.FollowLogs,
 			Details:    true,
 			Tail:       "all"})
 
@@ -181,7 +176,7 @@ func ContainerLogs(ctx context.Context, containerId string, followLogs bool, cli
 		if err != nil {
 			return &popagateError{
 				originalErr: err,
-				newErr:      fmt.Errorf(" :unable to get container logs %s", containerId)}
+				newErr:      fmt.Errorf(" :unable to get container logs %s", xyz.ContainerID)}
 		}
 	}
 	defer containerLogResp.Close()

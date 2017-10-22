@@ -15,7 +15,8 @@ import (
 	"github.com/docker/docker/api/types"
 )
 
-func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) error {
+func PullDockerImage(ctx context.Context, cli MeliAPiClient, xyz *XYZ) error {
+	imageName := xyz.ServiceConfig.Image
 	result, _ := AuthInfo.Load("dockerhub")
 	if strings.Contains(imageName, "quay") {
 		result, _ = AuthInfo.Load("quay")
@@ -81,10 +82,23 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 	}
 }
 
-func BuildDockerImage(ctx context.Context, k, dockerFile string, cli MeliAPiClient) (string, error) {
+//func BuildDockerImage(ctx context.Context, k, dockerFile string, cli MeliAPiClient) (string, error) {
+
+func BuildDockerImage(ctx context.Context, cli MeliAPiClient, xyz *XYZ) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
+
+	dockerFile := xyz.ServiceConfig.Build.Dockerfile
+	if dockerFile == "" {
+		dockerFile = "Dockerfile"
+	}
+	// TODO: we should probably use the filepath stdlib module
+	// so that atleast it can guarantee us os agnotic'ness
+	pathToDockerFile := FormatComposePath(xyz.DockerComposeFile)[0]
+	if pathToDockerFile != "docker-compose.yml" {
+		dockerFile = pathToDockerFile + "/" + dockerFile
+	}
 
 	dockerFilePath, err := filepath.Abs(dockerFile)
 	if err != nil {
@@ -108,7 +122,7 @@ func BuildDockerImage(ctx context.Context, k, dockerFile string, cli MeliAPiClie
 			newErr:      errors.New(" :unable to read dockerfile")}
 	}
 
-	imageName := "meli_" + strings.ToLower(k)
+	imageName := "meli_" + strings.ToLower(xyz.ServiceName)
 
 	splitDockerfile := strings.Split(string(readDockerFile), " ")
 	splitImageName := strings.Split(splitDockerfile[1], "\n")

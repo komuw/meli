@@ -38,6 +38,21 @@ type DockerComposeConfig struct {
 	Volumes  map[string]string        `yaml:"volumes,omitempty"`
 }
 
+type XYZ struct {
+	ServiceName       string
+	ServiceConfig     ServiceConfig
+	NetworkID         string
+	NetworkName       string
+	FollowLogs        bool
+	DockerComposeFile string
+	ContainerID       string
+	// this assumes that there can only be one container per docker-compose service
+}
+
+func (xyz *XYZ) UpdateContainerID(containerID string) {
+	xyz.ContainerID = containerID
+}
+
 type MeliAPiClient interface {
 	// we implement this interface so that we can be able to mock it in tests
 	// https://medium.com/@zach_4342/dependency-injection-in-golang-e587c69478a8
