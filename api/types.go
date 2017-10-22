@@ -20,7 +20,7 @@ type Buildstruct struct {
 	Dockerfile string `yaml:"dockerfile,omitempty"`
 }
 
-type ServiceConfig struct {
+type ComposeService struct {
 	Image       string      `yaml:"image,omitempty"`
 	Ports       []string    `yaml:"ports,omitempty"`
 	Labels      []string    `yaml:"labels,omitempty"`
@@ -33,14 +33,14 @@ type ServiceConfig struct {
 }
 
 type DockerComposeConfig struct {
-	Version  string                   `yaml:"version,omitempty"`
-	Services map[string]ServiceConfig `yaml:"services"`
-	Volumes  map[string]string        `yaml:"volumes,omitempty"`
+	Version  string                    `yaml:"version,omitempty"`
+	Services map[string]ComposeService `yaml:"services"`
+	Volumes  map[string]string         `yaml:"volumes,omitempty"`
 }
 
 type DockerContainer struct {
 	ServiceName       string
-	ServiceConfig     ServiceConfig
+	ComposeService    ComposeService
 	NetworkID         string
 	NetworkName       string
 	FollowLogs        bool

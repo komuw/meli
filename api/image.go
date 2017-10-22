@@ -16,7 +16,7 @@ import (
 )
 
 func PullDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) error {
-	imageName := dc.ServiceConfig.Image
+	imageName := dc.ComposeService.Image
 	result, _ := AuthInfo.Load("dockerhub")
 	if strings.Contains(imageName, "quay") {
 		result, _ = AuthInfo.Load("quay")
@@ -89,7 +89,7 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
 
-	dockerFile := dc.ServiceConfig.Build.Dockerfile
+	dockerFile := dc.ComposeService.Build.Dockerfile
 	if dockerFile == "" {
 		dockerFile = "Dockerfile"
 	}

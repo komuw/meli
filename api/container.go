@@ -16,15 +16,15 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-//func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, formattedImageName, dockerComposeFile string, cli MeliAPiClient) (bool, string, error) {
+//func CreateContainer(ctx context.Context, s ComposeService, k, networkName, formattedImageName, dockerComposeFile string, cli MeliAPiClient) (bool, string, error) {
 
 func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) (bool, string, error) {
 	formattedImageName := FormatImageName(dc.ServiceName)
 
 	// 2.1 make labels
 	labelsMap := make(map[string]string)
-	if len(dc.ServiceConfig.Labels) > 0 {
-		for _, v := range dc.ServiceConfig.Labels {
+	if len(dc.ComposeService.Labels) > 0 {
+		for _, v := range dc.ComposeService.Labels {
 			onelabel := FormatLabels(v)
 			labelsMap[onelabel[0]] = onelabel[1]
 		}
@@ -48,8 +48,8 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 	//2.2 make ports
 	portsMap := make(map[nat.Port]struct{})
 	portBindingMap := make(map[nat.Port][]nat.PortBinding)
-	if len(dc.ServiceConfig.Ports) > 0 {
-		for _, v := range dc.ServiceConfig.Ports {
+	if len(dc.ComposeService.Ports) > 0 {
+		for _, v := range dc.ComposeService.Ports {
 			oneport := FormatPorts(v)
 			hostport := oneport[0]
 			containerport := oneport[1]
@@ -64,25 +64,25 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 	}
 	//2.3 create command
 	cmd := strslice.StrSlice{}
-	if dc.ServiceConfig.Command != "" {
-		sliceCommand := strings.Fields(dc.ServiceConfig.Command)
+	if dc.ComposeService.Command != "" {
+		sliceCommand := strings.Fields(dc.ComposeService.Command)
 		cmd = strslice.StrSlice(sliceCommand)
 	}
 	//2.4 create restart policy
 	restartPolicy := container.RestartPolicy{}
-	if dc.ServiceConfig.Restart != "" {
+	if dc.ComposeService.Restart != "" {
 		// You cannot set MaximumRetryCount for the following restart policies;
 		// always, no, unless-stopped
-		if dc.ServiceConfig.Restart == "on-failure" {
-			restartPolicy = container.RestartPolicy{Name: dc.ServiceConfig.Restart, MaximumRetryCount: 3}
+		if dc.ComposeService.Restart == "on-failure" {
+			restartPolicy = container.RestartPolicy{Name: dc.ComposeService.Restart, MaximumRetryCount: 3}
 		} else {
-			restartPolicy = container.RestartPolicy{Name: dc.ServiceConfig.Restart}
+			restartPolicy = container.RestartPolicy{Name: dc.ComposeService.Restart}
 		}
 
 	}
 	//2.5 build image
-	imageNamePtr := &dc.ServiceConfig.Image
-	if dc.ServiceConfig.Build != (Buildstruct{}) {
+	imageNamePtr := &dc.ComposeService.Image
+	if dc.ComposeService.Build != (Buildstruct{}) {
 		imageName, err := BuildDockerImage(ctx, cli, dc)
 		if err != nil {
 			return false, "", &popagateError{originalErr: err}
@@ -96,8 +96,8 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 	//2.6 add volumes
 	volume := make(map[string]struct{})
 	binds := []string{}
-	if len(dc.ServiceConfig.Volumes) > 0 {
-		for _, v := range dc.ServiceConfig.Volumes {
+	if len(dc.ComposeService.Volumes) > 0 {
+		for _, v := range dc.ComposeService.Volumes {
 			vol := FormatServiceVolumes(v, dc.DockerComposeFile)
 			volume[vol[1]] = EmptyStruct{}
 			// TODO: handle other read/write modes
@@ -113,7 +113,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 		&container.Config{
 			Image:        imageName,
 			Labels:       labelsMap,
-			Env:          dc.ServiceConfig.Environment,
+			Env:          dc.ComposeService.Environment,
 			ExposedPorts: portsMap,
 			Cmd:          cmd,
 			Volumes:      volume},
@@ -133,7 +133,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			NetworkMode:     container.NetworkMode(dc.NetworkName),
 			RestartPolicy:   restartPolicy,
 			Binds:           binds,
-			Links:           dc.ServiceConfig.Links},
+			Links:           dc.ComposeService.Links},
 		nil,
 		formattedImageName)
 	if err != nil {

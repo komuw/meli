@@ -77,7 +77,7 @@ func main() {
 
 		dc := &api.DockerContainer{
 			ServiceName:       k,
-			ServiceConfig:     v,
+			ComposeService:     v,
 			NetworkID:         networkID,
 			NetworkName:       networkName,
 			FollowLogs:        followLogs,
@@ -98,7 +98,7 @@ func startContainers(ctx context.Context, cli *client.Client, wg *sync.WaitGroup
 		5. Stream container logs
 	*/
 
-	if len(dc.ServiceConfig.Image) > 0 {
+	if len(dc.ComposeService.Image) > 0 {
 		err := api.PullDockerImage(ctx, cli, dc)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images

@@ -13,7 +13,7 @@ func TestCreateContainer(t *testing.T) {
 	}{
 		{
 			&DockerContainer{
-				ServiceConfig:     ServiceConfig{Image: "busybox", Restart: "unless-stopped"},
+				ComposeService:     ComposeService{Image: "busybox", Restart: "unless-stopped"},
 				ServiceName:       "myservice",
 				NetworkName:       "myNetworkName",
 				DockerComposeFile: "DockerFile",
@@ -78,7 +78,7 @@ func BenchmarkCreateContainer(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	dc := &DockerContainer{
-		ServiceConfig:     ServiceConfig{Image: "busybox", Restart: "unless-stopped"},
+		ComposeService:     ComposeService{Image: "busybox", Restart: "unless-stopped"},
 		ServiceName:       "myservice",
 		NetworkName:       "myNetworkName",
 		DockerComposeFile: "DockerFile",
