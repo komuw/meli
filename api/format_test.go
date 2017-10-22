@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestFormatContainerName(t *testing.T) {
+func TestFormatImageName(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected string
@@ -15,9 +15,9 @@ func TestFormatContainerName(t *testing.T) {
 		{"yolo:ala", "yolo"},
 	}
 	for _, v := range tt {
-		actual := FormatContainerName(v.input)
+		actual := FormatImageName(v.input)
 		if actual != v.expected {
-			t.Errorf("\nran FormatContainerName(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled FormatImageName(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
@@ -33,7 +33,7 @@ func TestFormatLabels(t *testing.T) {
 	for _, v := range tt {
 		actual := FormatLabels(v.input)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nran FormatLabels(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled FormatLabels(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
@@ -48,7 +48,7 @@ func TestFormatPorts(t *testing.T) {
 	for _, v := range tt {
 		actual := FormatPorts(v.input)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nran TestFormatPorts(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled TestFormatPorts(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
@@ -64,7 +64,7 @@ func TestFormatServiceVolumes(t *testing.T) {
 	for _, v := range tt {
 		actual := FormatServiceVolumes(v.volume, v.dockerComposeFile)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nran FormatServiceVolumes(%#+v) \ngot %#+v \nwanted %#+v", v.volume, actual, v.expected)
+			t.Errorf("\nCalled FormatServiceVolumes(%#+v) \ngot %#+v \nwanted %#+v", v.volume, actual, v.expected)
 		}
 	}
 }
@@ -79,7 +79,7 @@ func TestFormatRegistryAuth(t *testing.T) {
 	for _, v := range tt {
 		actual := FormatRegistryAuth(v.input)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nran FormatRegistryAuth(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled FormatRegistryAuth(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
@@ -94,7 +94,7 @@ func TestFormatComposePath(t *testing.T) {
 	for _, v := range tt {
 		actual := FormatComposePath(v.input)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nran FormatComposePath(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled FormatComposePath(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
@@ -118,9 +118,9 @@ func BenchmarkFormatServiceVolumes(b *testing.B) {
 	}
 }
 
-func BenchmarkFormatContainerName(b *testing.B) {
+func BenchmarkFormatImageName(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_ = FormatContainerName("build_with_no_specified_dockerfile")
+		_ = FormatImageName("build_with_no_specified_dockerfile")
 	}
 
 }

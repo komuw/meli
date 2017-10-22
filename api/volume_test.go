@@ -19,10 +19,10 @@ func TestCreateDockerVolume(t *testing.T) {
 	for _, v := range tt {
 		actual, err := CreateDockerVolume(ctx, v.name, v.driver, cli)
 		if err != nil {
-			t.Errorf("\nran CreateDockerVolume(%#+v) \ngot %s \nwanted %#+v", v.name, err, v.expectedErr)
+			t.Errorf("\nCalled CreateDockerVolume(%#+v) \ngot %s \nwanted %#+v", v.name, err, v.expectedErr)
 		}
 		if actual != v.expected {
-			t.Errorf("\nran CreateDockerVolume(%#+v) \ngot %#+v \nwanted %#+v", v.name, actual, v.expected)
+			t.Errorf("\nCalled CreateDockerVolume(%#+v) \ngot %#+v \nwanted %#+v", v.name, actual, v.expected)
 		}
 	}
 }

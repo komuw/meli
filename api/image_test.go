@@ -17,7 +17,7 @@ func TestGetPullDockerImage(t *testing.T) {
 	for _, v := range tt {
 		err := PullDockerImage(ctx, v.input, cli)
 		if err != nil {
-			t.Errorf("\nran PullDockerImage(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
+			t.Errorf("\nCalled PullDockerImage(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
 		}
 	}
 }
@@ -36,10 +36,10 @@ func TestGetBuildDockerImage(t *testing.T) {
 	for _, v := range tt {
 		actual, err := BuildDockerImage(ctx, v.serviceName, v.dockerFile, cli)
 		if err != nil {
-			t.Errorf("\nran BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dockerFile, err, v.expectedErr)
+			t.Errorf("\nCalled BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dockerFile, err, v.expectedErr)
 		}
 		if actual != v.expected {
-			t.Errorf("\nran BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dockerFile, actual, v.expected)
+			t.Errorf("\nCalled BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dockerFile, actual, v.expected)
 		}
 	}
 }

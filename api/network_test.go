@@ -18,10 +18,10 @@ func TestGetNetwork(t *testing.T) {
 	for _, v := range tt {
 		actual, err := GetNetwork(ctx, v.input, cli)
 		if err != nil {
-			t.Errorf("\nran GetNetwork(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
+			t.Errorf("\nCalled GetNetwork(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
 		}
 		if actual != v.expected {
-			t.Errorf("\nran GetNetwork(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled GetNetwork(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
@@ -39,7 +39,7 @@ func TestConnectNetwork(t *testing.T) {
 	for _, v := range tt {
 		err := ConnectNetwork(ctx, v.netWorkID, v.containerID, cli)
 		if err != nil {
-			t.Errorf("\nran ConnectNetwork(%#+v) \ngot %s \nwanted %#+v", v.netWorkID, err, v.expectedErr)
+			t.Errorf("\nCalled ConnectNetwork(%#+v) \ngot %s \nwanted %#+v", v.netWorkID, err, v.expectedErr)
 		}
 	}
 }
