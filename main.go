@@ -75,14 +75,14 @@ func main() {
 		wg.Add(1)
 		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", k))
 
-		ala := &api.DockerContainer{
+		dc := &api.DockerContainer{
 			ServiceName:       k,
 			ServiceConfig:     v,
 			NetworkID:         networkID,
 			NetworkName:       networkName,
 			FollowLogs:        followLogs,
 			DockerComposeFile: dockerComposeFile}
-		go startContainers(ctx, cli, &wg, ala)
+		go startContainers(ctx, cli, &wg, dc)
 	}
 	wg.Wait()
 }
