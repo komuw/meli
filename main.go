@@ -81,7 +81,8 @@ func main() {
 			NetworkID:         networkID,
 			NetworkName:       networkName,
 			FollowLogs:        followLogs,
-			DockerComposeFile: dockerComposeFile}
+			DockerComposeFile: dockerComposeFile,
+			LogMedium:         os.Stdout}
 		go startContainers(ctx, cli, &wg, dc)
 	}
 	wg.Wait()
