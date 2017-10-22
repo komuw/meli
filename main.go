@@ -66,7 +66,7 @@ func main() {
 			// than volumes, so the sync in the for loop for containers is enough
 			// 2. since we intend to stream logs as containers run(see; issues/24);
 			// then meli will be up long enough for the volume creation goroutines to have finished.
-			go api.CreateDockerVolume(ctx, "meli_"+k, "local", cli)
+			go api.CreateDockerVolume(ctx, cli, "meli_"+k, "local", os.Stdout)
 		}
 	}
 
@@ -77,11 +77,12 @@ func main() {
 
 		dc := &api.DockerContainer{
 			ServiceName:       k,
-			ComposeService:     v,
+			ComposeService:    v,
 			NetworkID:         networkID,
 			NetworkName:       networkName,
 			FollowLogs:        followLogs,
-			DockerComposeFile: dockerComposeFile}
+			DockerComposeFile: dockerComposeFile,
+			LogMedium:         os.Stdout}
 		go startContainers(ctx, cli, &wg, dc)
 	}
 	wg.Wait()

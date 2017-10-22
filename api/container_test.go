@@ -2,18 +2,19 @@ package api
 
 import (
 	"context"
+	"io/ioutil"
 	"testing"
 )
 
 func TestCreateContainer(t *testing.T) {
 	tt := []struct {
-		dc         *DockerContainer
+		dc          *DockerContainer
 		expected    string
 		expectedErr error
 	}{
 		{
 			&DockerContainer{
-				ComposeService:     ComposeService{Image: "busybox", Restart: "unless-stopped"},
+				ComposeService:    ComposeService{Image: "busybox", Restart: "unless-stopped"},
 				ServiceName:       "myservice",
 				NetworkName:       "myNetworkName",
 				DockerComposeFile: "DockerFile",
@@ -41,7 +42,7 @@ func TestCreateContainer(t *testing.T) {
 
 func TestContainerStart(t *testing.T) {
 	tt := []struct {
-		dc         *DockerContainer
+		dc          *DockerContainer
 		expectedErr error
 	}{
 		{&DockerContainer{ContainerID: "myContainerId"}, nil},
@@ -58,11 +59,11 @@ func TestContainerStart(t *testing.T) {
 
 func TestContainerLogs(t *testing.T) {
 	tt := []struct {
-		dc         *DockerContainer
+		dc          *DockerContainer
 		expectedErr error
 	}{
-		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: true}, nil},
-		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: false}, nil},
+		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: true, LogMedium: ioutil.Discard}, nil},
+		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: false, LogMedium: ioutil.Discard}, nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
@@ -78,7 +79,7 @@ func BenchmarkCreateContainer(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	dc := &DockerContainer{
-		ComposeService:     ComposeService{Image: "busybox", Restart: "unless-stopped"},
+		ComposeService:    ComposeService{Image: "busybox", Restart: "unless-stopped"},
 		ServiceName:       "myservice",
 		NetworkName:       "myNetworkName",
 		DockerComposeFile: "DockerFile",
@@ -101,6 +102,6 @@ func BenchmarkContainerLogs(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for n := 0; n < b.N; n++ {
-		_ = ContainerLogs(ctx, cli, &DockerContainer{ContainerID: "containerId"})
+		_ = ContainerLogs(ctx, cli, &DockerContainer{ContainerID: "containerId", LogMedium: ioutil.Discard})
 	}
 }

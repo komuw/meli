@@ -36,7 +36,7 @@ func PullDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 
 	// supplying your own buffer is perfomant than letting the system do it for you
 	buff := make([]byte, 2048)
-	io.CopyBuffer(os.Stdout, imagePullResp, buff)
+	io.CopyBuffer(dc.LogMedium, imagePullResp, buff)
 
 	return nil
 }
@@ -177,7 +177,7 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 	defer imageBuildResponse.Body.Close()
 
 	buff := make([]byte, 2048)
-	io.CopyBuffer(os.Stdout, imageBuildResponse.Body, buff)
+	io.CopyBuffer(dc.LogMedium, imageBuildResponse.Body, buff)
 
 	return imageName, nil
 }
