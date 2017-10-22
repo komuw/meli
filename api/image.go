@@ -93,9 +93,15 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 	if dockerFile == "" {
 		dockerFile = "Dockerfile"
 	}
+
 	// TODO: we should probably use the filepath stdlib module
 	// so that atleast it can guarantee us os agnotic'ness
-	pathToDockerFile := FormatComposePath(dc.DockerComposeFile)[0]
+	formattedDockerComposePath := FormatComposePath(dc.DockerComposeFile)
+	if len(formattedDockerComposePath) == 0 {
+		// very unlikely to hit this situation, but
+		return "", fmt.Errorf(" :docker-compose file is empty %s", dc.DockerComposeFile)
+	}
+	pathToDockerFile := formattedDockerComposePath[0]
 	if pathToDockerFile != "docker-compose.yml" {
 		dockerFile = pathToDockerFile + "/" + dockerFile
 	}
