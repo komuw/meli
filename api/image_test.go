@@ -30,7 +30,8 @@ func TestGetBuildDockerImage(t *testing.T) {
 	}{
 		{
 			&DockerContainer{
-				ServiceName: "myservicename",
+				ServiceName:       "myservicename",
+				DockerComposeFile: "docker-compose.yml",
 				ServiceConfig: ServiceConfig{
 					Build: Buildstruct{Dockerfile: "../testdata/Dockerfile"}}},
 			"meli_myservicename",
@@ -39,6 +40,7 @@ func TestGetBuildDockerImage(t *testing.T) {
 
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
+	GetAuth()
 	for _, v := range tt {
 		actual, err := BuildDockerImage(ctx, cli, v.dc)
 		if err != nil {
