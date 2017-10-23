@@ -8,7 +8,7 @@ as it can in parallel.
 
 Meli is a Swahili word meaning ship; so think of Meli as a ship carrying your docker containers safely across the treacherous container seas.
 
-It's currently work in progress.
+It's currently work in progress, API will remain unstable for sometime.
 
 I only intend to support docker-compose version 3+; https://docs.docker.com/compose/compose-file/compose-versioning/           
 
@@ -56,10 +56,40 @@ services:
 2017/10/07 14:30:12 u2017-10-07T11:30:12.720619075Z  1:M 07 Oct 11:30:12.720 * The server is now ready to accept connections on port 6379
 ```
 
-# Build                   
-`git clone git@github.com:komuW/meli.git`           
-`go build -o meli main.go`           
-`./meli -up -f /path/to/docker-compose-file.yml`                
+# Usage as a library
+You really should be using the official [docker Go sdk](https://godoc.org/github.com/moby/moby/client)         
+However, if you feel inclined to use meli;
+```go
+package main
+
+import (
+	"context"
+	"log"
+	"os"
+
+	"github.com/docker/docker/client"
+	"github.com/komuw/meli/api"
+)
+
+func main() {
+
+	dc := &api.DockerContainer{
+		ComposeService: api.ComposeService{Image: "busybox"},
+		LogMedium:      os.Stdout,
+		FollowLogs:     true}
+
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		log.Fatal(err, " :unable to intialize docker client")
+	}
+	defer cli.Close()
+	err = api.PullDockerImage(ctx, cli, dc)
+	log.Println(err)
+
+}
+
+```
 
 
 # Benchmarks
@@ -100,5 +130,15 @@ Benchmark results(average):
 
 Thus, meli appears to be 2.4 times faster than docker-compose(by wall clock time).           
 You can [checkout the current benchmark results from the circleCI](https://circleci.com/gh/komuW/meli/)              
-However, I'm not making a tool to take docker-compose to the races.
+However, I'm not making a tool to take docker-compose to the races.                   
+
+# Build                   
+`git clone git@github.com:komuW/meli.git`           
+`go build -o meli main.go`           
+`./meli -up -f /path/to/docker-compose-file.yml`                   
+
+
+# TODO
+- add better documentation(godoc)
+- stabilise API(maybe)
 
