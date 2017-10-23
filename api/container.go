@@ -105,8 +105,6 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 		}
 	}
 
-	// TODO: we should skip creating the container again if already exists
-	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
