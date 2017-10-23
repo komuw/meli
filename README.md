@@ -8,7 +8,7 @@ as it can in parallel.
 
 Meli is a Swahili word meaning ship; so think of Meli as a ship carrying your docker containers safely across the treacherous container seas.
 
-It's currently work in progress.
+It's currently work in progress, API will remain unstable for sometime.
 
 I only intend to support docker-compose version 3+; https://docs.docker.com/compose/compose-file/compose-versioning/           
 
@@ -56,10 +56,40 @@ services:
 2017/10/07 14:30:12 u2017-10-07T11:30:12.720619075Z  1:M 07 Oct 11:30:12.720 * The server is now ready to accept connections on port 6379
 ```
 
-# Build                   
-`git clone git@github.com:komuW/meli.git`           
-`go build -o meli main.go`           
-`./meli -up -f /path/to/docker-compose-file.yml`                
+# Usage as a library
+You really should be using the official [docker Go sdk](https://godoc.org/github.com/moby/moby/client)         
+However, if you feel inclined to use meli;
+```go
+package main
+
+import (
+	"context"
+	"log"
+	"os"
+
+	"github.com/docker/docker/client"
+	"github.com/komuw/meli/api"
+)
+
+func main() {
+
+	dc := &api.DockerContainer{
+		ComposeService: api.ComposeService{Image: "busybox"},
+		LogMedium:      os.Stdout,
+		FollowLogs:     true}
+
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		log.Fatal(err, " :unable to intialize docker client")
+	}
+	defer cli.Close()
+	err = api.PullDockerImage(ctx, cli, dc)
+	log.Println(err)
+
+}
+
+```
 
 
 # Benchmarks
@@ -69,18 +99,8 @@ Take any results you see here with a large spoon of salt; They are unscientific 
 Having made that disclaimer,                 
 
 test machine:             
-`lsb_release -a`
-```bash
-Distributor ID:	Ubuntu
-Description:	Ubuntu 16.04 LTS
-Release:	16.04
-Codename:	xenial
-No LSB modules are available.
-```
-`uname -ra`
-```bash
-4.4.0-96-generic #119-Ubuntu SMP Tue Sep 12 14:59:54 UTC 2017 x86_64 x86_64 x86_64 GNU/
-```
+[This circleCI machine](https://github.com/komuW/meli/blob/master/.circleci/config.yml#L9)
+
 
 docker-compose version:         
 `docker-compose --version`
@@ -89,7 +109,7 @@ docker-compose version 1.16.1, build 6d1ac219
 ```
 
 Meli version:   
-[version 0.0.5](https://github.com/komuW/meli/releases/tag/v0.0.5)
+[version 0.0.8](https://github.com/komuW/meli/releases/tag/v0.0.8)
            
 
 Benchmark test:           
@@ -101,16 +121,24 @@ for docker-compose:
 for meli:                
 `docker ps -aq | xargs docker rm -f; docker system prune -af; /usr/bin/time -apv meli -up -d`            
 
-the above scripts were ran 3 times for each tool and an average taken. 
-
 Benchmark results(average):                       
 
-| tool           | User time(seconds) | Elapsed wall clock time(seconds) |
-| :---           |     :---:          |          ---:                    |
-| docker-compose | 1.61 sec           | 63.57 sec                        |
-| meli           | 0.04 sec           | 28.43 sec                        |
+| tool           | Elapsed wall clock time(seconds) |
+| :---           |          ---:                    |
+| docker-compose |  11.911 seconds                  |
+| meli           |  4.778  seconds                  |
 
-Thus, meli appears to be 2.2 times faster than docker-compose(by wall clock time).       
-There are still some low hanging fruits, performance wise, that I'll target in future.        
-But I'm not making a tool to take docker-compose to the races.
+Thus, meli appears to be 2.4 times faster than docker-compose(by wall clock time).           
+You can [checkout the current benchmark results from the circleCI](https://circleci.com/gh/komuW/meli/)              
+However, I'm not making a tool to take docker-compose to the races.                   
+
+# Build                   
+`git clone git@github.com:komuW/meli.git`           
+`go build -o meli main.go`           
+`./meli -up -f /path/to/docker-compose-file.yml`                   
+
+
+# TODO
+- add better documentation(godoc)
+- stabilise API(maybe)
 
