@@ -23,7 +23,7 @@ func TestPullDockerImage(t *testing.T) {
 	}
 }
 
-func TestGetBuildDockerImage(t *testing.T) {
+func TestBuildDockerImage(t *testing.T) {
 	tt := []struct {
 		dc          *DockerContainer
 		expected    string
