@@ -15,7 +15,8 @@ import (
 	"github.com/docker/docker/api/types"
 )
 
-func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) error {
+func PullDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) error {
+	imageName := dc.ComposeService.Image
 	result, _ := AuthInfo.Load("dockerhub")
 	if strings.Contains(imageName, "quay") {
 		result, _ = AuthInfo.Load("quay")
@@ -35,7 +36,7 @@ func PullDockerImage(ctx context.Context, imageName string, cli MeliAPiClient) e
 
 	// supplying your own buffer is perfomant than letting the system do it for you
 	buff := make([]byte, 2048)
-	io.CopyBuffer(os.Stdout, imagePullResp, buff)
+	io.CopyBuffer(dc.LogMedium, imagePullResp, buff)
 
 	return nil
 }
@@ -81,10 +82,24 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 	}
 }
 
-func BuildDockerImage(ctx context.Context, k, dockerFile string, cli MeliAPiClient) (string, error) {
+func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
+
+	dockerFile := dc.ComposeService.Build.Dockerfile
+	if dockerFile == "" {
+		dockerFile = "Dockerfile"
+	}
+	formattedDockerComposePath := FormatComposePath(dc.DockerComposeFile)
+	if len(formattedDockerComposePath) == 0 {
+		// very unlikely to hit this situation, but
+		return "", fmt.Errorf(" :docker-compose file is empty %s", dc.DockerComposeFile)
+	}
+	pathToDockerFile := formattedDockerComposePath[0]
+	if pathToDockerFile != "docker-compose.yml" {
+		dockerFile = filepath.Join(pathToDockerFile, dockerFile)
+	}
 
 	dockerFilePath, err := filepath.Abs(dockerFile)
 	if err != nil {
@@ -108,7 +123,7 @@ func BuildDockerImage(ctx context.Context, k, dockerFile string, cli MeliAPiClie
 			newErr:      errors.New(" :unable to read dockerfile")}
 	}
 
-	imageName := "meli_" + strings.ToLower(k)
+	imageName := "meli_" + strings.ToLower(dc.ServiceName)
 
 	splitDockerfile := strings.Split(string(readDockerFile), " ")
 	splitImageName := strings.Split(splitDockerfile[1], "\n")
@@ -157,7 +172,7 @@ func BuildDockerImage(ctx context.Context, k, dockerFile string, cli MeliAPiClie
 	defer imageBuildResponse.Body.Close()
 
 	buff := make([]byte, 2048)
-	io.CopyBuffer(os.Stdout, imageBuildResponse.Body, buff)
+	io.CopyBuffer(dc.LogMedium, imageBuildResponse.Body, buff)
 
 	return imageName, nil
 }

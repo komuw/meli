@@ -3,12 +3,14 @@ package api
 import (
 	"context"
 	"errors"
-	"log"
+	"fmt"
+	"io"
+	"strings"
 
 	"github.com/docker/docker/api/types/volume"
 )
 
-func CreateDockerVolume(ctx context.Context, name, driver string, cli MeliAPiClient) (string, error) {
+func CreateDockerVolume(ctx context.Context, cli MeliAPiClient, name, driver string, dst io.Writer) (string, error) {
 	volume, err := cli.VolumeCreate(
 		ctx,
 		volume.VolumesCreateBody{
@@ -18,6 +20,8 @@ func CreateDockerVolume(ctx context.Context, name, driver string, cli MeliAPiCli
 		return "", &popagateError{originalErr: err, newErr: errors.New(" :unable to create docker volume")}
 	}
 
-	log.Printf("\ndocker volume: %s created succesfully.\n", volume.Name)
+	r := strings.NewReader(fmt.Sprintf("\ndocker volume: %s created succesfully.\n", volume.Name))
+	io.Copy(dst, r)
+
 	return volume.Name, nil
 }

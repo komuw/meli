@@ -18,28 +18,32 @@ func TestGetNetwork(t *testing.T) {
 	for _, v := range tt {
 		actual, err := GetNetwork(ctx, v.input, cli)
 		if err != nil {
-			t.Errorf("\nran GetNetwork(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
+			t.Errorf("\nCalled GetNetwork(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
 		}
 		if actual != v.expected {
-			t.Errorf("\nran GetNetwork(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled GetNetwork(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
 
 func TestConnectNetwork(t *testing.T) {
 	tt := []struct {
-		netWorkID   string
-		containerID string
+		dc          *DockerContainer
 		expectedErr error
 	}{
-		{"myNetWorkID", "myContainerID003", nil},
+		{
+			&DockerContainer{
+				NetworkID:   "myNetWorkID",
+				ContainerID: "myContainerID003"},
+			nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
+
 	for _, v := range tt {
-		err := ConnectNetwork(ctx, v.netWorkID, v.containerID, cli)
+		err := ConnectNetwork(ctx, cli, v.dc)
 		if err != nil {
-			t.Errorf("\nran ConnectNetwork(%#+v) \ngot %s \nwanted %#+v", v.netWorkID, err, v.expectedErr)
+			t.Errorf("\nCalled ConnectNetwork(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
 		}
 	}
 }
@@ -55,7 +59,8 @@ func BenchmarkGetNetwork(b *testing.B) {
 func BenchmarkConnectNetwork(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
+	dc := &DockerContainer{NetworkID: "myNetWorkID", ContainerID: "myContainerID003"}
 	for n := 0; n < b.N; n++ {
-		_ = ConnectNetwork(ctx, "netWorkID", "containerID", cli)
+		_ = ConnectNetwork(ctx, cli, dc)
 	}
 }

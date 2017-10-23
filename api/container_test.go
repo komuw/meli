@@ -2,76 +2,75 @@ package api
 
 import (
 	"context"
+	"io/ioutil"
 	"testing"
 )
 
 func TestCreateContainer(t *testing.T) {
 	tt := []struct {
-		s                 ServiceConfig
-		k                 string
-		networkName       string
-		imgName           string
-		dockerComposeFile string
-		expected          string
-		expectedErr       error
+		dc          *DockerContainer
+		expected    string
+		expectedErr error
 	}{
 		{
-			ServiceConfig{Image: "busybox", Restart: "unless-stopped"},
-			"myservice",
-			"myNetworkName",
-			"myImageName",
-			"DockerFile",
+			&DockerContainer{
+				ComposeService:    ComposeService{Image: "busybox", Restart: "unless-stopped"},
+				ServiceName:       "myservice",
+				NetworkName:       "myNetworkName",
+				DockerComposeFile: "DockerFile",
+				ContainerID:       "myExistingContainerId00912",
+			},
 			"myExistingContainerId00912",
 			nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		alreadyCreated, actual, err := CreateContainer(ctx, v.s, v.k, v.networkName, v.imgName, v.dockerComposeFile, cli)
+		//CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer)
+		alreadyCreated, actual, err := CreateContainer(ctx, cli, v.dc)
 		if err != nil {
-			t.Errorf("\nran CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.s, err, v.expectedErr)
+			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
 		}
 		if actual != v.expected {
-			t.Errorf("\nran CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.s, actual, v.expected)
+			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.dc, actual, v.expected)
 		}
 		if alreadyCreated != true {
-			t.Errorf("\nran CreateContainer(%#+v) \ngot %#+v \nwanted %#+v", v.s, alreadyCreated, true)
+			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %#+v \nwanted %#+v", v.dc, alreadyCreated, true)
 		}
 	}
 }
 
 func TestContainerStart(t *testing.T) {
 	tt := []struct {
-		input       string
+		dc          *DockerContainer
 		expectedErr error
 	}{
-		{"myContainerId", nil},
+		{&DockerContainer{ContainerID: "myContainerId"}, nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		err := ContainerStart(ctx, v.input, cli)
+		err := ContainerStart(ctx, cli, v.dc)
 		if err != nil {
-			t.Errorf("\nran ContainerStart(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
+			t.Errorf("\nCalled ContainerStart(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
 		}
 	}
 }
 
 func TestContainerLogs(t *testing.T) {
 	tt := []struct {
-		containerID string
-		followLogs  bool
+		dc          *DockerContainer
 		expectedErr error
 	}{
-		{"myContainerId", true, nil},
-		{"myContainerId", false, nil},
+		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: true, LogMedium: ioutil.Discard}, nil},
+		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: false, LogMedium: ioutil.Discard}, nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		err := ContainerLogs(ctx, v.containerID, v.followLogs, cli)
+		err := ContainerLogs(ctx, cli, v.dc)
 		if err != nil {
-			t.Errorf("\nran ContainerLogs(%#+v) \ngot %s \nwanted %#+v", v.containerID, err, v.expectedErr)
+			t.Errorf("\nCalled ContainerLogs(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
 		}
 	}
 }
@@ -79,15 +78,15 @@ func TestContainerLogs(t *testing.T) {
 func BenchmarkCreateContainer(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
+	dc := &DockerContainer{
+		ComposeService:    ComposeService{Image: "busybox", Restart: "unless-stopped"},
+		ServiceName:       "myservice",
+		NetworkName:       "myNetworkName",
+		DockerComposeFile: "DockerFile",
+		ContainerID:       "myExistingContainerId00912",
+	}
 	for n := 0; n < b.N; n++ {
-		_, _, _ = CreateContainer(
-			ctx,
-			ServiceConfig{Image: "busybox", Restart: "unless-stopped"},
-			"myservice",
-			"mynetwork",
-			"myImage",
-			"dockerfile",
-			cli)
+		_, _, _ = CreateContainer(ctx, cli, dc)
 	}
 }
 
@@ -95,7 +94,7 @@ func BenchmarkContainerStart(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for n := 0; n < b.N; n++ {
-		_ = ContainerStart(ctx, "containerId", cli)
+		_ = ContainerStart(ctx, cli, &DockerContainer{ContainerID: "containerId"})
 	}
 }
 
@@ -103,6 +102,6 @@ func BenchmarkContainerLogs(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for n := 0; n < b.N; n++ {
-		_ = ContainerLogs(ctx, "containerID", true, cli)
+		_ = ContainerLogs(ctx, cli, &DockerContainer{ContainerID: "containerId", LogMedium: ioutil.Discard})
 	}
 }

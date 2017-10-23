@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func FormatContainerName(containerName string) string {
+func FormatImageName(containerName string) string {
 	// container names are supposed to be unique
 	// we are using the docker-compose service as the container name
 	f := func(c rune) bool {

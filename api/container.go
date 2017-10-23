@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -16,11 +15,11 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, formattedImageName, dockerComposeFile string, cli MeliAPiClient) (bool, string, error) {
-	// 2.1 make labels
+func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) (bool, string, error) {
+	// 1. make labels
 	labelsMap := make(map[string]string)
-	if len(s.Labels) > 0 {
-		for _, v := range s.Labels {
+	if len(dc.ComposeService.Labels) > 0 {
+		for _, v := range dc.ComposeService.Labels {
 			onelabel := FormatLabels(v)
 			labelsMap[onelabel[0]] = onelabel[1]
 		}
@@ -41,11 +40,11 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 		return true, containers[0].ID, nil
 	}
 
-	//2.2 make ports
+	// 2. make ports
 	portsMap := make(map[nat.Port]struct{})
 	portBindingMap := make(map[nat.Port][]nat.PortBinding)
-	if len(s.Ports) > 0 {
-		for _, v := range s.Ports {
+	if len(dc.ComposeService.Ports) > 0 {
+		for _, v := range dc.ComposeService.Ports {
 			oneport := FormatPorts(v)
 			hostport := oneport[0]
 			containerport := oneport[1]
@@ -58,38 +57,28 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 			portBindingMap[port] = []nat.PortBinding{myPortBinding}
 		}
 	}
-	//2.3 create command
+	// 3. create command
 	cmd := strslice.StrSlice{}
-	if s.Command != "" {
-		sliceCommand := strings.Fields(s.Command)
+	if dc.ComposeService.Command != "" {
+		sliceCommand := strings.Fields(dc.ComposeService.Command)
 		cmd = strslice.StrSlice(sliceCommand)
 	}
-	//2.4 create restart policy
+	// 4. create restart policy
 	restartPolicy := container.RestartPolicy{}
-	if s.Restart != "" {
+	if dc.ComposeService.Restart != "" {
 		// You cannot set MaximumRetryCount for the following restart policies;
 		// always, no, unless-stopped
-		if s.Restart == "on-failure" {
-			restartPolicy = container.RestartPolicy{Name: s.Restart, MaximumRetryCount: 3}
+		if dc.ComposeService.Restart == "on-failure" {
+			restartPolicy = container.RestartPolicy{Name: dc.ComposeService.Restart, MaximumRetryCount: 3}
 		} else {
-			restartPolicy = container.RestartPolicy{Name: s.Restart}
+			restartPolicy = container.RestartPolicy{Name: dc.ComposeService.Restart}
 		}
 
 	}
-	//2.5 build image
-	imageNamePtr := &s.Image
-	if s.Build != (Buildstruct{}) {
-		dockerFile := s.Build.Dockerfile
-		if dockerFile == "" {
-			dockerFile = "Dockerfile"
-		}
-		// TODO: we should probably use the filepath stdlib module
-		// so that atleast it can guarantee us os agnotic'ness
-		pathToDockerFile := FormatComposePath(dockerComposeFile)[0]
-		if pathToDockerFile != "docker-compose.yml" {
-			dockerFile = pathToDockerFile + "/" + dockerFile
-		}
-		imageName, err := BuildDockerImage(ctx, k, dockerFile, cli)
+	// 5. build image
+	imageNamePtr := &dc.ComposeService.Image
+	if dc.ComposeService.Build != (Buildstruct{}) {
+		imageName, err := BuildDockerImage(ctx, cli, dc)
 		if err != nil {
 			return false, "", &popagateError{originalErr: err}
 		}
@@ -99,12 +88,12 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 	}
 	imageName := *imageNamePtr
 
-	//2.6 add volumes
+	// 6. add volumes
 	volume := make(map[string]struct{})
 	binds := []string{}
-	if len(s.Volumes) > 0 {
-		for _, v := range s.Volumes {
-			vol := FormatServiceVolumes(v, dockerComposeFile)
+	if len(dc.ComposeService.Volumes) > 0 {
+		for _, v := range dc.ComposeService.Volumes {
+			vol := FormatServiceVolumes(v, dc.DockerComposeFile)
 			volume[vol[1]] = EmptyStruct{}
 			// TODO: handle other read/write modes
 			whatToBind := vol[0] + ":" + vol[1] + ":rw"
@@ -112,14 +101,12 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 		}
 	}
 
-	// TODO: we should skip creating the container again if already exists
-	// instead of creating a uniquely named container name
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
 			Image:        imageName,
 			Labels:       labelsMap,
-			Env:          s.Environment,
+			Env:          dc.ComposeService.Environment,
 			ExposedPorts: portsMap,
 			Cmd:          cmd,
 			Volumes:      volume},
@@ -136,44 +123,45 @@ func CreateContainer(ctx context.Context, s ServiceConfig, k, networkName, forma
 				"2001:4860:4860::8844"},
 			PublishAllPorts: false,
 			PortBindings:    portBindingMap,
-			NetworkMode:     container.NetworkMode(networkName),
+			NetworkMode:     container.NetworkMode(dc.NetworkName),
 			RestartPolicy:   restartPolicy,
 			Binds:           binds,
-			Links:           s.Links},
+			Links:           dc.ComposeService.Links},
 		nil,
-		formattedImageName)
+		FormatImageName(dc.ServiceName))
 	if err != nil {
 		return false, "", &popagateError{
 			originalErr: err,
 			newErr:      errors.New(" :unable to create container")}
 	}
 
+	dc.UpdateContainerID(containerCreateResp.ID)
 	return false, containerCreateResp.ID, nil
 }
 
-func ContainerStart(ctx context.Context, containerId string, cli MeliAPiClient) error {
+func ContainerStart(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) error {
 	err := cli.ContainerStart(
 		ctx,
-		containerId,
+		dc.ContainerID,
 		types.ContainerStartOptions{})
 	if err != nil {
 		return &popagateError{
 			originalErr: err,
-			newErr:      fmt.Errorf(" :unable to start container %s", containerId)}
+			newErr:      fmt.Errorf(" :unable to start container %s", dc.ContainerID)}
 
 	}
 	return nil
 }
 
-func ContainerLogs(ctx context.Context, containerId string, followLogs bool, cli MeliAPiClient) error {
+func ContainerLogs(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) error {
 	containerLogResp, err := cli.ContainerLogs(
 		ctx,
-		containerId,
+		dc.ContainerID,
 		types.ContainerLogsOptions{
 			ShowStdout: true,
 			ShowStderr: true,
 			Timestamps: true,
-			Follow:     followLogs,
+			Follow:     dc.FollowLogs,
 			Details:    true,
 			Tail:       "all"})
 
@@ -181,14 +169,14 @@ func ContainerLogs(ctx context.Context, containerId string, followLogs bool, cli
 		if err != nil {
 			return &popagateError{
 				originalErr: err,
-				newErr:      fmt.Errorf(" :unable to get container logs %s", containerId)}
+				newErr:      fmt.Errorf(" :unable to get container logs %s", dc.ContainerID)}
 		}
 	}
 	defer containerLogResp.Close()
 
 	// supplying your own buffer is perfomant than letting the system do it for you
 	buff := make([]byte, 2048)
-	io.CopyBuffer(os.Stdout, containerLogResp, buff)
+	io.CopyBuffer(dc.LogMedium, containerLogResp, buff)
 
 	return nil
 }

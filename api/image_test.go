@@ -2,44 +2,54 @@ package api
 
 import (
 	"context"
+	"io/ioutil"
 	"testing"
 )
 
-func TestGetPullDockerImage(t *testing.T) {
+func TestPullDockerImage(t *testing.T) {
 	tt := []struct {
-		input       string
+		dc          *DockerContainer
 		expectedErr error
 	}{
-		{"busybox", nil},
+		{&DockerContainer{ComposeService: ComposeService{Image: "busybox"}, LogMedium: ioutil.Discard}, nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		err := PullDockerImage(ctx, v.input, cli)
+		err := PullDockerImage(ctx, cli, v.dc)
 		if err != nil {
-			t.Errorf("\nran PullDockerImage(%#+v) \ngot %s \nwanted %#+v", v.input, err, v.expectedErr)
+			t.Errorf("\nCalled PullDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
 		}
 	}
 }
 
-func TestGetBuildDockerImage(t *testing.T) {
+func TestBuildDockerImage(t *testing.T) {
 	tt := []struct {
-		serviceName string
-		dockerFile  string
+		dc          *DockerContainer
 		expected    string
 		expectedErr error
 	}{
-		{"myservicename", "../testdata/Dockerfile", "meli_myservicename", nil},
+		{
+			&DockerContainer{
+				ServiceName:       "myservicename",
+				DockerComposeFile: "docker-compose.yml",
+				ComposeService: ComposeService{
+					Build: Buildstruct{Dockerfile: "../testdata/Dockerfile"}},
+				LogMedium: ioutil.Discard},
+			"meli_myservicename",
+			nil},
 	}
+
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
+	GetAuth()
 	for _, v := range tt {
-		actual, err := BuildDockerImage(ctx, v.serviceName, v.dockerFile, cli)
+		actual, err := BuildDockerImage(ctx, cli, v.dc)
 		if err != nil {
-			t.Errorf("\nran BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dockerFile, err, v.expectedErr)
+			t.Errorf("\nCalled BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
 		}
 		if actual != v.expected {
-			t.Errorf("\nran BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dockerFile, actual, v.expected)
+			t.Errorf("\nCalled BuildDockerImage(%#+v) \ngot %s \nwanted %#+v", v.dc, actual, v.expected)
 		}
 	}
 }
@@ -47,16 +57,22 @@ func TestGetBuildDockerImage(t *testing.T) {
 func BenchmarkPullDockerImage(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
+	dc := &DockerContainer{ComposeService: ComposeService{Image: "busybox"}, LogMedium: ioutil.Discard}
 	GetAuth()
 	for n := 0; n < b.N; n++ {
-		_ = PullDockerImage(ctx, "busybox", cli)
+		_ = PullDockerImage(ctx, cli, dc)
 	}
 }
 
 func BenchmarkBuildDockerImage(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
+	dc := &DockerContainer{
+		ServiceName: "myservicename",
+		ComposeService: ComposeService{
+			Build: Buildstruct{Dockerfile: "../testdata/Dockerfile"}},
+		LogMedium: ioutil.Discard}
 	for n := 0; n < b.N; n++ {
-		_, _ = BuildDockerImage(ctx, "meliserice", "meli_../testdata/dockerfile", cli)
+		_, _ = BuildDockerImage(ctx, cli, dc)
 	}
 }

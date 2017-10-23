@@ -66,7 +66,7 @@ func main() {
 			// than volumes, so the sync in the for loop for containers is enough
 			// 2. since we intend to stream logs as containers run(see; issues/24);
 			// then meli will be up long enough for the volume creation goroutines to have finished.
-			go api.CreateDockerVolume(ctx, "meli_"+k, "local", cli)
+			go api.CreateDockerVolume(ctx, cli, "meli_"+k, "local", os.Stdout)
 		}
 	}
 
@@ -75,29 +75,20 @@ func main() {
 		wg.Add(1)
 		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", k))
 
-		go startContainers(
-			ctx,
-			k,
-			v,
-			networkID,
-			networkName,
-			&wg,
-			followLogs,
-			dockerComposeFile,
-			cli)
+		dc := &api.DockerContainer{
+			ServiceName:       k,
+			ComposeService:    v,
+			NetworkID:         networkID,
+			NetworkName:       networkName,
+			FollowLogs:        followLogs,
+			DockerComposeFile: dockerComposeFile,
+			LogMedium:         os.Stdout}
+		go startContainers(ctx, cli, &wg, dc)
 	}
 	wg.Wait()
 }
 
-func startContainers(
-	ctx context.Context,
-	k string,
-	s api.ServiceConfig,
-	networkID, networkName string,
-	wg *sync.WaitGroup,
-	followLogs bool,
-	dockerComposeFile string,
-	cli *client.Client) {
+func startContainers(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, dc *api.DockerContainer) {
 	defer wg.Done()
 
 	/*
@@ -108,60 +99,41 @@ func startContainers(
 		5. Stream container logs
 	*/
 
-	formattedContainerName := api.FormatContainerName(k)
-	if len(s.Image) > 0 {
-		err := api.PullDockerImage(ctx, s.Image, cli)
+	if len(dc.ComposeService.Image) > 0 {
+		err := api.PullDockerImage(ctx, cli, dc)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
-			log.Printf("\n\t service=%s error=%s", k, err)
+			log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 			return
 		}
 	}
-	alreadyCreated, containerID, err := api.CreateContainer(
-		ctx,
-		s,
-		k,
-		networkName,
-		formattedContainerName,
-		dockerComposeFile,
-		cli)
+	alreadyCreated, _, err := api.CreateContainer(ctx, cli, dc)
 	if err != nil {
 		// clean exit since we want other goroutines for fetching other images
 		// to continue running
-		log.Printf("\n\t service=%s error=%s", k, err)
+		log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
 
 	if !alreadyCreated {
-		err = api.ConnectNetwork(
-			ctx,
-			networkID,
-			containerID,
-			cli)
+		err = api.ConnectNetwork(ctx, cli, dc)
 		if err != nil {
 			// create whitespace so that error is visible to human
-			log.Printf("\n\t service=%s error=%s", k, err)
+			log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 			return
 		}
 	}
 
-	err = api.ContainerStart(
-		ctx,
-		containerID,
-		cli)
+	err = api.ContainerStart(ctx, cli, dc)
 	if err != nil {
-		log.Printf("\n\t service=%s error=%s", k, err)
+		log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
 
-	err = api.ContainerLogs(
-		ctx,
-		containerID,
-		followLogs,
-		cli)
+	err = api.ContainerLogs(ctx, cli, dc)
 	if err != nil {
-		log.Printf("\n\t service=%s error=%s", k, err)
+		log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
 }
