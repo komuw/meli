@@ -16,9 +16,7 @@ import (
 )
 
 func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) (bool, string, error) {
-	formattedImageName := FormatImageName(dc.ServiceName)
-
-	// 2.1 make labels
+	// 1. make labels
 	labelsMap := make(map[string]string)
 	if len(dc.ComposeService.Labels) > 0 {
 		for _, v := range dc.ComposeService.Labels {
@@ -42,7 +40,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 		return true, containers[0].ID, nil
 	}
 
-	//2.2 make ports
+	// 2. make ports
 	portsMap := make(map[nat.Port]struct{})
 	portBindingMap := make(map[nat.Port][]nat.PortBinding)
 	if len(dc.ComposeService.Ports) > 0 {
@@ -59,13 +57,13 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			portBindingMap[port] = []nat.PortBinding{myPortBinding}
 		}
 	}
-	//2.3 create command
+	// 3. create command
 	cmd := strslice.StrSlice{}
 	if dc.ComposeService.Command != "" {
 		sliceCommand := strings.Fields(dc.ComposeService.Command)
 		cmd = strslice.StrSlice(sliceCommand)
 	}
-	//2.4 create restart policy
+	// 4. create restart policy
 	restartPolicy := container.RestartPolicy{}
 	if dc.ComposeService.Restart != "" {
 		// You cannot set MaximumRetryCount for the following restart policies;
@@ -77,7 +75,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 		}
 
 	}
-	//2.5 build image
+	// 5. build image
 	imageNamePtr := &dc.ComposeService.Image
 	if dc.ComposeService.Build != (Buildstruct{}) {
 		imageName, err := BuildDockerImage(ctx, cli, dc)
@@ -90,7 +88,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 	}
 	imageName := *imageNamePtr
 
-	//2.6 add volumes
+	// 6. add volumes
 	volume := make(map[string]struct{})
 	binds := []string{}
 	if len(dc.ComposeService.Volumes) > 0 {
@@ -130,7 +128,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			Binds:           binds,
 			Links:           dc.ComposeService.Links},
 		nil,
-		formattedImageName)
+		FormatImageName(dc.ServiceName))
 	if err != nil {
 		return false, "", &popagateError{
 			originalErr: err,
