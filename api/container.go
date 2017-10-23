@@ -15,8 +15,6 @@ import (
 	"github.com/docker/go-connections/nat"
 )
 
-//func CreateContainer(ctx context.Context, s ComposeService, k, networkName, formattedImageName, dockerComposeFile string, cli MeliAPiClient) (bool, string, error) {
-
 func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) (bool, string, error) {
 	formattedImageName := FormatImageName(dc.ServiceName)
 

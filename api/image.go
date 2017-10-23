@@ -82,8 +82,6 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 	}
 }
 
-//func BuildDockerImage(ctx context.Context, k, dockerFile string, cli MeliAPiClient) (string, error) {
-
 func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
