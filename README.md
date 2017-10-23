@@ -69,18 +69,8 @@ Take any results you see here with a large spoon of salt; They are unscientific 
 Having made that disclaimer,                 
 
 test machine:             
-`lsb_release -a`
-```bash
-Distributor ID:	Ubuntu
-Description:	Ubuntu 16.04 LTS
-Release:	16.04
-Codename:	xenial
-No LSB modules are available.
-```
-`uname -ra`
-```bash
-4.4.0-96-generic #119-Ubuntu SMP Tue Sep 12 14:59:54 UTC 2017 x86_64 x86_64 x86_64 GNU/
-```
+[This circleCI machine](https://github.com/komuW/meli/blob/master/.circleci/config.yml#L9)
+
 
 docker-compose version:         
 `docker-compose --version`
@@ -89,7 +79,7 @@ docker-compose version 1.16.1, build 6d1ac219
 ```
 
 Meli version:   
-[version 0.0.5](https://github.com/komuW/meli/releases/tag/v0.0.5)
+[version 0.0.8](https://github.com/komuW/meli/releases/tag/v0.0.8)
            
 
 Benchmark test:           
@@ -101,16 +91,13 @@ for docker-compose:
 for meli:                
 `docker ps -aq | xargs docker rm -f; docker system prune -af; /usr/bin/time -apv meli -up -d`            
 
-the above scripts were ran 3 times for each tool and an average taken. 
-
 Benchmark results(average):                       
 
-| tool           | User time(seconds) | Elapsed wall clock time(seconds) |
-| :---           |     :---:          |          ---:                    |
-| docker-compose | 1.61 sec           | 63.57 sec                        |
-| meli           | 0.04 sec           | 28.43 sec                        |
+| tool           | Elapsed wall clock time(seconds) |
+| :---           |          ---:                    |
+| docker-compose |  11.911 seconds                  |
+| meli           |  4.778  seconds                  |
 
-Thus, meli appears to be 2.2 times faster than docker-compose(by wall clock time).       
-There are still some low hanging fruits, performance wise, that I'll target in future.        
-But I'm not making a tool to take docker-compose to the races.
+Thus, meli appears to be 2.4 times faster than docker-compose(by wall clock time).       
+However, I'm not making a tool to take docker-compose to the races.
 
