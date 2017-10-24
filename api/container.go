@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"strings"
 
@@ -176,7 +175,7 @@ func ContainerLogs(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) 
 
 	// supplying your own buffer is perfomant than letting the system do it for you
 	buff := make([]byte, 2048)
-	io.CopyBuffer(dc.LogMedium, containerLogResp, buff)
+	CopyBufferWithColor(dc.LogMedium, containerLogResp, buff, dc.ServiceName, dc.Color)
 
 	return nil
 }
