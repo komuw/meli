@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 
@@ -48,6 +49,7 @@ type DockerContainer struct {
 	ContainerID       string
 	// this assumes that there can only be one container per docker-compose service
 	LogMedium io.Writer
+	Color     string
 }
 
 func (dc *DockerContainer) UpdateContainerID(containerID string) {
@@ -106,4 +108,38 @@ func (m *MockDockerClient) VolumeCreate(ctx context.Context, options volumetypes
 
 func (m *MockDockerClient) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
 	return []types.Container{types.Container{ID: "myExistingContainerId00912"}}, nil
+}
+
+func CopyBufferWithColor(dst io.Writer, src io.Reader, buf []byte, serviceName, color string) (written int64, err error) {
+	// set TERM color
+	fmt.Println(color)
+
+	for {
+		nr, er := src.Read(buf)
+		if nr > 0 {
+			fmt.Fprintf(dst, "service=%s:: ", serviceName)
+			nw, ew := dst.Write(buf[0:nr])
+			if nw > 0 {
+				written += int64(nw)
+			}
+			if ew != nil {
+				err = ew
+				break
+			}
+			if nr != nw {
+				err = io.ErrShortWrite
+				break
+			}
+		}
+		if er != nil {
+			if er != io.EOF {
+				err = er
+			}
+			break
+		}
+	}
+
+	// undo the color
+	fmt.Println("\x1b[0m")
+	return written, err
 }
