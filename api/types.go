@@ -56,6 +56,16 @@ func (dc *DockerContainer) UpdateContainerID(containerID string) {
 	dc.ContainerID = containerID
 }
 
+var Colors = []string{
+	"\x1b[30;1m", // black
+	"\x1b[31;1m", // red
+	"\x1b[32;1m", // green
+	"\x1b[33;1m", // yellow
+	"\x1b[34;1m", // blue
+	"\x1b[35;1m", // magenta
+	"\x1b[36;1m", // cyan
+	"\x1b[37;1m"} // white
+
 type MeliAPiClient interface {
 	// we implement this interface so that we can be able to mock it in tests
 	// https://medium.com/@zach_4342/dependency-injection-in-golang-e587c69478a8
@@ -111,13 +121,14 @@ func (m *MockDockerClient) ContainerList(ctx context.Context, options types.Cont
 }
 
 func CopyBufferWithColor(dst io.Writer, src io.Reader, buf []byte, serviceName, color string) (written int64, err error) {
-	// set TERM color
-	fmt.Println(color)
+	// undo the set TERM color
+	defer fmt.Println("\x1b[0m")
 
 	for {
 		nr, er := src.Read(buf)
 		if nr > 0 {
-			fmt.Fprintf(dst, "service=%s:: ", serviceName)
+			// also set TERM color
+			fmt.Fprintf(dst, "%sSERVICE=%s:: ", color, serviceName)
 			nw, ew := dst.Write(buf[0:nr])
 			if nw > 0 {
 				written += int64(nw)
@@ -139,7 +150,5 @@ func CopyBufferWithColor(dst io.Writer, src io.Reader, buf []byte, serviceName, 
 		}
 	}
 
-	// undo the color
-	fmt.Println("\x1b[0m")
 	return written, err
 }

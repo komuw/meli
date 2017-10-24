@@ -73,13 +73,10 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
+	rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
 		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", k))
-
-		Colors := []string{"\x1b[30;1m", "\x1b[31;1m", "\x1b[32;1m", "\x1b[33;1m", "\x1b[34;1m", "\x1b[35;1m", "\x1b[36;1m", "\x1b[37;1m"}
-		rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
-		color := Colors[rand.Intn(len(Colors))]
 
 		dc := &api.DockerContainer{
 			ServiceName:       k,
@@ -89,7 +86,7 @@ func main() {
 			FollowLogs:        followLogs,
 			DockerComposeFile: dockerComposeFile,
 			LogMedium:         os.Stdout,
-			Color:             color}
+			Color:             api.Colors[rand.Intn(len(api.Colors))]}
 		go startContainers(ctx, cli, &wg, dc)
 	}
 	wg.Wait()
