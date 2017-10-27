@@ -21,10 +21,12 @@ func BenchmarkStartContainers(b *testing.B) {
 	defer cli.Close()
 
 	dc := &api.DockerContainer{
-		ServiceName: "myservicename",
+		ServiceName:       "myservicename",
+		LogMedium:         ioutil.Discard,
+		DockerComposeFile: "/testdata/docker-compose.yml",
 		ComposeService: api.ComposeService{
-			Build: api.Buildstruct{Dockerfile: "../testdata/Dockerfile"}},
-		LogMedium: ioutil.Discard}
+			Build: api.Buildstruct{Dockerfile: "Dockerfile"}},
+	}
 	for n := 0; n < b.N; n++ {
 		wg.Add(1)
 		startContainers(ctx, cli, &wg, dc)
