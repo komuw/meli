@@ -172,10 +172,7 @@ func ContainerLogs(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) 
 				newErr:      fmt.Errorf(" :unable to get container logs %s", dc.ContainerID)}
 		}
 	}
-
-	// supplying your own buffer is perfomant than letting the system do it for you
-	buff := make([]byte, 2048)
-	io.CopyBuffer(dc.LogMedium, containerLogResp, buff)
+	io.Copy(dc.LogMedium, containerLogResp)
 
 	containerLogResp.Close()
 	return nil

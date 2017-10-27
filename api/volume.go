@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/docker/docker/api/types/volume"
 )
@@ -19,9 +18,7 @@ func CreateDockerVolume(ctx context.Context, cli MeliAPiClient, name, driver str
 	if err != nil {
 		return "", &popagateError{originalErr: err, newErr: errors.New(" :unable to create docker volume")}
 	}
-
-	r := strings.NewReader(fmt.Sprintf("\ndocker volume: %s created succesfully.\n", volume.Name))
-	io.Copy(dst, r)
+	fmt.Fprintf(dst, "\ndocker volume: %s created succesfully.\n", volume.Name)
 
 	return volume.Name, nil
 }
