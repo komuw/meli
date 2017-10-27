@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/docker/docker/client"
 	"github.com/komuw/meli/api"
@@ -71,6 +73,7 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
+	rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
 		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", k))
@@ -82,7 +85,8 @@ func main() {
 			NetworkName:       networkName,
 			FollowLogs:        followLogs,
 			DockerComposeFile: dockerComposeFile,
-			LogMedium:         os.Stdout}
+			LogMedium:         os.Stdout,
+			Color:             api.Colors[rand.Intn(len(api.Colors))]}
 		go startContainers(ctx, cli, &wg, dc)
 	}
 	wg.Wait()

@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 
@@ -48,11 +49,22 @@ type DockerContainer struct {
 	ContainerID       string
 	// this assumes that there can only be one container per docker-compose service
 	LogMedium io.Writer
+	Color     string
 }
 
 func (dc *DockerContainer) UpdateContainerID(containerID string) {
 	dc.ContainerID = containerID
 }
+
+var Colors = []string{
+	"\x1b[30;1m", // black
+	"\x1b[31;1m", // red
+	"\x1b[32;1m", // green
+	"\x1b[33;1m", // yellow
+	"\x1b[34;1m", // blue
+	"\x1b[35;1m", // magenta
+	"\x1b[36;1m", // cyan
+	"\x1b[37;1m"} // white
 
 type MeliAPiClient interface {
 	// we implement this interface so that we can be able to mock it in tests
@@ -106,4 +118,37 @@ func (m *MockDockerClient) VolumeCreate(ctx context.Context, options volumetypes
 
 func (m *MockDockerClient) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
 	return []types.Container{types.Container{ID: "myExistingContainerId00912"}}, nil
+}
+
+func CopyBufferWithColor(dst io.Writer, src io.Reader, buf []byte, serviceName, color string) (written int64, err error) {
+	// undo the set TERM color
+	defer fmt.Println("\x1b[0m")
+
+	for {
+		nr, er := src.Read(buf)
+		if nr > 0 {
+			// also set TERM color
+			fmt.Fprintf(dst, "%sSERVICE=%s:: ", color, serviceName)
+			nw, ew := dst.Write(buf[0:nr])
+			if nw > 0 {
+				written += int64(nw)
+			}
+			if ew != nil {
+				err = ew
+				break
+			}
+			if nr != nw {
+				err = io.ErrShortWrite
+				break
+			}
+		}
+		if er != nil {
+			if er != io.EOF {
+				err = er
+			}
+			break
+		}
+	}
+
+	return written, err
 }
