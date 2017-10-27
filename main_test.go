@@ -19,7 +19,6 @@ func BenchmarkStartContainers(b *testing.B) {
 		log.Fatal(err, " :unable to intialize docker client")
 	}
 	defer cli.Close()
-
 	dc := &api.DockerContainer{
 		ServiceName:       "myservicename",
 		LogMedium:         ioutil.Discard,
@@ -27,6 +26,8 @@ func BenchmarkStartContainers(b *testing.B) {
 		ComposeService: api.ComposeService{
 			Build: api.Buildstruct{Dockerfile: "Dockerfile"}},
 	}
+	api.GetAuth()
+
 	for n := 0; n < b.N; n++ {
 		wg.Add(1)
 		startContainers(ctx, cli, &wg, dc)
