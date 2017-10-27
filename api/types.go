@@ -45,9 +45,9 @@ type DockerContainer struct {
 	NetworkName       string
 	FollowLogs        bool
 	DockerComposeFile string
-	ContainerID       string
-	// this assumes that there can only be one container per docker-compose service
-	LogMedium io.Writer
+	ContainerID       string // this assumes that there can only be one container per docker-compose service
+	LogMedium         io.Writer
+	Debug             bool
 }
 
 func (dc *DockerContainer) UpdateContainerID(containerID string) {

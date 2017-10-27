@@ -32,12 +32,16 @@ func PullDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			originalErr: err,
 			newErr:      fmt.Errorf(" :unable to pull image %s", imageName)}
 	}
-	defer imagePullResp.Close()
 
-	// supplying your own buffer is perfomant than letting the system do it for you
-	buff := make([]byte, 2048)
-	io.CopyBuffer(dc.LogMedium, imagePullResp, buff)
+	if dc.Debug {
+		// supplying your own buffer is perfomant than letting the system do it for you
+		buff := make([]byte, 2048)
+		io.CopyBuffer(dc.LogMedium, imagePullResp, buff)
+	} else {
+		fmt.Fprintf(dc.LogMedium, "\nSuccesfully pulled image for service %s", dc.ServiceName)
+	}
 
+	imagePullResp.Close()
 	return nil
 }
 
@@ -169,10 +173,14 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 			originalErr: err,
 			newErr:      errors.New(" :unable to build docker image")}
 	}
-	defer imageBuildResponse.Body.Close()
 
-	buff := make([]byte, 2048)
-	io.CopyBuffer(dc.LogMedium, imageBuildResponse.Body, buff)
+	if dc.Debug {
+		buff := make([]byte, 2048)
+		io.CopyBuffer(dc.LogMedium, imageBuildResponse.Body, buff)
+	} else {
+		fmt.Fprintf(dc.LogMedium, "\nSuccesfully built image for service %s", dc.ServiceName)
+	}
 
+	imageBuildResponse.Body.Close()
 	return imageName, nil
 }
