@@ -37,6 +37,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 		log.Println(" :unable to list containers")
 	}
 	if len(containers) > 0 {
+		dc.UpdateContainerID(containers[0].ID)
 		return true, containers[0].ID, nil
 	}
 
