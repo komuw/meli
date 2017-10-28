@@ -31,24 +31,38 @@ jobs:
       - run: dep ensure; dep prune
       - run: go build --race -o meli main.go
       - run: ./meli -up -d -f testdata/docker-compose.yml
-      - run: echo "number of running containersI(expected=9), actual=" && docker ps -q | wc -l
+      - run:
+          name: echo number of running containers (expected=9), actual;
+          command: docker ps -q | wc -l
       # stop the containers running from the previous command
       - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
       - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
-      - run: echo "number of running containersII(expected=9), actual=" && docker ps -q | wc -l
-      - run: go test -timeout 1m -race -cover -v ./...
-      - run: go test -timeout 1m -race -run=XXXX -bench=. ./...
+      - run:
+          name: echo number of running containers (expected=9), actual;
+          command: docker ps -q | wc -l
+      - run:
+          name: run tests
+          command: go test -timeout 1m -race -cover -v ./...
+      - run:
+          name: run benchmarks
+          command: go test -timeout 1m -race -run=XXXX -bench=. ./...
 
       # benchmark against docker-compose
       - run: sudo apt -y install python-pip
       - run: sudo pip install -U pip && sudo pip install -U docker-compose
-      - run: docker-compose version
       - run: rm meli
       - run: go build -o meli main.go
       - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
-      - run: time docker-compose -f testdata/docker-compose.yml up -d
+      - run:
+          name: show docker-compose version
+          command: docker-compose version
+      - run:
+          name: time docker-compose up
+          command: time docker-compose -f testdata/docker-compose.yml up -d
       - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
-      - run: time ./meli -up -d -f testdata/docker-compose.yml
+      - run:
+          name: time meli -up
+          command: time ./meli -up -d -f testdata/docker-compose.yml
 
       - deploy:
           name: do a github release on master
