@@ -4,6 +4,7 @@ import (
 	"context"
 	"io/ioutil"
 	"log"
+	"os"
 	"sync"
 	"testing"
 
@@ -11,7 +12,7 @@ import (
 	"github.com/komuw/meli/api"
 )
 
-func BenchmarkStartContainers(b *testing.B) {
+func BenchmarkstartComposeServices(b *testing.B) {
 	var wg sync.WaitGroup
 	var ctx = context.Background()
 	cli, err := client.NewEnvClient()
@@ -19,9 +20,14 @@ func BenchmarkStartContainers(b *testing.B) {
 		log.Fatal(err, " :unable to intialize docker client")
 	}
 	defer cli.Close()
+	curentDir, _ := os.Getwd()
+	networkName := "meli_network_" + api.GetCwdName(curentDir)
+	networkID, _ := api.GetNetwork(ctx, networkName, cli)
+
 	dc := &api.DockerContainer{
 		ServiceName:       "myservicename",
 		LogMedium:         ioutil.Discard,
+		NetworkID:         networkID,
 		DockerComposeFile: "/testdata/docker-compose.yml",
 		ComposeService: api.ComposeService{
 			Build: api.Buildstruct{Dockerfile: "Dockerfile"}},
@@ -30,6 +36,6 @@ func BenchmarkStartContainers(b *testing.B) {
 
 	for n := 0; n < b.N; n++ {
 		wg.Add(1)
-		startContainers(ctx, cli, &wg, dc)
+		startComposeServices(ctx, cli, &wg, dc)
 	}
 }
