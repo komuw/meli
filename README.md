@@ -72,7 +72,6 @@ import (
 )
 
 func main() {
-
 	dc := &api.DockerContainer{
 		ComposeService: api.ComposeService{Image: "busybox"},
 		LogMedium:      os.Stdout,
@@ -84,6 +83,8 @@ func main() {
 		log.Fatal(err, " :unable to intialize docker client")
 	}
 	defer cli.Close()
+
+	api.GetAuth() // read dockerhub info
 	err = api.PullDockerImage(ctx, cli, dc)
 	log.Println(err)
 
