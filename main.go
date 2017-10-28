@@ -83,12 +83,12 @@ func main() {
 			FollowLogs:        followLogs,
 			DockerComposeFile: dockerComposeFile,
 			LogMedium:         os.Stdout}
-		go startContainers(ctx, cli, &wg, dc)
+		go startComposeServices(ctx, cli, &wg, dc)
 	}
 	wg.Wait()
 }
 
-func startContainers(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, dc *api.DockerContainer) {
+func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, dc *api.DockerContainer) {
 	defer wg.Done()
 
 	/*

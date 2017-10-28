@@ -37,6 +37,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 		log.Println(" :unable to list containers")
 	}
 	if len(containers) > 0 {
+		dc.UpdateContainerID(containers[0].ID)
 		return true, containers[0].ID, nil
 	}
 
@@ -172,11 +173,8 @@ func ContainerLogs(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) 
 				newErr:      fmt.Errorf(" :unable to get container logs %s", dc.ContainerID)}
 		}
 	}
-	defer containerLogResp.Close()
+	io.Copy(dc.LogMedium, containerLogResp)
 
-	// supplying your own buffer is perfomant than letting the system do it for you
-	buff := make([]byte, 2048)
-	io.CopyBuffer(dc.LogMedium, containerLogResp, buff)
-
+	containerLogResp.Close()
 	return nil
 }
