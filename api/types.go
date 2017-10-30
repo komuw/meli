@@ -38,6 +38,10 @@ type DockerComposeConfig struct {
 	Volumes  map[string]string         `yaml:"volumes,omitempty"`
 }
 
+type LogWriter interface {
+	io.Writer
+	io.ReaderFrom
+}
 type DockerContainer struct {
 	ServiceName       string
 	ComposeService    ComposeService
@@ -46,7 +50,7 @@ type DockerContainer struct {
 	FollowLogs        bool
 	DockerComposeFile string
 	ContainerID       string // this assumes that there can only be one container per docker-compose service
-	LogMedium         io.Writer
+	LogMedium         LogWriter
 }
 
 func (dc *DockerContainer) UpdateContainerID(containerID string) {

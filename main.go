@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -82,7 +83,7 @@ func main() {
 			NetworkName:       networkName,
 			FollowLogs:        followLogs,
 			DockerComposeFile: dockerComposeFile,
-			LogMedium:         os.Stdout}
+			LogMedium:         bytes.NewBuffer(make([]byte, 0, 0))}
 		go startComposeServices(ctx, cli, &wg, dc)
 	}
 	wg.Wait()
