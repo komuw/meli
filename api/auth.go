@@ -5,11 +5,34 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os/user"
+	"runtime"
 	"strings"
 	"sync"
+
+	"github.com/docker/docker-credential-helpers/client"
 )
 
 var AuthInfo sync.Map
+
+func useCredStore(server string) (string, string) {
+	// this program is usually installed by docker(i think)
+	prog := "docker-credential-secretservice"
+	goos := runtime.GOOS
+	// TODO: handle other Oses or just fail with an error if we encounter an OS that we do not know.
+	if goos == "windows" {
+		prog = "docker-credential-wincred"
+	} else if goos == "darwin" {
+		prog = "docker-credential-osxkeychain"
+	}
+
+	programfunc := client.NewShellProgramFunc(prog)
+	cred, err := client.Get(programfunc, server)
+	if err != nil {
+		return "", ""
+	}
+
+	return cred.Username, cred.Secret
+}
 
 func GetAuth() {
 	usr, err := user.Current()
@@ -30,7 +53,8 @@ func GetAuth() {
 	}
 
 	type AuthData struct {
-		Auths map[string]map[string]string `json:"auths,omitempty"`
+		Auths      map[string]map[string]string `json:"auths,omitempty"`
+		CredsStore string                       `json:"credsStore,omitempty"`
 	}
 	data := &AuthData{}
 	err = json.Unmarshal([]byte(dockerAuth), data)
@@ -62,13 +86,20 @@ func GetAuth() {
 		AuthInfo.Store("quay", map[string]string{"registryURL": "", "username": "", "password": ""})
 	}
 
-	dockerUserPass := FormatRegistryAuth(string(dockerAuth))
-	dockerUsername := dockerUserPass[0]
-	dockerPassword := dockerUserPass[1]
+	dockerUsername, dockerPassword, quayUsername, quayPassword := "PLACEHOLDER", "PLACEHOLDER", "PLACEHOLDER", "PLACEHOLDER"
+	if data.CredsStore != "" {
+		dockerUsername, dockerPassword = useCredStore(dockerRegistryURL)
+		quayUsername, quayPassword = useCredStore(quayRegistryURL)
 
-	quayUserPass := FormatRegistryAuth(string(quayAuth))
-	quayUsername := quayUserPass[0]
-	quayPassword := quayUserPass[1]
+	} else {
+		dockerUserPass := FormatRegistryAuth(string(dockerAuth))
+		dockerUsername = dockerUserPass[0]
+		dockerPassword = dockerUserPass[1]
+
+		quayUserPass := FormatRegistryAuth(string(quayAuth))
+		quayUsername = quayUserPass[0]
+		quayPassword = quayUserPass[1]
+	}
 
 	dockerStringRegistryAuth := `{"username": "DOCKERUSERNAME", "password": "DOCKERPASSWORD", "email": null, "serveraddress": "DOCKERREGISTRYURL"}`
 	dockerStringRegistryAuth = strings.Replace(dockerStringRegistryAuth, "DOCKERUSERNAME", dockerUsername, 1)
