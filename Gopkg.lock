@@ -20,6 +20,12 @@
   version = "v1.13.1"
 
 [[projects]]
+  name = "github.com/docker/docker-credential-helpers"
+  packages = ["client","credentials"]
+  revision = "d68f9aeca33f5fd3f08eeae5e9d175edf4e731d1"
+  version = "v0.6.0"
+
+[[projects]]
   name = "github.com/docker/go-connections"
   packages = ["nat","sockets","tlsconfig"]
   revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
@@ -41,13 +47,13 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp","proxy"]
-  revision = "0744d001aa8470aaa53df28d32e5ceeb8af9bd70"
+  revision = "a337091b0525af65de94df2eb7e98bd9962dcbe2"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["windows"]
-  revision = "429f518978ab01db8bb6f44b66785088e7fba58b"
+  revision = "bcc62b628abe70dd6bee1f06c4e31630209cd8d7"
 
 [[projects]]
   branch = "v2"
@@ -58,6 +64,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "59b50f2679248829bafe934a9c4e055bcb812fc448791fe70880ce14caeba09f"
+  inputs-digest = "edeccbfc8fb4571ad9c12d284433fd7b931ca72f8fccaaa8cd41332fdb54b74c"
   solver-name = "gps-cdcl"
   solver-version = 1
