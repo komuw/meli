@@ -93,12 +93,20 @@ func GetAuth() {
 
 	} else {
 		dockerUserPass := FormatRegistryAuth(string(dockerAuth))
-		dockerUsername = dockerUserPass[0]
-		dockerPassword = dockerUserPass[1]
-
 		quayUserPass := FormatRegistryAuth(string(quayAuth))
-		quayUsername = quayUserPass[0]
-		quayPassword = quayUserPass[1]
+
+		if len(dockerUserPass) < 2 {
+			dockerUsername, dockerPassword = "", ""
+		} else {
+			dockerUsername = dockerUserPass[0]
+			dockerPassword = dockerUserPass[1]
+		}
+		if len(quayUserPass) < 2 {
+			quayUsername, quayPassword = "", ""
+		} else {
+			quayUsername = quayUserPass[0]
+			quayPassword = quayUserPass[1]
+		}
 	}
 
 	dockerStringRegistryAuth := `{"username": "DOCKERUSERNAME", "password": "DOCKERPASSWORD", "email": null, "serveraddress": "DOCKERREGISTRYURL"}`
