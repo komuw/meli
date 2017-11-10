@@ -25,7 +25,7 @@ var version string
 func main() {
 	showVersion, followLogs, dockerComposeFile := cli.Cli()
 	if showVersion {
-		log.Println("Meli version: ", version)
+		fmt.Println("Meli version: ", version)
 		os.Exit(0)
 	}
 
@@ -104,7 +104,7 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
-			log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
+			fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 			return
 		}
 	}
@@ -112,7 +112,7 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 	if err != nil {
 		// clean exit since we want other goroutines for fetching other images
 		// to continue running
-		log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
+		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
 
@@ -120,20 +120,20 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 		err = api.ConnectNetwork(ctx, cli, dc)
 		if err != nil {
 			// create whitespace so that error is visible to human
-			log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
+			fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 			return
 		}
 	}
 
 	err = api.ContainerStart(ctx, cli, dc)
 	if err != nil {
-		log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
+		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
 
 	err = api.ContainerLogs(ctx, cli, dc)
 	if err != nil {
-		log.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
+		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
 }
