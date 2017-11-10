@@ -109,6 +109,7 @@ func (m *MockDockerClient) ContainerList(ctx context.Context, options types.Cont
 
 type ImageProgress struct {
 	Status         string `json:"status,omitempty"`
+	Stream         string `json:"stream,omitempty"`
 	Progress       string `json:"progress,omitempty"`
 	ProgressDetail string `json:"progressDetail,omitempty"`
 }
