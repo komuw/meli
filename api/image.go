@@ -2,8 +2,10 @@ package api
 
 import (
 	"archive/tar"
+	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -32,7 +34,16 @@ func PullDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			originalErr: err,
 			newErr:      fmt.Errorf(" :unable to pull image %s", imageName)}
 	}
-	io.Copy(dc.LogMedium, imagePullResp)
+
+	var imgProg ImageProgress
+	scanner := bufio.NewScanner(imagePullResp)
+	for scanner.Scan() {
+		_ = json.Unmarshal(scanner.Bytes(), &imgProg)
+		fmt.Fprintln(dc.LogMedium, dc.ServiceName, "::", imgProg.Status, imgProg.Progress)
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println(" :unable to log output for image", imageName, err)
+	}
 
 	imagePullResp.Close()
 	return nil
