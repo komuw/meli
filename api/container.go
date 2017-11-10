@@ -1,10 +1,10 @@
 package api
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -172,7 +172,14 @@ func ContainerLogs(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) 
 				newErr:      fmt.Errorf(" :unable to get container logs %s", dc.ContainerID)}
 		}
 	}
-	io.Copy(dc.LogMedium, containerLogResp)
+
+	scanner := bufio.NewScanner(containerLogResp)
+	for scanner.Scan() {
+		fmt.Fprintln(dc.LogMedium, dc.ServiceName, "::", scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println(" :unable to log output for container", dc.ContainerID, err)
+	}
 
 	containerLogResp.Close()
 	return nil

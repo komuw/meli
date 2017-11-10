@@ -2,11 +2,12 @@ package api
 
 import (
 	"archive/tar"
+	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -32,7 +33,16 @@ func PullDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			originalErr: err,
 			newErr:      fmt.Errorf(" :unable to pull image %s", imageName)}
 	}
-	io.Copy(dc.LogMedium, imagePullResp)
+
+	var imgProg ImageProgress
+	scanner := bufio.NewScanner(imagePullResp)
+	for scanner.Scan() {
+		_ = json.Unmarshal(scanner.Bytes(), &imgProg)
+		fmt.Fprintln(dc.LogMedium, dc.ServiceName, "::", imgProg.Status, imgProg.Progress)
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println(" :unable to log output for image", imageName, err)
+	}
 
 	imagePullResp.Close()
 	return nil
@@ -166,7 +176,16 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 			originalErr: err,
 			newErr:      errors.New(" :unable to build docker image")}
 	}
-	io.Copy(dc.LogMedium, imageBuildResponse.Body)
+
+	var imgProg ImageProgress
+	scanner := bufio.NewScanner(imageBuildResponse.Body)
+	for scanner.Scan() {
+		_ = json.Unmarshal(scanner.Bytes(), &imgProg)
+		fmt.Fprintln(dc.LogMedium, dc.ServiceName, "::", imgProg.Status, imgProg.Progress)
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println(" :unable to log output for image", imageName, err)
+	}
 
 	imageBuildResponse.Body.Close()
 	return imageName, nil
