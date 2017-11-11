@@ -10,7 +10,7 @@ Meli is a Swahili word meaning ship; so think of Meli as a ship carrying your do
 
 It's currently work in progress, API will remain unstable for sometime.
 
-I only intend to support docker-compose version 3+; https://docs.docker.com/compose/compose-file/compose-versioning/           
+I only intend to support docker-compose [version 3+](https://docs.docker.com/compose/compose-file/compose-versioning/)          
 
 Meli is NOT intended to replicate every feature of docker-compose, it is primarily intended to enable you to pull, build and run the services in your docker-compose file as fast as possible.          
 If you want to exec in to a running container, use docker; if you want to run an adhoc command in a container, use docker; if you want..... you get the drift.
@@ -49,11 +49,13 @@ services:
 
 `meli -up`          
 ```bash 
-2017/10/07 14:30:11 {"status":"Pulling from library/redis","id":"3.0-alpine"}
-2017/10/07 14:30:11 {"status":"Digest: sha256:350469b395eac82395f9e59d7b7b90f7d23fe0838965e56400739dec3afa60de"}
-2017/10/07 14:30:11 {"status":"Status: Image is up to date for redis:3.0-alpine"}
-...
-2017/10/07 14:30:12 u2017-10-07T11:30:12.720619075Z  1:M 07 Oct 11:30:12.720 * The server is now ready to accept connections on port 6379
+redis :: Pulling from library/redis 
+redis :: Pulling fs layer 
+redis :: Pulling fs layer 
+redis :: Downloading [======================>        ]  3.595kB/8.164kB
+redis :: Downloading [==============================>]  8.164kB/8.164kB
+redis :: Download complete [========================>]  8.164kB/8.164kB
+redis :: The server is now ready to accept connections on port 6379
 ```
 
 # Usage as a library
@@ -126,10 +128,10 @@ Benchmark results(average):
 
 | tool           | Elapsed wall clock time(seconds) |
 | :---           |          ---:                    |
-| docker-compose |  9.389 seconds                  |
-| meli           |  3.658  seconds                  |
+| docker-compose |  12.920 seconds                  |
+| meli           |  5.291  seconds                  |
 
-Thus, meli appears to be 2.56 times faster than docker-compose(by wall clock time).           
+Thus, meli appears to be 2.44 times faster than docker-compose(by wall clock time).           
 You can [checkout the current benchmark results from the circleCI](https://circleci.com/gh/komuW/meli/)              
 However, I'm not making a tool to take docker-compose to the races.                   
 
