@@ -10,7 +10,7 @@ Meli is a Swahili word meaning ship; so think of Meli as a ship carrying your do
 
 It's currently work in progress, API will remain unstable for sometime.
 
-I only intend to support docker-compose version 3+; https://docs.docker.com/compose/compose-file/compose-versioning/           
+I only intend to support docker-compose [version 3+](https://docs.docker.com/compose/compose-file/compose-versioning/)          
 
 Meli is NOT intended to replicate every feature of docker-compose, it is primarily intended to enable you to pull, build and run the services in your docker-compose file as fast as possible.          
 If you want to exec in to a running container, use docker; if you want to run an adhoc command in a container, use docker; if you want..... you get the drift.
