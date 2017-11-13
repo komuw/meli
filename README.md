@@ -108,11 +108,11 @@ test machine:
 docker-compose version:         
 `docker-compose --version`
 ```bash
-docker-compose version 1.16.1, build 6d1ac219
+docker-compose version 1.17.1, build 6d101fb
 ```
 
 Meli version:   
-[version 0.0.8](https://github.com/komuW/meli/releases/tag/v0.0.8)
+[version 0.1.1](https://github.com/komuW/meli/releases/tag/v0.1.1)
            
 
 Benchmark test:           
@@ -128,11 +128,11 @@ Benchmark results(average):
 
 | tool           | Elapsed wall clock time(seconds) |
 | :---           |          ---:                    |
-| docker-compose |  12.920 seconds                  |
-| meli           |  5.291  seconds                  |
+| docker-compose |  10.411 seconds                  |
+| meli           |  3.945  seconds                  |
 
-Thus, meli appears to be 2.44 times faster than docker-compose(by wall clock time).           
-You can [checkout the current benchmark results from the circleCI](https://circleci.com/gh/komuW/meli/)              
+Thus, meli appears to be 2.6 times faster than docker-compose(by wall clock time).           
+You can [checkout the current benchmark results from circleCI](https://circleci.com/gh/komuW/meli/)              
 However, I'm not making a tool to take docker-compose to the races.                   
 
 # Build                   
