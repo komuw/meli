@@ -65,5 +65,12 @@ services:
     image: 'quay.io/komuw/busybox'
     command: tail -fn10 .dockerenv
 
+  nestedservice:
+    build:
+      context: .
+      dockerfile: nestedDir/level1/level2/nestedDockerfile
+    labels:
+      - "type=nestedservice"
+
 volumes:
   data-volume:
