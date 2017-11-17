@@ -32,13 +32,13 @@ jobs:
       - run: go build --race -o meli main.go
       - run: ./meli -up -d -f testdata/docker-compose.yml
       - run:
-          name: echo number of running containers (expected=10), actual;
+          name: echo number of running containers (expected=11), actual;
           command: docker ps -q | wc -l
       # stop the containers running from the previous command
       - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
       - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
       - run:
-          name: echo number of running containers (expected=10), actual;
+          name: echo number of running containers (expected=11), actual;
           command: docker ps -q | wc -l
       - run:
           name: run tests

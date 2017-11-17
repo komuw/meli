@@ -72,5 +72,9 @@ services:
     labels:
       - "type=nestedservice"
 
+  symbolic-link-service:
+    build:
+      context: .
+
 volumes:
   data-volume:
