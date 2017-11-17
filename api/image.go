@@ -70,6 +70,11 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 		if info.Mode().IsDir() {
 			return nil
 		}
+		// return on non-regular files since there will be no content to tar
+		if !info.Mode().IsRegular() {
+			// non regular files are like symlinks etc; https://golang.org/src/os/types.go?h=ModeSymlink#L49
+			return nil
+		}
 
 		// open files for taring
 		f, err := os.Open(path)
