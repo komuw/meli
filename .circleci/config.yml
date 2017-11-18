@@ -89,5 +89,7 @@ jobs:
                 docker login -u $DOCKER_USER -p $DOCKER_PASS
                 goreleaser --rm-dist -config .goreleaser.yml --skip-validate
             filters:
-                tags:
-                    only: /v[0-9]+(\.[0-9]+)*/
+              tags:
+                only: /v[0-9]+(\.[0-9]+)*/
+              branches:
+                only: master
