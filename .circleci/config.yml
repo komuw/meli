@@ -75,8 +75,13 @@ jobs:
           name: test release
           command: |
             if [ "${CIRCLE_BRANCH}" == "homebrew" ]; then
-              echo "todo: deploy with goreleaser"
-              git checkout . && git clean -fd
-              goreleaser --rm-dist -config .goreleaser.yml --skip-validate
+              if [[ -n ${CIRCLE_TAG} ]]; then
+                echo "todo: deploy with goreleaser"
+                sudo apt-get -y update
+                sudo apt-get -y install ruby ruby-dev rubygems build-essential snapd
+                sudo gem install --no-ri --no-rdoc fpm
+                git checkout . && git clean -fd
+                goreleaser --rm-dist -config .goreleaser.yml --skip-validate
+              fi
             fi
 
