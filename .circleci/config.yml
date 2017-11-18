@@ -76,8 +76,6 @@ jobs:
             name: time meli -up
             command: time ./meli -up -d -f testdata/docker-compose.yml
 
-  deploy:
-     steps:
         - run:
             name: do a github release on master
             command: |
