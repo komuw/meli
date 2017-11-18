@@ -76,12 +76,7 @@ jobs:
             name: time meli -up
             command: time ./meli -up -d -f testdata/docker-compose.yml
 
-  deploy:
-    docker:
-        - image: ubuntu:16.04
-    working_directory: ~/go/src/github.com/komuw/meli
-    steps:
-      - run:
+        - run:
             name: do a github release on master
             command: |
                 echo "todo: deploy with goreleaser"
@@ -93,15 +88,6 @@ jobs:
                 git checkout . && git clean -fd
                 docker login -u $DOCKER_USER -p $DOCKER_PASS
                 goreleaser --rm-dist -config .goreleaser.yml --skip-validate
-
-workflows:
-  version: 2
-  build-deploy:
-    jobs:
-      - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
+            filters:
+                tags:
+                    only: /v[0-9]+(\.[0-9]+)*/
