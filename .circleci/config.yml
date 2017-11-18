@@ -37,6 +37,8 @@ jobs:
              echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
              mkdir -p ~/go/bin
              echo "export PATH=$PATH:~/go/bin" >> /etc/profile
+             echo "export LC_ALL=C.UTF-8" >> /etc/profile
+             echo "export LANG=C.UTF-8" >> /etc/profile
              source /etc/profile
 
       - run: source /etc/profile && go get -u github.com/golang/dep/cmd/dep
