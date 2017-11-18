@@ -39,6 +39,7 @@ fpm:
   license: MIT
   formats:
     - rpm
+    - deb
 
 snapcraft:
   name: meli
