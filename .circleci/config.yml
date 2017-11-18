@@ -6,13 +6,13 @@ jobs:
   build:
     docker:
       # specify the version
-      - image: circleci/golang:1.9.2-stretch
+      - image: ubuntu:16.04
 
     #### TEMPLATE_NOTE: go expects specific checkout path representing url
     #### expecting it in the form of
     ####   /go/src/github.com/circleci/go-tool
     ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: /go/src/github.com/komuw/meli
+    working_directory: ~/go/src/github.com/komuw/meli
     steps:
       - checkout
       - setup_remote_docker
@@ -25,6 +25,13 @@ jobs:
             curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
             tar -xz -C /tmp -f /tmp/docker-$VER.tgz
             sudo mv /tmp/docker/* /usr/bin
+
+      - run:
+          name: install golang
+          command: |
+             sudo wget --directory-prefix=/go https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz
+             tar -C /usr/local -xzf go1.9.2.linux-amd64.tar.gz
+             export PATH=$PATH:/usr/local/go/bin
 
       - run: go get -u github.com/golang/dep/cmd/dep
       - run: go get -u github.com/goreleaser/goreleaser
