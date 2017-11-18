@@ -82,17 +82,15 @@ jobs:
       - deploy:
           name: do a github release on master
           command: |
-            if [[ -n ${CIRCLE_TAG} ]]; then
-                echo "todo: deploy with goreleaser"
-                source /etc/profile
-                apt-get -y update
-                apt-get -y install software-properties-common
-                apt-get -y install ruby ruby-dev rubygems build-essential snapd snapcraft rpm rpm-common
-                gem install --no-ri --no-rdoc fpm
-                git checkout . && git clean -fd
-                docker login -u $DOCKER_USER -p $DOCKER_PASS
-                goreleaser --rm-dist -config .goreleaser.yml --skip-validate
-            fi
+            echo "todo: deploy with goreleaser"
+            source /etc/profile
+            apt-get -y update
+            apt-get -y install software-properties-common
+            apt-get -y install ruby ruby-dev rubygems build-essential snapd snapcraft rpm rpm-common
+            gem install --no-ri --no-rdoc fpm
+            git checkout . && git clean -fd
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            goreleaser --rm-dist -config .goreleaser.yml --skip-validate
           filters:
             tags:
-              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
+              only: /v[0-9]+(\.[0-9]+)*/
