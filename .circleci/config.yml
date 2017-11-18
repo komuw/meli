@@ -6,7 +6,7 @@ jobs:
   build:
     docker:
       # specify the version
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.9.2-stretch
 
     #### TEMPLATE_NOTE: go expects specific checkout path representing url
     #### expecting it in the form of
@@ -78,7 +78,8 @@ jobs:
             #   if [[ -n ${CIRCLE_TAG} ]]; then
                 echo "todo: deploy with goreleaser"
                 sudo apt-get -y update
-                sudo apt-get -y install ruby ruby-dev rubygems build-essential snapd
+                sudo apt-get -y install software-properties-common
+                sudo apt-get -y install ruby ruby-dev rubygems build-essential snapd snapcraft
                 sudo gem install --no-ri --no-rdoc fpm
                 git checkout . && git clean -fd
                 goreleaser --rm-dist -config .goreleaser.yml --skip-validate
