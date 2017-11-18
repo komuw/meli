@@ -119,8 +119,16 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 			originalErr: err,
 			newErr:      fmt.Errorf(" :unable to get path to Dockerfile %s", dockerFile)}
 	}
-	dockerContextPath := filepath.Dir(dockerFilePath)
-	dockerFileName := filepath.Base(dockerFile)
+
+	dockerFileContextPath := filepath.Dir(dockerFile)
+	UserProvidedContextPath := filepath.Dir(dc.ComposeService.Build.Context + "/")
+	if dc.ComposeService.Build.Context == "." {
+		// context will be the directory containing the compose file
+		UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
+	} else if dc.ComposeService.Build.Context == "" {
+		// context will be the directory containing the compose file
+		UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
+	}
 
 	dockerFileReader, err := os.Open(dockerFilePath)
 	if err != nil {
@@ -153,16 +161,23 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 	AuthConfigs := make(map[string]types.AuthConfig)
 	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}
 
-	// TODO: we need to read the context passed in the docker-compose context key for a service
-	// rather than assume the context is the dir the Dockerfile is in.
-	err = filepath.Walk(dockerContextPath, walkFnClosure(dockerContextPath, tw, buf))
+	// TODO: stop calling filepath.Walk twice; once for dockerfile context and then for uer context
+	// Both the user provided context and that of the DockerFile needs to be in the tar file.
+	err = filepath.Walk(dockerFileContextPath, walkFnClosure(dockerFileContextPath, tw, buf))
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
 			newErr:      fmt.Errorf(" :unable to walk dockefile context path %s", dockerFile)}
 	}
+	err = filepath.Walk(UserProvidedContextPath, walkFnClosure(UserProvidedContextPath, tw, buf))
+	if err != nil {
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf(" :unable to walk user provided context path %s", dockerFile)}
+	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 
+	dockerFileName := filepath.Base(dockerFile)
 	imageBuildResponse, err := cli.ImageBuild(
 		ctx,
 		dockerFileTarReader,
