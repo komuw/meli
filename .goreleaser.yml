@@ -22,7 +22,6 @@ brew:
     name: komuW
     email: komuw05@gmail.com
   folder: HomebrewFormula
-  caveats: "meli -up"
   homepage: "https://github.com/komuW/meli"
   description: "Meli is supposed to be a faster alternative to docker-compose.\n Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel."
   test: |
