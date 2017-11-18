@@ -22,14 +22,16 @@ jobs:
           command: |
             set -x
             VER="17.03.0-ce"
+            apt-get -y update
+            apt-get -y install curl wget
             curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
             tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            sudo mv /tmp/docker/* /usr/bin
+            mv /tmp/docker/* /usr/bin
 
       - run:
           name: install golang
           command: |
-             sudo wget --directory-prefix=/go https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz
+             wget https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz
              tar -C /usr/local -xzf go1.9.2.linux-amd64.tar.gz
              export PATH=$PATH:/usr/local/go/bin
 
@@ -55,8 +57,8 @@ jobs:
           command: go test -timeout 1m -race -run=XXXX -bench=. ./...
 
       # benchmark against docker-compose
-      - run: sudo apt -y install python-pip
-      - run: sudo pip install -U pip && sudo pip install -U docker-compose
+      - run: apt -y install python-pip
+      - run: pip install -U pip && pip install -U docker-compose
       - run: rm meli
       - run: go build -o meli main.go
       - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
@@ -84,10 +86,10 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "homebrew" ]; then
             #   if [[ -n ${CIRCLE_TAG} ]]; then
                 echo "todo: deploy with goreleaser"
-                sudo apt-get -y update
-                sudo apt-get -y install software-properties-common
-                sudo apt-get -y install ruby ruby-dev rubygems build-essential snapd snapcraft
-                sudo gem install --no-ri --no-rdoc fpm
+                apt-get -y update
+                apt-get -y install software-properties-common
+                apt-get -y install ruby ruby-dev rubygems build-essential snapd snapcraft
+                gem install --no-ri --no-rdoc fpm
                 git checkout . && git clean -fd
                 goreleaser --rm-dist -config .goreleaser.yml --skip-validate
             #   fi
