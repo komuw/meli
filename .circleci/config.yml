@@ -37,10 +37,10 @@ jobs:
              echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
              source /etc/profile
 
-      - run: go get -u github.com/golang/dep/cmd/dep
-      - run: go get -u github.com/goreleaser/goreleaser
-      - run: dep ensure; dep prune
-      - run: go build --race -o meli main.go
+      - run: source /etc/profile && go get -u github.com/golang/dep/cmd/dep
+      - run: source /etc/profile && go get -u github.com/goreleaser/goreleaser
+      - run: source /etc/profile && dep ensure; dep prune
+      - run: source /etc/profile && go build --race -o meli main.go
       - run: ./meli -up -d -f testdata/docker-compose.yml
       - run:
           name: echo number of running containers (expected=11), actual;
@@ -53,16 +53,16 @@ jobs:
           command: docker ps -q | wc -l
       - run:
           name: run tests
-          command: go test -timeout 1m -race -cover -v ./...
+          command: source /etc/profile && go test -timeout 1m -race -cover -v ./...
       - run:
           name: run benchmarks
-          command: go test -timeout 1m -race -run=XXXX -bench=. ./...
+          command: source /etc/profile && go test -timeout 1m -race -run=XXXX -bench=. ./...
 
       # benchmark against docker-compose
       - run: apt -y install python-pip
       - run: pip install -U pip && pip install -U docker-compose
       - run: rm meli
-      - run: go build -o meli main.go
+      - run: source /etc/profile && go build -o meli main.go
       - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
       - run:
           name: show docker-compose version
@@ -80,6 +80,7 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               echo "todo: deploy with goreleaser"
+              source /etc/profile
               git checkout . && git clean -fd
               goreleaser --rm-dist -config .goreleaser.yml --skip-validate
             fi
@@ -88,6 +89,7 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "homebrew" ]; then
             #   if [[ -n ${CIRCLE_TAG} ]]; then
                 echo "todo: deploy with goreleaser"
+                source /etc/profile
                 apt-get -y update
                 apt-get -y install software-properties-common
                 apt-get -y install ruby ruby-dev rubygems build-essential snapd snapcraft
