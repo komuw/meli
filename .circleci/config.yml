@@ -69,6 +69,14 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               echo "todo: deploy with goreleaser"
-              # git checkout . && git clean -fd
-              # goreleaser --rm-dist -config .goreleaser.yml --skip-validate
+              git checkout . && git clean -fd
+              goreleaser --rm-dist -config .goreleaser.yml --skip-validate
             fi
+          name: test release
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "homebrew" ]; then
+              echo "todo: deploy with goreleaser"
+              git checkout . && git clean -fd
+              goreleaser --rm-dist -config .goreleaser.yml --skip-validate
+            fi
+
