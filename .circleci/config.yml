@@ -36,7 +36,7 @@ jobs:
              export PATH=$PATH:/usr/local/go/bin
              echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
              mkdir -p ~/go/bin
-             echo "~/go/bin" >> /etc/profile
+             echo "export PATH=$PATH:~/go/bin" >> /etc/profile
              source /etc/profile
 
       - run: source /etc/profile && go get -u github.com/golang/dep/cmd/dep
