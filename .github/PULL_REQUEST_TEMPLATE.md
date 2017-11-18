@@ -1,5 +1,5 @@
 Thank you for contributing to meli.                    
-Every contribution to meli is important to us.                                  
+Every contribution to meli is important to us.                                   
 
 Contributor offers to license certain software (a “Contribution” or multiple
 “Contributions”) to meli, and meli agrees to accept said Contributions,
