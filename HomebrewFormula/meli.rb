@@ -12,6 +12,5 @@ class Meli < Formula
 
   test do
     system "#{bin}/program --version"
-    ...
   end
 end
