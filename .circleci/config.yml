@@ -89,7 +89,7 @@ jobs:
             command: docker-compose version
         - run:
             name: time docker-compose up
-            command: time docker-compose -f testdata/docker-compose.yml up -d
+            command: CURL_CA_BUNDLE= && time docker-compose -f testdata/docker-compose.yml up -d
         - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
         - run:
             name: time meli -up
