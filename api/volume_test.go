@@ -1,8 +1,9 @@
 package api
 
 import (
+	"bytes"
 	"context"
-	"io/ioutil"
+
 	"testing"
 )
 
@@ -17,7 +18,7 @@ func TestCreateDockerVolume(t *testing.T) {
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
-	dst := ioutil.Discard
+	dst := bytes.NewBuffer(make([]byte, 0, 0))
 	for _, v := range tt {
 		actual, err := CreateDockerVolume(ctx, cli, v.name, v.driver, dst)
 		if err != nil {
@@ -32,7 +33,7 @@ func TestCreateDockerVolume(t *testing.T) {
 func BenchmarkCreateDockerVolume(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
-	dst := ioutil.Discard
+	dst := bytes.NewBuffer(make([]byte, 0, 0))
 	for n := 0; n < b.N; n++ {
 		_, _ = CreateDockerVolume(ctx, cli, "name", "local", dst)
 	}

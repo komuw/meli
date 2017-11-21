@@ -1,8 +1,9 @@
 package api
 
 import (
+	"bytes"
 	"context"
-	"io/ioutil"
+
 	"testing"
 )
 
@@ -11,7 +12,7 @@ func TestPullDockerImage(t *testing.T) {
 		dc          *DockerContainer
 		expectedErr error
 	}{
-		{&DockerContainer{ComposeService: ComposeService{Image: "busybox"}, LogMedium: ioutil.Discard}, nil},
+		{&DockerContainer{ComposeService: ComposeService{Image: "busybox"}, LogMedium: bytes.NewBuffer(make([]byte, 0, 0))}, nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
@@ -35,7 +36,7 @@ func TestBuildDockerImage(t *testing.T) {
 				DockerComposeFile: "docker-compose.yml",
 				ComposeService: ComposeService{
 					Build: Buildstruct{Dockerfile: "../testdata/Dockerfile"}},
-				LogMedium: ioutil.Discard},
+				LogMedium: bytes.NewBuffer(make([]byte, 0, 0))},
 			"meli_myservicename",
 			nil},
 	}
@@ -57,7 +58,7 @@ func TestBuildDockerImage(t *testing.T) {
 func BenchmarkPullDockerImage(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
-	dc := &DockerContainer{ComposeService: ComposeService{Image: "busybox"}, LogMedium: ioutil.Discard}
+	dc := &DockerContainer{ComposeService: ComposeService{Image: "busybox"}, LogMedium: bytes.NewBuffer(make([]byte, 0, 0))}
 	GetAuth()
 	for n := 0; n < b.N; n++ {
 		_ = PullDockerImage(ctx, cli, dc)
@@ -71,7 +72,7 @@ func BenchmarkBuildDockerImage(b *testing.B) {
 		ServiceName: "myservicename",
 		ComposeService: ComposeService{
 			Build: Buildstruct{Dockerfile: "../testdata/Dockerfile"}},
-		LogMedium: ioutil.Discard}
+		LogMedium: bytes.NewBuffer(make([]byte, 0, 0))}
 	for n := 0; n < b.N; n++ {
 		_, _ = BuildDockerImage(ctx, cli, dc)
 	}

@@ -1,8 +1,9 @@
 package api
 
 import (
+	"bytes"
 	"context"
-	"io/ioutil"
+
 	"testing"
 )
 
@@ -62,8 +63,8 @@ func TestContainerLogs(t *testing.T) {
 		dc          *DockerContainer
 		expectedErr error
 	}{
-		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: true, LogMedium: ioutil.Discard}, nil},
-		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: false, LogMedium: ioutil.Discard}, nil},
+		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: true, LogMedium: bytes.NewBuffer(make([]byte, 0, 0))}, nil},
+		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: false, LogMedium: bytes.NewBuffer(make([]byte, 0, 0))}, nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
@@ -102,6 +103,6 @@ func BenchmarkContainerLogs(b *testing.B) {
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for n := 0; n < b.N; n++ {
-		_ = ContainerLogs(ctx, cli, &DockerContainer{ContainerID: "containerId", LogMedium: ioutil.Discard})
+		_ = ContainerLogs(ctx, cli, &DockerContainer{ContainerID: "containerId", LogMedium: bytes.NewBuffer(make([]byte, 0, 0))})
 	}
 }
