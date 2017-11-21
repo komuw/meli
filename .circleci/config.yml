@@ -15,23 +15,24 @@ jobs:
             name: install apt and pip deps
             command: |
                 apt-get -y update
-                apt-get -y install \
-                                  curl \
-                                  wget \
-                                  git \
-                                  python \
-                                  python-pip \
-                                  software-properties-common \
-                                  ruby \
-                                  ruby-dev \
-                                  rubygems \
-                                  build-essential \
-                                  snapd \
-                                  snapcraft \
-                                  rpm \
-                                  rpm-common \
-                                  nano
-                pip install -U pip && pip install -U docker-compose
+                apt -y install \
+                            curl \
+                            wget \
+                            git \
+                            python \
+                            python-pip \
+                            software-properties-common \
+                            ruby \
+                            ruby-dev \
+                            rubygems \
+                            build-essential \
+                            snapd \
+                            snapcraft \
+                            rpm \
+                            rpm-common \
+                            nano
+                pip install -U pip
+                pip install -U docker-compose
         - run:
             name: install golang
             command: |
@@ -47,7 +48,8 @@ jobs:
         - run:
             name: install golang pkgs
             command: |
-                source /etc/profile && go get -u github.com/golang/dep/cmd/dep && \
+                source /etc/profile && \
+                go get -u github.com/golang/dep/cmd/dep && \
                 go get -u github.com/goreleaser/goreleaser && \
                 dep ensure; dep prune
 
@@ -103,25 +105,24 @@ jobs:
             name: install apt and pip deps
             command: |
                 apt-get -y update
-                command: |
-                apt-get -y update
-                apt-get -y install \
-                                  curl \
-                                  wget \
-                                  git \
-                                  python \
-                                  python-pip \
-                                  software-properties-common \
-                                  ruby \
-                                  ruby-dev \
-                                  rubygems \
-                                  build-essential \
-                                  snapd \
-                                  snapcraft \
-                                  rpm \
-                                  rpm-common \
-                                  nano
-                pip install -U pip && pip install -U docker-compose
+                apt -y install \
+                            curl \
+                            wget \
+                            git \
+                            python \
+                            python-pip \
+                            software-properties-common \
+                            ruby \
+                            ruby-dev \
+                            rubygems \
+                            build-essential \
+                            snapd \
+                            snapcraft \
+                            rpm \
+                            rpm-common \
+                            nano
+                pip install -U pip
+                pip install -U docker-compose
         - run:
             name: install golang
             command: |
@@ -137,7 +138,8 @@ jobs:
         - run:
             name: install golang pkgs
             command: |
-                source /etc/profile && go get -u github.com/golang/dep/cmd/dep && \
+                source /etc/profile && \
+                go get -u github.com/golang/dep/cmd/dep && \
                 go get -u github.com/goreleaser/goreleaser && \
                 dep ensure; dep prune
         - run:
