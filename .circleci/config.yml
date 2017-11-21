@@ -151,14 +151,19 @@ jobs:
                 tar -xz -C /tmp -f /tmp/docker-$VER.tgz
                 mv /tmp/docker/* /usr/bin
         - run:
-            name: do a github release on tags
+            name: do a new release
             command: |
-                echo "deploying with goreleaser"
-                source /etc/profile
-                gem install --no-ri --no-rdoc fpm
-                git checkout . && git clean -fd
-                docker login -u $DOCKER_USER -p $DOCKER_PASS
-                goreleaser --rm-dist -config .goreleaser.yml --skip-validate
+                LAST_GIT_MESSAGE=$(git log -n1 master --format=oneline --pretty=%B)
+                echo "last git commit message on master:"
+                echo $LAST_GIT_MESSAGE
+                if [ "$LAST_GIT_MESSAGE" == 'do release' ]; then
+                    echo "deploying with goreleaser"
+                    source /etc/profile
+                    gem install --no-ri --no-rdoc fpm
+                    git checkout . && git clean -fd
+                    docker login -u $DOCKER_USER -p $DOCKER_PASS
+                    goreleaser --rm-dist -config .goreleaser.yml --skip-validate
+                fi
 
 workflows:
   version: 2
