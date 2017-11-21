@@ -1,6 +1,9 @@
 build:
   main: main.go
   binary: meli
+  ldflags: -static -d
+  env:
+    - CGO_ENABLED=0
   goos:
     - darwin
     - linux
