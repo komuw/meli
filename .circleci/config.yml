@@ -1,6 +1,7 @@
 # Golang CircleCI 2.0 configuration file
 #
 # Check https://circleci.com/docs/2.0/language-go/ for more details
+# tags DOCS: https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
 version: 2
 jobs:
   build:
@@ -91,3 +92,5 @@ jobs:
             filters:
               tags:
                 only: /v[0-9]+(\.[0-9]+)*/
+              branches:
+                ignore: /.*/
