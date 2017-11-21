@@ -29,7 +29,8 @@ jobs:
                                   snapd \
                                   snapcraft \
                                   rpm \
-                                  rpm-common
+                                  rpm-common \
+                                  nano
                 pip install -U pip && pip install -U docker-compose
         - run:
             name: install golang
@@ -118,7 +119,8 @@ jobs:
                                   snapd \
                                   snapcraft \
                                   rpm \
-                                  rpm-common
+                                  rpm-common \
+                                  nano
                 pip install -U pip && pip install -U docker-compose
         - run:
             name: install golang
