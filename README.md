@@ -17,7 +17,16 @@ If you want to exec in to a running container, use docker; if you want to run an
 
 
 # Installing          
-Very early test releases are available from the [releases page](https://github.com/komuW/meli/releases)          
+Download a binary release for your particular OS from the [releases page](https://github.com/komuW/meli/releases)           
+We have binaries for:                
+- linux(32bit and 64bit)           
+- windows(32bit and 64bit)            
+- darwin(32bit and 64bit)            
+Optionally, if you are on a Mac/OSx, you can install using brew;       
+```bash
+brew tap komuw/meli git@github.com:komuw/meli.git              
+brew install meli
+```
 
 # Usage  
 `meli --help`         
