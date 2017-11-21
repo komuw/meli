@@ -110,3 +110,10 @@ func (m *MockDockerClient) VolumeCreate(ctx context.Context, options volumetypes
 func (m *MockDockerClient) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
 	return []types.Container{types.Container{ID: "myExistingContainerId00912"}}, nil
 }
+
+type ImageProgress struct {
+	Status         string `json:"status,omitempty"`
+	Stream         string `json:"stream,omitempty"`
+	Progress       string `json:"progress,omitempty"`
+	ProgressDetail string `json:"progressDetail,omitempty"`
+}

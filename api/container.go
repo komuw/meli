@@ -1,11 +1,10 @@
 package api
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
-	"io"
-	"log"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -34,7 +33,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 		All:     true,
 		Filters: filters})
 	if err != nil {
-		log.Println(" :unable to list containers")
+		fmt.Println(" :unable to list containers")
 	}
 	if len(containers) > 0 {
 		dc.UpdateContainerID(containers[0].ID)
@@ -52,7 +51,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			port, err := nat.NewPort("tcp", containerport)
 			myPortBinding := nat.PortBinding{HostPort: hostport}
 			if err != nil {
-				log.Println(err, " :unable to create a nat.Port")
+				fmt.Println(err, " :unable to create a nat.Port")
 			}
 			portsMap[port] = EmptyStruct{}
 			portBindingMap[port] = []nat.PortBinding{myPortBinding}
@@ -173,7 +172,14 @@ func ContainerLogs(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) 
 				newErr:      fmt.Errorf(" :unable to get container logs %s", dc.ContainerID)}
 		}
 	}
-	io.Copy(dc.LogMedium, containerLogResp)
+
+	scanner := bufio.NewScanner(containerLogResp)
+	for scanner.Scan() {
+		fmt.Fprintln(dc.LogMedium, dc.ServiceName, "::", scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println(" :unable to log output for container", dc.ContainerID, err)
+	}
 
 	containerLogResp.Close()
 	return nil

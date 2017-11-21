@@ -1,74 +1,164 @@
 # Golang CircleCI 2.0 configuration file
-#
 # Check https://circleci.com/docs/2.0/language-go/ for more details
+# tags DOCS: https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
 version: 2
 jobs:
   build:
     docker:
-      # specify the version
-      - image: circleci/golang:1.9
-
-    #### TEMPLATE_NOTE: go expects specific checkout path representing url
-    #### expecting it in the form of
-    ####   /go/src/github.com/circleci/go-tool
-    ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: /go/src/github.com/komuw/meli
+        - image: ubuntu:16.04
+    working_directory: ~/go/src/github.com/komuw/meli
     steps:
-      - checkout
-      - setup_remote_docker
+        - checkout
+        - setup_remote_docker
+        - run:
+            name: install apt and pip deps
+            command: |
+                apt-get -y update
+                apt -y install \
+                            curl \
+                            wget \
+                            git \
+                            python \
+                            python-pip \
+                            software-properties-common \
+                            ruby \
+                            ruby-dev \
+                            rubygems \
+                            build-essential \
+                            snapd \
+                            snapcraft \
+                            rpm \
+                            rpm-common \
+                            nano
+                pip install -U pip
+                pip install -U docker-compose
+        - run:
+            name: install golang
+            command: |
+                wget https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz
+                tar -C /usr/local -xzf go1.9.2.linux-amd64.tar.gz
+                export PATH=$PATH:/usr/local/go/bin
+                echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
+                mkdir -p ~/go/bin
+                echo "export PATH=$PATH:~/go/bin" >> /etc/profile
+                echo "export LC_ALL=C.UTF-8" >> /etc/profile
+                echo "export LANG=C.UTF-8" >> /etc/profile
+                source /etc/profile
+        - run:
+            name: install golang pkgs
+            command: |
+                source /etc/profile && \
+                go get -u github.com/golang/dep/cmd/dep && \
+                go get -u github.com/goreleaser/goreleaser && \
+                dep ensure; dep prune
 
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="17.03.0-ce"
-            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            sudo mv /tmp/docker/* /usr/bin
+        - run:
+            name: Install Docker client
+            command: |
+                set -x
+                VER="17.03.0-ce"
+                curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+                tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+                mv /tmp/docker/* /usr/bin
 
-      - run: go get -u github.com/golang/dep/cmd/dep
-      - run: go get -u github.com/goreleaser/goreleaser
-      - run: dep ensure; dep prune
-      - run: go build --race -o meli main.go
-      - run: ./meli -up -d -f testdata/docker-compose.yml
-      - run:
-          name: echo number of running containers (expected=9), actual;
-          command: docker ps -q | wc -l
-      # stop the containers running from the previous command
-      - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
-      - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
-      - run:
-          name: echo number of running containers (expected=9), actual;
-          command: docker ps -q | wc -l
-      - run:
-          name: run tests
-          command: go test -timeout 1m -race -cover -v ./...
-      - run:
-          name: run benchmarks
-          command: go test -timeout 1m -race -run=XXXX -bench=. ./...
+        - run: source /etc/profile && go build --race -o meli main.go
+        - run: ./meli -up -d -f testdata/docker-compose.yml
+        - run:
+            name: echo number of running containers (expected=11), actual;
+            command: docker ps -q | wc -l
+        # stop the containers running from the previous command
+        - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+        - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
+        - run:
+            name: echo number of running containers (expected=11), actual;
+            command: docker ps -q | wc -l
+        - run:
+            name: run tests
+            command: source /etc/profile && go test -timeout 1m -race -cover -v ./...
+        - run:
+            name: run benchmarks
+            command: source /etc/profile && go test -timeout 1m -race -run=XXXX -bench=. ./...
 
-      # benchmark against docker-compose
-      - run: sudo apt -y install python-pip
-      - run: sudo pip install -U pip && sudo pip install -U docker-compose
-      - run: rm meli
-      - run: go build -o meli main.go
-      - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
-      - run:
-          name: show docker-compose version
-          command: docker-compose version
-      - run:
-          name: time docker-compose up
-          command: time docker-compose -f testdata/docker-compose.yml up -d
-      - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
-      - run:
-          name: time meli -up
-          command: time ./meli -up -d -f testdata/docker-compose.yml
+        # benchmark against docker-compose
+        - run: rm meli
+        - run: source /etc/profile && go build -o meli main.go
+        - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+        - run:
+            name: show docker-compose version
+            command: docker-compose version
+        - run:
+            name: time docker-compose up
+            command: time CURL_CA_BUNDLE= docker-compose -f testdata/docker-compose.yml up -d
+        - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+        - run:
+            name: time meli -up
+            command: time ./meli -up -d -f testdata/docker-compose.yml
 
+  deploy:
+    docker:
+        - image: ubuntu:16.04
+    working_directory: ~/go/src/github.com/komuw/meli
+    steps:
+        - checkout
+        - run:
+            name: install apt and pip deps
+            command: |
+                apt-get -y update
+                apt -y install \
+                            curl \
+                            wget \
+                            git \
+                            python \
+                            python-pip \
+                            software-properties-common \
+                            ruby \
+                            ruby-dev \
+                            rubygems \
+                            build-essential \
+                            snapd \
+                            snapcraft \
+                            rpm \
+                            rpm-common \
+                            nano
+                pip install -U pip
+                pip install -U docker-compose
+        - run:
+            name: install golang
+            command: |
+                wget https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz
+                tar -C /usr/local -xzf go1.9.2.linux-amd64.tar.gz
+                export PATH=$PATH:/usr/local/go/bin
+                echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
+                mkdir -p ~/go/bin
+                echo "export PATH=$PATH:~/go/bin" >> /etc/profile
+                echo "export LC_ALL=C.UTF-8" >> /etc/profile
+                echo "export LANG=C.UTF-8" >> /etc/profile
+                source /etc/profile
+        - run:
+            name: install golang pkgs
+            command: |
+                source /etc/profile && \
+                go get -u github.com/golang/dep/cmd/dep && \
+                go get -u github.com/goreleaser/goreleaser && \
+                dep ensure; dep prune
+        - run:
+            name: do a github release on tags
+            command: |
+                echo "todo: deploy with goreleaser"
+                source /etc/profile
+                gem install --no-ri --no-rdoc fpm
+                git checkout . && git clean -fd
+                docker login -u $DOCKER_USER -p $DOCKER_PASS
+                goreleaser --rm-dist -config .goreleaser.yml --skip-validate
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
       - deploy:
-          name: do a github release on master
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              echo "todo: deploy with goreleaser"
-              # git checkout . && git clean -fd
-              # goreleaser --rm-dist -config .goreleaser.yml --skip-validate
-            fi
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v.*/

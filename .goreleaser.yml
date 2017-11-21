@@ -8,3 +8,46 @@ build:
   goarch:
     - amd64
     - 386
+
+dockers:
+  -
+    image: komuw/meli
+    latest: true
+
+brew:
+  github:
+    owner: komuw
+    name: meli
+  commit_author:
+    name: komuW
+    email: komuw05@gmail.com
+  folder: HomebrewFormula
+  homepage: "https://github.com/komuW/meli"
+  description: "Meli is supposed to be a faster alternative to docker-compose.\n Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel."
+  test: |
+    system "#{bin}/meli --version"
+  install: |
+    bin.install "meli"
+
+fpm:
+  vendor: komuW.
+  homepage: https://github.com/komuW/meli
+  maintainer: komuW <komuw05@gmail.com>
+  description: Meli is supposed to be a faster alternative to docker-compose.\n Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel.
+  license: MIT
+  formats:
+    - rpm
+    - deb
+
+snapcraft:
+  name: meli
+  # 79 char long at most.
+  summary: Meli is supposed to be a faster alternative to docker-compose.
+  # Keep dscription under 100 words though
+  description: |
+    Meli is supposed to be a faster alternative to docker-compose.
+    Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel.
+  # https://snapcraft.io/docs/reference/channels
+  grade: stable
+  # https://snapcraft.io/docs/reference/confinement
+  confinement: strict

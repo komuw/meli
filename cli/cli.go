@@ -2,7 +2,7 @@ package cli
 
 import (
 	"flag"
-	"log"
+	"fmt"
 	"os"
 )
 
@@ -46,7 +46,7 @@ func Cli() (bool, bool, string) {
 		return true, followLogs, ""
 	}
 	if !up {
-		log.Println("to use Meli, run: \n\n\t meli -up")
+		fmt.Println("to use Meli, run: \n\n\t meli -up")
 		os.Exit(0)
 	}
 	if d {

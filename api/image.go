@@ -2,11 +2,12 @@ package api
 
 import (
 	"archive/tar"
+	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -32,7 +33,16 @@ func PullDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			originalErr: err,
 			newErr:      fmt.Errorf(" :unable to pull image %s", imageName)}
 	}
-	io.Copy(dc.LogMedium, imagePullResp)
+
+	var imgProg ImageProgress
+	scanner := bufio.NewScanner(imagePullResp)
+	for scanner.Scan() {
+		_ = json.Unmarshal(scanner.Bytes(), &imgProg)
+		fmt.Fprintln(dc.LogMedium, dc.ServiceName, "::", imgProg.Status, imgProg.Progress)
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println(" :unable to log output for image", imageName, err)
+	}
 
 	imagePullResp.Close()
 	return nil
@@ -58,6 +68,11 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 		}
 		// return on directories since there will be no content to tar
 		if info.Mode().IsDir() {
+			return nil
+		}
+		// return on non-regular files since there will be no content to tar
+		if !info.Mode().IsRegular() {
+			// non regular files are like symlinks etc; https://golang.org/src/os/types.go?h=ModeSymlink#L49
 			return nil
 		}
 
@@ -104,8 +119,16 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 			originalErr: err,
 			newErr:      fmt.Errorf(" :unable to get path to Dockerfile %s", dockerFile)}
 	}
-	dockerContextPath := filepath.Dir(dockerFilePath)
-	dockerFileName := filepath.Base(dockerFile)
+
+	dockerFileContextPath := filepath.Dir(dockerFile)
+	UserProvidedContextPath := filepath.Dir(dc.ComposeService.Build.Context + "/")
+	if dc.ComposeService.Build.Context == "." {
+		// context will be the directory containing the compose file
+		UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
+	} else if dc.ComposeService.Build.Context == "" {
+		// context will be the directory containing the compose file
+		UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
+	}
 
 	dockerFileReader, err := os.Open(dockerFilePath)
 	if err != nil {
@@ -138,16 +161,23 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 	AuthConfigs := make(map[string]types.AuthConfig)
 	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}
 
-	// TODO: we need to read the context passed in the docker-compose context key for a service
-	// rather than assume the context is the dir the Dockerfile is in.
-	err = filepath.Walk(dockerContextPath, walkFnClosure(dockerContextPath, tw, buf))
+	// TODO: stop calling filepath.Walk twice; once for dockerfile context and then for uer context
+	// Both the user provided context and that of the DockerFile needs to be in the tar file.
+	err = filepath.Walk(dockerFileContextPath, walkFnClosure(dockerFileContextPath, tw, buf))
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
 			newErr:      fmt.Errorf(" :unable to walk dockefile context path %s", dockerFile)}
 	}
+	err = filepath.Walk(UserProvidedContextPath, walkFnClosure(UserProvidedContextPath, tw, buf))
+	if err != nil {
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf(" :unable to walk user provided context path %s", dockerFile)}
+	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 
+	dockerFileName := filepath.Base(dockerFile)
 	imageBuildResponse, err := cli.ImageBuild(
 		ctx,
 		dockerFileTarReader,
@@ -166,7 +196,16 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 			originalErr: err,
 			newErr:      errors.New(" :unable to build docker image")}
 	}
-	io.Copy(dc.LogMedium, imageBuildResponse.Body)
+
+	var imgProg ImageProgress
+	scanner := bufio.NewScanner(imageBuildResponse.Body)
+	for scanner.Scan() {
+		_ = json.Unmarshal(scanner.Bytes(), &imgProg)
+		fmt.Fprintln(dc.LogMedium, dc.ServiceName, "::", imgProg.Status, imgProg.Progress)
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println(" :unable to log output for image", imageName, err)
+	}
 
 	imageBuildResponse.Body.Close()
 	return imageName, nil
