@@ -12,10 +12,11 @@ build:
     - amd64
     - 386
 
-dockers:
-  -
-    image: komuw/meli
-    latest: true
+# see issues/72
+# dockers:
+#   -
+#     image: komuw/meli
+#     latest: true
 
 brew:
   github:
