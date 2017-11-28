@@ -201,7 +201,13 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 	scanner := bufio.NewScanner(imageBuildResponse.Body)
 	for scanner.Scan() {
 		_ = json.Unmarshal(scanner.Bytes(), &imgProg)
-		fmt.Fprintln(dc.LogMedium, dc.ServiceName, "::", imgProg.Status, imgProg.Progress, imgProg.Stream)
+		fmt.Fprint(
+			dc.LogMedium,
+			dc.ServiceName,
+			"::",
+			imgProg.Status,
+			imgProg.Progress,
+			imgProg.Stream)
 	}
 	if err := scanner.Err(); err != nil {
 		fmt.Println(" :unable to log output for image", imageName, err)
