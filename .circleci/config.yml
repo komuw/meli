@@ -159,8 +159,7 @@ jobs:
                 if [ "$LAST_GIT_MESSAGE" == 'do release' ]; then
                     echo "deploying with goreleaser"
                     source /etc/profile
-                    gem install --no-ri --no-rdoc fpm
-                    git checkout . && git clean -fd
+                    gem install fpm
                     docker login -u $DOCKER_USER -p $DOCKER_PASS
                     goreleaser --rm-dist -config .goreleaser.yml --skip-validate
                 fi
