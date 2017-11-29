@@ -298,10 +298,10 @@ TARBALL=${NAME}.${FORMAT}
 TARBALL_URL=${GITHUB_DOWNLOAD}/${VERSION}/${TARBALL}
 # fix url location
 TARBALL_URL=$(echo $TARBALL_URL| sed "s/meli_v/meli_/")
-CHECKSUM="meli_${VERSION}_checksums.txt"
-CHECKSUM_URL=${GITHUB_DOWNLOAD}/${VERSION}/${CHECKSUM}
+CHECKSUM_URL="${GITHUB_DOWNLOAD}/${VERSION}/meli_${VERSION}_checksums.txt"
 # fix url location
 CHECKSUM_URL=$(echo $CHECKSUM_URL| sed "s/meli_v/meli_/")
+
 
 # Adjust binary name if windows
 if [ "$OS" = "windows" ]; then
