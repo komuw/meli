@@ -1,4 +1,4 @@
-Thank you for contributing to meli.                     
+Thank you for contributing to meli.                      
 Every contribution to meli is important to us.                                    
 
 Contributor offers to license certain software (a “Contribution” or multiple
