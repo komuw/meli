@@ -296,9 +296,12 @@ echo "$PREFIX: found version ${VERSION} for ${OS}/${ARCH}"
 NAME=${BINARY}_${VERSION}_${OS}_${ARCH}
 TARBALL=${NAME}.${FORMAT}
 TARBALL_URL=${GITHUB_DOWNLOAD}/${VERSION}/${TARBALL}
+# fix url location
 TARBALL_URL=$(echo $TARBALL_URL| sed "s/meli_v/meli_/")
 CHECKSUM=meli_checksums.txt
 CHECKSUM_URL=${GITHUB_DOWNLOAD}/${VERSION}/${CHECKSUM}
+# fix url location
+CHECKSUM_URL=$(echo $CHECKSUM_URL| sed "s/meli_v/meli_/")
 
 # Adjust binary name if windows
 if [ "$OS" = "windows" ]; then
