@@ -18,20 +18,20 @@ build:
 #     image: komuw/meli
 #     latest: true
 
-brew:
-  github:
-    owner: komuw
-    name: meli
-  commit_author:
-    name: komuW
-    email: komuw05@gmail.com
-  folder: HomebrewFormula
-  homepage: "https://github.com/komuw/meli"
-  description: "Faster alternative to docker-compose"
-  test: |
-    system "#{bin}/meli", "--version"
-  install: |
-    bin.install "meli"
+# brew:
+#   github:
+#     owner: komuw
+#     name: meli
+#   commit_author:
+#     name: komuW
+#     email: komuw05@gmail.com
+#   folder: HomebrewFormula
+#   homepage: "https://github.com/komuw/meli"
+#   description: "Faster alternative to docker-compose"
+#   test: |
+#     system "#{bin}/meli", "--version"
+#   install: |
+#     bin.install "meli"
 
 fpm:
   vendor: komuW.

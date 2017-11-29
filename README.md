@@ -21,11 +21,10 @@ Download a binary release for your particular OS from the [releases page](https:
 We have binaries for:                
 - linux(32bit and 64bit)           
 - windows(32bit and 64bit)            
-- darwin(32bit and 64bit)            
-Optionally, if you are on a Mac/OSx, you can install using brew;       
+- darwin(32bit and 64bit)             
+Optionally, you can install using curl;       
 ```bash
-brew tap komuw/meli git@github.com:komuw/meli.git              
-brew install meli
+curl -sfL https://raw.githubusercontent.com/komuw/meli/master/install.sh | sh
 ```
 
 # Usage  
