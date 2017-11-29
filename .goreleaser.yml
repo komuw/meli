@@ -40,7 +40,6 @@ fpm:
   description: Meli is supposed to be a faster alternative to docker-compose.\n Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel.
   license: MIT
   formats:
-    - rpm
     - deb
 
 snapcraft:
