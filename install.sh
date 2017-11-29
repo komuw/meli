@@ -298,7 +298,7 @@ TARBALL=${NAME}.${FORMAT}
 TARBALL_URL=${GITHUB_DOWNLOAD}/${VERSION}/${TARBALL}
 # fix url location
 TARBALL_URL=$(echo $TARBALL_URL| sed "s/meli_v/meli_/")
-CHECKSUM="${NAME}_${VERSION}_meli_checksums.txt"
+CHECKSUM="meli_${VERSION}_meli_checksums.txt"
 CHECKSUM_URL=${GITHUB_DOWNLOAD}/${VERSION}/${CHECKSUM}
 # fix url location
 CHECKSUM_URL=$(echo $CHECKSUM_URL| sed "s/meli_v/meli_/")
