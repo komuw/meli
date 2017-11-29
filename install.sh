@@ -9,7 +9,7 @@ usage() {
 $this: download go binaries for komuw/meli
 
 Usage: $this [-b] bindir [version]
-  -b sets bindir or installation directory, default "./bin"
+  -b sets bindir or installation directory, default "/usr/local/bin}"
    [version] is a version number from
    https://github.com/komuw/meli/releases
    If version is missing, then an attempt to find the latest will be found.
@@ -25,7 +25,7 @@ parse_args() {
   #BINDIR is ./bin unless set be ENV
   # over-ridden by flag below
 
-  BINDIR=${BINDIR:-./bin}
+  BINDIR=${BINDIR:-/usr/local/bin}
   while getopts "b:h?" arg; do
     case "$arg" in
       b) BINDIR="$OPTARG" ;;
