@@ -44,7 +44,7 @@ execute() {
   echo "$PREFIX: downloading ${TARBALL_URL}"
   http_download "${TMPDIR}/${TARBALL}" "${TARBALL_URL}"
 
-  echo "$PREFIX: verifying checksums ${CHECKSUM} with url ${CHECKSUM_URL}"
+  echo "$PREFIX: verifying checksums ${CHECKSUM} with url ${CHECKSUM_URL} and tarball ${TARBALL}"
   http_download "${TMPDIR}/${CHECKSUM}" "${CHECKSUM_URL}"
   hash_sha256_verify "${TMPDIR}/${TARBALL}" "${TMPDIR}/${CHECKSUM}"
 
@@ -294,15 +294,16 @@ adjust_arch
 echo "$PREFIX: found version ${VERSION} for ${OS}/${ARCH}"
 
 NAME=${BINARY}_${VERSION}_${OS}_${ARCH}
-TARBALL=${NAME}.${FORMAT}
+
 
 # fix url location
+TARBALL=${NAME}.${FORMAT}
+TARBALL=$(echo $TARBALL | sed "s/meli_v/meli_/")
 TARBALL_URL=${GITHUB_DOWNLOAD}/${VERSION}/${TARBALL}
-TARBALL_URL=$(echo $TARBALL_URL| sed "s/meli_v/meli_/")
 
 # fix url location
 CHECKSUM=${BINARY}_${VERSION}_checksums.txt
-CHECKSUM=$(echo $CHECKSUM| sed "s/meli_v/meli_/")
+CHECKSUM=$(echo $CHECKSUM | sed "s/meli_v/meli_/")
 CHECKSUM_URL=${GITHUB_DOWNLOAD}/${VERSION}/$CHECKSUM
 
 # Adjust binary name if windows
