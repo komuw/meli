@@ -26,7 +26,7 @@ brew:
     name: komuW
     email: komuw05@gmail.com
   folder: HomebrewFormula
-  homepage: "https://github.com/komuW/meli"
+  homepage: "https://github.com/komuw/meli"
   description: "Meli is supposed to be a faster alternative to docker-compose.\n Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel."
   test: |
     system "#{bin}/meli --version"
@@ -35,7 +35,7 @@ brew:
 
 fpm:
   vendor: komuW.
-  homepage: https://github.com/komuW/meli
+  homepage: https://github.com/komuw/meli
   maintainer: komuW <komuw05@gmail.com>
   description: Meli is supposed to be a faster alternative to docker-compose.\n Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel.
   license: MIT
