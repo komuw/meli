@@ -27,9 +27,9 @@ brew:
     email: komuw05@gmail.com
   folder: HomebrewFormula
   homepage: "https://github.com/komuw/meli"
-  description: "Meli is supposed to be a faster alternative to docker-compose.\n Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel."
+  description: "Faster alternative to docker-compose"
   test: |
-    system "#{bin}/meli --version"
+    system "#{bin}/meli", "--version"
   install: |
     bin.install "meli"
 
