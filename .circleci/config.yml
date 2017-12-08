@@ -67,6 +67,7 @@ jobs:
             name: echo number of running containers (expected=11), actual;
             command: |
                 num_containers=$(docker ps -q | wc -l)
+                echo "number of containers are; $num_containers"
                 if [ "$num_containers" != "11" ]; then
                     echo "wanted 11 containers, got $num_containers" && exit 500
                 fi
@@ -77,6 +78,7 @@ jobs:
             name: echo number of running containers (expected=11), actual;
             command: |
                 num_containers=$(docker ps -q | wc -l)
+                echo "number of containers are; $num_containers"
                 if [ "$num_containers" != "11" ]; then
                     echo "wanted 11 containers, got $num_containers" && exit 500
                 fi
