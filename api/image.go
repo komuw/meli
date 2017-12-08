@@ -62,6 +62,11 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 		// update the name to correctly reflect the desired destination when untaring
 		// https://medium.com/@skdomino/taring-untaring-files-in-go-6b07cf56bc07
 		tarHeader.Name = strings.TrimPrefix(strings.Replace(path, src, "", -1), string(filepath.Separator))
+		if src == "." {
+			// see: issues/74
+			tarHeader.Name = strings.TrimPrefix(path, string(filepath.Separator))
+		}
+
 		err = tw.WriteHeader(tarHeader)
 		if err != nil {
 			return err
