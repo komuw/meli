@@ -8,7 +8,7 @@ Contributor understands and agrees that meli shall have the irrevocable and perp
 and distribute copies of any Contribution, as well as to create and distribute collective works and
 derivative works of any Contribution, under the MIT License.
 
-## To contribute:            
+## To contribute:             
 
 - fork this repo.
 - make the changes you want on your fork.
