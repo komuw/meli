@@ -65,10 +65,15 @@ func FormatServiceVolumes(volume, dockerComposeFile string) []string {
 	// TODO: we should trim any whitespace before returning.
 	// this will prevent labels like type= web
 	hostAndContainerPath := strings.FieldsFunc(volume, f)
+	dockerComposeFileDir := filepath.Dir(dockerComposeFile)
+
 	if strings.Contains(hostAndContainerPath[0], "./") {
-		dockerComposeFileDir := filepath.Dir(dockerComposeFile)
 		dockerComposeFilePath, _ := filepath.Abs(hostAndContainerPath[0])
 		hostPath := filepath.Join(dockerComposeFilePath, dockerComposeFileDir)
+		hostAndContainerPath[0] = hostPath
+	} else if strings.HasPrefix(hostAndContainerPath[0], ".") {
+		dockerComposeFileDirAbs, _ := filepath.Abs(dockerComposeFileDir)
+		hostPath := filepath.Join(dockerComposeFileDirAbs, hostAndContainerPath[0])
 		hostAndContainerPath[0] = hostPath
 	}
 
