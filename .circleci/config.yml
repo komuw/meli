@@ -163,7 +163,7 @@ jobs:
         - run:
             name: do a new release
             command: |
-                LAST_GIT_MESSAGE=$(git log -n1 master --format=oneline --pretty=%B)
+                LAST_GIT_MESSAGE=$(git log -n1 --format=oneline --pretty=%B)
                 echo "last git commit message on master:"
                 echo $LAST_GIT_MESSAGE
                 if [ "$LAST_GIT_MESSAGE" == 'do release' ]; then
