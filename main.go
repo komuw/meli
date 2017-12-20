@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/docker/docker/client"
@@ -73,7 +74,11 @@ func main() {
 	var wg sync.WaitGroup
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
-		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", curentDir))
+
+		// use dotted filepath. make it also work for windows
+		r := strings.NewReplacer("/", ".", ":", ".", "\\", ".")
+		dotFormattedrCurentDir := r.Replace(curentDir)
+		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", dotFormattedrCurentDir))
 
 		dc := &api.DockerContainer{
 			ServiceName:       k,
@@ -83,7 +88,7 @@ func main() {
 			FollowLogs:        followLogs,
 			DockerComposeFile: dockerComposeFile,
 			LogMedium:         os.Stdout,
-			CurentDir:         curentDir}
+			CurentDir:         dotFormattedrCurentDir}
 		go startComposeServices(ctx, cli, &wg, dc)
 	}
 	wg.Wait()
