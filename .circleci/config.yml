@@ -64,7 +64,7 @@ jobs:
         - run: source /etc/profile && go build --race -o meli main.go
         - run: ./meli -up -d -f testdata/docker-compose.yml
         - run:
-            name: echo number of running containers (expected=11), actual;
+            name: echo number of running containers (expected=12), actual;
             command: |
                 num_containers=$(docker ps -q | wc -l)
                 echo "number of containers are; $num_containers"
@@ -75,7 +75,7 @@ jobs:
         - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
         - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
         - run:
-            name: echo number of running containers (expected=11), actual;
+            name: echo number of running containers (expected=12), actual;
             command: |
                 num_containers=$(docker ps -q | wc -l)
                 echo "number of containers are; $num_containers"
