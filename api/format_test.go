@@ -5,19 +5,19 @@ import (
 	"testing"
 )
 
-func TestFormatImageName(t *testing.T) {
+func TestFormatContainerName(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected string
 	}{
-		{"redis", "redis"},
-		{"nats:", "nats"},
-		{"yolo:ala", "yolo"},
+		{"redis", "meli_redis_."},
+		{"nats:", "meli_nats_."},
+		{"yolo:ala", "meli_yolo_."},
 	}
 	for _, v := range tt {
-		actual := FormatImageName(v.input)
+		actual := FormatContainerName(v.input, ".")
 		if actual != v.expected {
-			t.Errorf("\nCalled FormatImageName(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled FormatContainerName(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
@@ -118,9 +118,9 @@ func BenchmarkFormatServiceVolumes(b *testing.B) {
 	}
 }
 
-func BenchmarkFormatImageName(b *testing.B) {
+func BenchmarkFormatContainerName(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_ = FormatImageName("build_with_no_specified_dockerfile")
+		_ = FormatContainerName("build_with_no_specified_dockerfile", ".")
 	}
 
 }

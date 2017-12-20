@@ -128,7 +128,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			Binds:           binds,
 			Links:           dc.ComposeService.Links},
 		nil,
-		FormatImageName(dc.ServiceName))
+		FormatContainerName(dc.ServiceName, dc.CurentDir))
 	if err != nil {
 		return false, "", &popagateError{
 			originalErr: err,

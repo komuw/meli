@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-func FormatImageName(containerName string) string {
+func FormatContainerName(containerName, curentDir string) string {
 	// container names are supposed to be unique
-	// we are using the docker-compose service as the container name
+	// we are using the docker-compose service name as well as current dir as the container name
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -16,7 +16,10 @@ func FormatImageName(containerName string) string {
 		}
 		return false
 	}
-	return strings.FieldsFunc(containerName, f)[0]
+	formattedContainerName := strings.FieldsFunc(containerName, f)[0]
+	contName := "meli_" + formattedContainerName + "_" + curentDir
+
+	return contName
 }
 
 func FormatLabels(label string) []string {
