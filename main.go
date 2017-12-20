@@ -78,7 +78,7 @@ func main() {
 		// use dotted filepath. make it also work for windows
 		r := strings.NewReplacer("/", ".", ":", ".", "\\", ".")
 		dotFormattedrCurentDir := r.Replace(curentDir)
-		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", dotFormattedrCurentDir))
+		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s%s", k, dotFormattedrCurentDir))
 
 		dc := &api.DockerContainer{
 			ServiceName:       k,
