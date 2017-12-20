@@ -1,6 +1,7 @@
 package api
 
 import (
+	"os"
 	"reflect"
 	"testing"
 )
@@ -54,15 +55,16 @@ func TestFormatPorts(t *testing.T) {
 }
 
 func TestFormatServiceVolumes(t *testing.T) {
+	currentDir, _ := os.Getwd()
 	tt := []struct {
 		volume            string
 		dockerComposeFile string
 		expected          []string
 	}{
 		{"data-volume:/home", "composefile", []string{"data-volume", "/home"}},
-		{"./:/mydir", "composefile", []string{"/Users/komuw/go/src/github.com/komuw/meli/api", "/mydir"}},
+		{"./:/mydir", "composefile", []string{currentDir, "/mydir"}},
 		{"/var/run/docker.sock:/var/run/docker.sock", "composefile", []string{"/var/run/docker.sock", "/var/run/docker.sock"}},
-		{".startWithDot:/home/.startWithDot", "composefile", []string{"/Users/komuw/go/src/github.com/komuw/meli/api/.startWithDot", "/home/.startWithDot"}},
+		{".startWithDot:/home/.startWithDot", "composefile", []string{currentDir + "/.startWithDot", "/home/.startWithDot"}},
 	}
 	for _, v := range tt {
 		actual := FormatServiceVolumes(v.volume, v.dockerComposeFile)
