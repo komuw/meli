@@ -17,7 +17,7 @@ func FormatContainerName(containerName, curentDir string) string {
 		return false
 	}
 	formattedContainerName := strings.FieldsFunc(containerName, f)[0]
-	contName := "meli_" + formattedContainerName + "_" + curentDir
+	contName := "meli_" + formattedContainerName + curentDir
 
 	return contName
 }

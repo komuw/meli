@@ -10,9 +10,9 @@ func TestFormatContainerName(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{"redis", "meli_redis_."},
-		{"nats:", "meli_nats_."},
-		{"yolo:ala", "meli_yolo_."},
+		{"redis", "meli_redis."},
+		{"nats:", "meli_nats."},
+		{"yolo:ala", "meli_yolo."},
 	}
 	for _, v := range tt {
 		actual := FormatContainerName(v.input, ".")
