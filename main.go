@@ -73,7 +73,7 @@ func main() {
 	var wg sync.WaitGroup
 	for k, v := range dockerCyaml.Services {
 		wg.Add(1)
-		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", k))
+		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s", curentDir))
 
 		dc := &api.DockerContainer{
 			ServiceName:       k,
@@ -82,7 +82,8 @@ func main() {
 			NetworkName:       networkName,
 			FollowLogs:        followLogs,
 			DockerComposeFile: dockerComposeFile,
-			LogMedium:         os.Stdout}
+			LogMedium:         os.Stdout,
+			CurentDir:         curentDir}
 		go startComposeServices(ctx, cli, &wg, dc)
 	}
 	wg.Wait()
