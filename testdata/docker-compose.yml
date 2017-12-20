@@ -76,5 +76,11 @@ services:
     build:
       context: .
 
+  dottedvolumeservice:
+    image: 'busybox'
+    command: tail -fn10 .dockerenv
+    volumes:
+      - .startWithDot:/home/.startWithDot
+
 volumes:
   data-volume:
