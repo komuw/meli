@@ -68,8 +68,8 @@ jobs:
             command: |
                 num_containers=$(docker ps -q | wc -l)
                 echo "number of containers are; $num_containers"
-                if [ "$num_containers" != "11" ]; then
-                    echo "wanted 11 containers, got $num_containers" && exit 500
+                if [ "$num_containers" != "12" ]; then
+                    echo "wanted 12 containers, got $num_containers" && exit 500
                 fi
         # stop the containers running from the previous command
         - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
@@ -79,8 +79,8 @@ jobs:
             command: |
                 num_containers=$(docker ps -q | wc -l)
                 echo "number of containers are; $num_containers"
-                if [ "$num_containers" != "11" ]; then
-                    echo "wanted 11 containers, got $num_containers" && exit 500
+                if [ "$num_containers" != "12" ]; then
+                    echo "wanted 12 containers, got $num_containers" && exit 500
                 fi
         - run:
             name: run tests
