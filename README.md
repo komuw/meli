@@ -16,7 +16,7 @@ Meli is NOT intended to replicate every feature of docker-compose, it is primari
 If you want to exec in to a running container, use docker; if you want to run an adhoc command in a container, use docker; if you want..... you get the drift.
 
 
-# Installing          
+# Installing/Upgrading          
 Download a binary release for your particular OS from the [releases page](https://github.com/komuW/meli/releases)           
 We have binaries for:                
 - linux(32bit and 64bit)           
