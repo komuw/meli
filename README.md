@@ -21,7 +21,7 @@ Download a binary release for your particular OS from the [releases page](https:
 We have binaries for:                
 - linux(32bit and 64bit)           
 - windows(32bit and 64bit)            
-- darwin(32bit and 64bit)                    
+- darwin(32bit and 64bit)                     
 
 Optionally, you can install using curl;       
 ```bash
