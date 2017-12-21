@@ -1,23 +1,24 @@
 package api
 
 import (
+	"os"
 	"reflect"
 	"testing"
 )
 
-func TestFormatImageName(t *testing.T) {
+func TestFormatContainerName(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected string
 	}{
-		{"redis", "redis"},
-		{"nats:", "nats"},
-		{"yolo:ala", "yolo"},
+		{"redis", "meli_redis."},
+		{"nats:", "meli_nats."},
+		{"yolo:ala", "meli_yolo."},
 	}
 	for _, v := range tt {
-		actual := FormatImageName(v.input)
+		actual := FormatContainerName(v.input, ".")
 		if actual != v.expected {
-			t.Errorf("\nCalled FormatImageName(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled FormatContainerName(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
@@ -54,12 +55,16 @@ func TestFormatPorts(t *testing.T) {
 }
 
 func TestFormatServiceVolumes(t *testing.T) {
+	currentDir, _ := os.Getwd()
 	tt := []struct {
 		volume            string
 		dockerComposeFile string
 		expected          []string
 	}{
 		{"data-volume:/home", "composefile", []string{"data-volume", "/home"}},
+		{"./:/mydir", "composefile", []string{currentDir, "/mydir"}},
+		{"/var/run/docker.sock:/var/run/docker.sock", "composefile", []string{"/var/run/docker.sock", "/var/run/docker.sock"}},
+		{".startWithDot:/home/.startWithDot", "composefile", []string{currentDir + "/.startWithDot", "/home/.startWithDot"}},
 	}
 	for _, v := range tt {
 		actual := FormatServiceVolumes(v.volume, v.dockerComposeFile)
@@ -118,9 +123,9 @@ func BenchmarkFormatServiceVolumes(b *testing.B) {
 	}
 }
 
-func BenchmarkFormatImageName(b *testing.B) {
+func BenchmarkFormatContainerName(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_ = FormatImageName("build_with_no_specified_dockerfile")
+		_ = FormatContainerName("build_with_no_specified_dockerfile", ".")
 	}
 
 }

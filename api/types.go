@@ -47,6 +47,7 @@ type DockerContainer struct {
 	DockerComposeFile string
 	ContainerID       string // this assumes that there can only be one container per docker-compose service
 	LogMedium         io.Writer
+	CurentDir         string
 }
 
 func (dc *DockerContainer) UpdateContainerID(containerID string) {

@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-func FormatImageName(containerName string) string {
+func FormatContainerName(containerName, curentDir string) string {
 	// container names are supposed to be unique
-	// we are using the docker-compose service as the container name
+	// we are using the docker-compose service name as well as current dir as the container name
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -16,7 +16,10 @@ func FormatImageName(containerName string) string {
 		}
 		return false
 	}
-	return strings.FieldsFunc(containerName, f)[0]
+	formattedContainerName := strings.FieldsFunc(containerName, f)[0]
+	contName := "meli_" + formattedContainerName + curentDir
+
+	return contName
 }
 
 func FormatLabels(label string) []string {
@@ -62,10 +65,15 @@ func FormatServiceVolumes(volume, dockerComposeFile string) []string {
 	// TODO: we should trim any whitespace before returning.
 	// this will prevent labels like type= web
 	hostAndContainerPath := strings.FieldsFunc(volume, f)
+	dockerComposeFileDir := filepath.Dir(dockerComposeFile)
+
 	if strings.Contains(hostAndContainerPath[0], "./") {
-		dockerComposeFileDir := filepath.Dir(dockerComposeFile)
 		dockerComposeFilePath, _ := filepath.Abs(hostAndContainerPath[0])
 		hostPath := filepath.Join(dockerComposeFilePath, dockerComposeFileDir)
+		hostAndContainerPath[0] = hostPath
+	} else if strings.HasPrefix(hostAndContainerPath[0], ".") {
+		dockerComposeFileDirAbs, _ := filepath.Abs(dockerComposeFileDir)
+		hostPath := filepath.Join(dockerComposeFileDirAbs, hostAndContainerPath[0])
 		hostAndContainerPath[0] = hostPath
 	}
 
