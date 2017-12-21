@@ -60,6 +60,7 @@ services:
     volumes:
       - ./:/mydir
       - /var/run/docker.sock:/var/run/docker.sock
+      - .startWithDot:/home/.startWithDot
 
   quayservice:
     image: 'quay.io/komuw/busybox'
@@ -75,12 +76,6 @@ services:
   symbolic-link-service:
     build:
       context: .
-
-  dottedvolumeservice:
-    image: 'busybox'
-    command: tail -fn10 .dockerenv
-    volumes:
-      - .startWithDot:/home/.startWithDot
 
 volumes:
   data-volume:
