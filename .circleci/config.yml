@@ -83,6 +83,9 @@ jobs:
                     echo "wanted 11 containers, got $num_containers" && exit 500
                 fi
         - run:
+             name: go vet
+             command: source /etc/profile && go vet -v -shadow ./...
+        - run:
             name: run tests
             command: source /etc/profile && go test -timeout 1m -race -cover -v ./...
         - run:

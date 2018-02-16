@@ -48,9 +48,9 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			oneport := FormatPorts(v)
 			hostport := oneport[0]
 			containerport := oneport[1]
-			port, err := nat.NewPort("tcp", containerport)
 			myPortBinding := nat.PortBinding{HostPort: hostport}
-			if err != nil {
+			port, shadowErr := nat.NewPort("tcp", containerport)
+			if shadowErr != nil {
 				fmt.Println(err, " :unable to create a nat.Port")
 			}
 			portsMap[port] = EmptyStruct{}
@@ -78,8 +78,8 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 	// 5. build image
 	imageNamePtr := &dc.ComposeService.Image
 	if dc.ComposeService.Build != (Buildstruct{}) {
-		imageName, err := BuildDockerImage(ctx, cli, dc)
-		if err != nil {
+		imageName, shadowErr := BuildDockerImage(ctx, cli, dc)
+		if shadowErr != nil {
 			return false, "", &popagateError{originalErr: err}
 		}
 		// done this way so that we can manipulate the value of the
