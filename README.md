@@ -37,6 +37,8 @@ Usage of meli:
         -d option runs containers in the background
   -f string
     	path to docker-compose.yml file. (default "docker-compose.yml")
+  -build
+    	Rebuild services
   -v	Show version information.
   -version
     	Show version information.

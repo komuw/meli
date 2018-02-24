@@ -24,7 +24,7 @@ import (
 var version string
 
 func main() {
-	showVersion, followLogs, dockerComposeFile := cli.Cli()
+	showVersion, followLogs, rebuild, dockerComposeFile := cli.Cli()
 	if showVersion {
 		fmt.Println("Meli version: ", version)
 		os.Exit(0)
@@ -88,7 +88,8 @@ func main() {
 			FollowLogs:        followLogs,
 			DockerComposeFile: dockerComposeFile,
 			LogMedium:         os.Stdout,
-			CurentDir:         dotFormattedrCurentDir}
+			CurentDir:         dotFormattedrCurentDir,
+			Rebuild:           rebuild}
 		go startComposeServices(ctx, cli, &wg, dc)
 	}
 	wg.Wait()

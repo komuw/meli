@@ -191,7 +191,7 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 			//Squash:     true, currently only supported in experimenta mode
 			Tags:           []string{imageName},
 			Remove:         true, //remove intermediary containers after build
-			ForceRemove:    true,
+			NoCache:        dc.Rebuild,
 			SuppressOutput: false,
 			Dockerfile:     dockerFileName,
 			Context:        dockerFileTarReader,

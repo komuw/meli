@@ -48,6 +48,7 @@ type DockerContainer struct {
 	ContainerID       string // this assumes that there can only be one container per docker-compose service
 	LogMedium         io.Writer
 	CurentDir         string
+	Rebuild           bool
 }
 
 func (dc *DockerContainer) UpdateContainerID(containerID string) {
@@ -67,6 +68,7 @@ type MeliAPiClient interface {
 	NetworkConnect(ctx context.Context, networkID, containerID string, config *network.EndpointSettings) error
 	VolumeCreate(ctx context.Context, options volumetypes.VolumesCreateBody) (types.Volume, error)
 	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
+	ContainerRemove(ctx context.Context, containerID string, options types.ContainerRemoveOptions) error
 }
 
 type MockDockerClient struct{}
@@ -106,6 +108,9 @@ func (m *MockDockerClient) VolumeCreate(ctx context.Context, options volumetypes
 
 func (m *MockDockerClient) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
 	return []types.Container{types.Container{ID: "myExistingContainerId00912"}}, nil
+}
+func (m *MockDockerClient) ContainerRemove(ctx context.Context, containerID string, options types.ContainerRemoveOptions) error {
+	return nil
 }
 
 type ImageProgress struct {
