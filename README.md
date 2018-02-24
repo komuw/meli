@@ -110,20 +110,6 @@ Take any results you see here with a large spoon of salt; They are unscientific 
 
 Having made that disclaimer,                 
 
-test machine:             
-[This circleCI machine](https://github.com/komuW/meli/blob/master/.circleci/config.yml#L9)
-
-
-docker-compose version:         
-`docker-compose --version`
-```bash
-docker-compose version 1.17.1, build 6d101fb
-```
-
-Meli version:   
-[version 0.1.1](https://github.com/komuW/meli/releases/tag/v0.1.1)
-           
-
 Benchmark test:           
 [this docker-compose file](https://github.com/komuW/meli/blob/master/testdata/docker-compose.yml)
 
