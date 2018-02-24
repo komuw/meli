@@ -24,22 +24,26 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 		}
 	}
 
-	if !dc.Rebuild {
-		// reuse container if already running
-		// only reuse containers if we aren't rebuilding
-		meliService := labelsMap["meli_service"]
-		filters := filters.NewArgs()
-		filters.Add("label", fmt.Sprintf("meli_service=%s", meliService))
-		containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
-			Quiet:   true,
-			All:     true,
-			Filters: filters})
-		if err != nil {
-			fmt.Println(" :unable to list containers")
-		}
-		if len(containers) > 0 {
+	// reuse container if already running
+	// only reuse containers if we aren't rebuilding
+	meliService := labelsMap["meli_service"]
+	filters := filters.NewArgs()
+	filters.Add("label", fmt.Sprintf("meli_service=%s", meliService))
+	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+		Quiet:   true,
+		All:     true,
+		Filters: filters})
+	if err != nil {
+		fmt.Println(" :unable to list containers")
+	}
+	if len(containers) > 0 {
+		if !dc.Rebuild {
 			dc.UpdateContainerID(containers[0].ID)
 			return true, containers[0].ID, nil
+		}
+		err := cli.ContainerRemove(ctx, containers[0].ID, types.ContainerRemoveOptions{Force: true})
+		if err != nil {
+			fmt.Println(err, " :unable to remove existing container, ", containers[0].ID)
 		}
 	}
 
