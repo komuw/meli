@@ -8,9 +8,10 @@ import (
 
 func TestCreateContainer(t *testing.T) {
 	tt := []struct {
-		dc          *DockerContainer
-		expected    string
-		expectedErr error
+		dc                      *DockerContainer
+		expected                string
+		containerAlreadycreated bool
+		expectedErr             error
 	}{
 		{
 			&DockerContainer{
@@ -21,12 +22,24 @@ func TestCreateContainer(t *testing.T) {
 				ContainerID:       "myExistingContainerId00912",
 			},
 			"myExistingContainerId00912",
+			true,
+			nil},
+		{
+			&DockerContainer{
+				ComposeService:    ComposeService{Image: "busybox", Restart: "unless-stopped"},
+				ServiceName:       "myservice",
+				NetworkName:       "myNetworkName",
+				DockerComposeFile: "DockerFile",
+				ContainerID:       "myContainerId001",
+				Rebuild:           true,
+			},
+			"myContainerId001",
+			false,
 			nil},
 	}
 	var ctx = context.Background()
 	cli := &MockDockerClient{}
 	for _, v := range tt {
-		//CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer)
 		alreadyCreated, actual, err := CreateContainer(ctx, cli, v.dc)
 		if err != nil {
 			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.dc, err, v.expectedErr)
@@ -34,7 +47,7 @@ func TestCreateContainer(t *testing.T) {
 		if actual != v.expected {
 			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %s \nwanted %#+v", v.dc, actual, v.expected)
 		}
-		if alreadyCreated != true {
+		if alreadyCreated != v.containerAlreadycreated {
 			t.Errorf("\nCalled CreateContainer(%#+v) \ngot %#+v \nwanted %#+v", v.dc, alreadyCreated, true)
 		}
 	}
