@@ -41,9 +41,9 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			dc.UpdateContainerID(containers[0].ID)
 			return true, containers[0].ID, nil
 		}
-		err := cli.ContainerRemove(ctx, containers[0].ID, types.ContainerRemoveOptions{Force: true})
+		shadowErr := cli.ContainerRemove(ctx, containers[0].ID, types.ContainerRemoveOptions{Force: true})
 		if err != nil {
-			fmt.Println(err, " :unable to remove existing container, ", containers[0].ID)
+			fmt.Println(shadowErr, " :unable to remove existing container, ", containers[0].ID)
 		}
 	}
 
