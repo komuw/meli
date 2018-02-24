@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -62,6 +63,7 @@ func FormatServiceVolumes(volume, dockerComposeFile string) []string {
 		}
 		return false
 	}
+	volume = os.ExpandEnv(volume)
 	// TODO: we should trim any whitespace before returning.
 	// this will prevent labels like type= web
 	hostAndContainerPath := strings.FieldsFunc(volume, f)

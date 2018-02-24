@@ -65,6 +65,7 @@ func TestFormatServiceVolumes(t *testing.T) {
 		{"./:/mydir", "composefile", []string{currentDir, "/mydir"}},
 		{"/var/run/docker.sock:/var/run/docker.sock", "composefile", []string{"/var/run/docker.sock", "/var/run/docker.sock"}},
 		{".startWithDot:/home/.startWithDot", "composefile", []string{currentDir + "/.startWithDot", "/home/.startWithDot"}},
+		{"$HOME/.aws:/root/.aws", "composefile", []string{os.ExpandEnv("$HOME/.aws"), "/root/.aws"}},
 	}
 	for _, v := range tt {
 		actual := FormatServiceVolumes(v.volume, v.dockerComposeFile)
