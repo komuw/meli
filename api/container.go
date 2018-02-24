@@ -24,20 +24,23 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 		}
 	}
 
-	// reuse container if already running
-	meliService := labelsMap["meli_service"]
-	filters := filters.NewArgs()
-	filters.Add("label", fmt.Sprintf("meli_service=%s", meliService))
-	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
-		Quiet:   true,
-		All:     true,
-		Filters: filters})
-	if err != nil {
-		fmt.Println(" :unable to list containers")
-	}
-	if len(containers) > 0 {
-		dc.UpdateContainerID(containers[0].ID)
-		return true, containers[0].ID, nil
+	if !dc.Rebuild {
+		// reuse container if already running
+		// only reuse containers if we aren't rebuilding
+		meliService := labelsMap["meli_service"]
+		filters := filters.NewArgs()
+		filters.Add("label", fmt.Sprintf("meli_service=%s", meliService))
+		containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+			Quiet:   true,
+			All:     true,
+			Filters: filters})
+		if err != nil {
+			fmt.Println(" :unable to list containers")
+		}
+		if len(containers) > 0 {
+			dc.UpdateContainerID(containers[0].ID)
+			return true, containers[0].ID, nil
+		}
 	}
 
 	// 2. make ports
@@ -51,7 +54,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			myPortBinding := nat.PortBinding{HostPort: hostport}
 			port, shadowErr := nat.NewPort("tcp", containerport)
 			if shadowErr != nil {
-				fmt.Println(err, " :unable to create a nat.Port")
+				fmt.Println(shadowErr, " :unable to create a nat.Port")
 			}
 			portsMap[port] = EmptyStruct{}
 			portBindingMap[port] = []nat.PortBinding{myPortBinding}
@@ -80,7 +83,7 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 	if dc.ComposeService.Build != (Buildstruct{}) {
 		imageName, shadowErr := BuildDockerImage(ctx, cli, dc)
 		if shadowErr != nil {
-			return false, "", &popagateError{originalErr: err}
+			return false, "", &popagateError{originalErr: shadowErr}
 		}
 		// done this way so that we can manipulate the value of the
 		// imageName inside this scope
