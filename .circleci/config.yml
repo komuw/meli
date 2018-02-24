@@ -71,7 +71,7 @@ jobs:
                 if [ "$num_containers" != "11" ]; then
                     echo "wanted 11 containers, got $num_containers" && exit 500
                 fi
-        # stop the containers running from the previous command
+        # remove the containers running from the previous command
         - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
         - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
         - run:
@@ -82,8 +82,8 @@ jobs:
                 if [ "$num_containers" != "11" ]; then
                     echo "wanted 11 containers, got $num_containers" && exit 500
                 fi
-        # test rebuild, do not remove containers from previous command
-        - run: docker ps -aq
+        # test rebuild, stop (BUT DO NOT remove) containers from previous command
+        - run: docker ps -aq | xargs docker stop
         - run: ./meli -up -d -f testdata/docker-compose.yml -build
         - run:
             name: echo number of running containers (expected=11), actual;
