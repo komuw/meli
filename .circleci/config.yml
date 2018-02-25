@@ -72,6 +72,11 @@ jobs:
                 if [ "$num_containers" != "11" ]; then
                     echo "wanted 11 containers, got $num_containers" && exit 500
                 fi
+        - run:
+            name: check that docker linking works
+            command: |
+                docker exec -it backup ping -w3 redis
+                docker exec -it backup ping -w3 eminem.com
         # remove the containers running from the previous command
         - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
         - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
