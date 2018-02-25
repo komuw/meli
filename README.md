@@ -141,4 +141,3 @@ However, I'm not making a tool to take docker-compose to the races.
 # TODO
 - add better documentation(godoc)
 - stabilise API(maybe)
-
