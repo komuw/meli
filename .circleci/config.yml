@@ -72,6 +72,11 @@ jobs:
                 if [ "$num_containers" != "11" ]; then
                     echo "wanted 11 containers, got $num_containers" && exit 500
                 fi
+        - run:
+            name: check that docker linking works
+            command: |
+                docker exec -it backup ping -w3 redis
+                docker exec -it backup ping -w3 eminem.com
         # remove the containers running from the previous command
         - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
         - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
@@ -84,7 +89,10 @@ jobs:
                     echo "wanted 11 containers, got $num_containers" && exit 500
                 fi
         # test rebuild, stop (BUT DO NOT remove) containers from previous command
-        - run: docker ps -aq | xargs docker stop
+        # BUT because of this error; https://circleci.com/docs/1.0/docker-btrfs-error/
+        # we cant do that on circleCI(though it works locally).
+        # so until circleCI fixes(or we run circleCI in a vm instead of a container), we need to destroy
+        - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
         - run: ./meli -up -d -f testdata/docker-compose.yml -build
         - run:
             name: echo number of running containers (expected=11), actual;
