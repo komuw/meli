@@ -62,6 +62,7 @@ jobs:
                 mv /tmp/docker/* /usr/bin
 
         - run: source /etc/profile && go build --race -o meli main.go
+        - run: ./meli -v
         - run: ./meli -up -d -f testdata/docker-compose.yml
         - run:
             name: echo number of running containers (expected=11), actual;

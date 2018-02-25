@@ -50,7 +50,7 @@ func Cli() (bool, bool, bool, string) {
 	flag.Parse()
 
 	if showVersion {
-		return false, true, followLogs, ""
+		return true, followLogs, rebuild, ""
 	}
 	if !up {
 		fmt.Println("to use Meli, run: \n\n\t meli -up")
