@@ -21,14 +21,9 @@ jobs:
                             python \
                             python-pip \
                             software-properties-common \
-                            ruby \
-                            ruby-dev \
-                            rubygems \
                             build-essential \
                             snapd \
                             snapcraft \
-                            rpm \
-                            rpm-common \
                             nano
                 pip install -U pip
                 pip install -U docker-compose
@@ -148,14 +143,9 @@ jobs:
                             python \
                             python-pip \
                             software-properties-common \
-                            ruby \
-                            ruby-dev \
-                            rubygems \
                             build-essential \
                             snapd \
                             snapcraft \
-                            rpm \
-                            rpm-common \
                             nano
                 pip install -U pip
                 pip install -U docker-compose
@@ -177,10 +167,11 @@ jobs:
                 source /etc/profile && \
                 go get -u github.com/golang/dep/cmd/dep && \
                 dep ensure -v
+        # use custom package that still has --skip-validate
         - run:
             name: go releaser
             command: |
-                wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/v0.54.2/goreleaser_Linux_arm64.tar.gz
+                wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/v0.54.3/goreleaser_Linux_arm64.tar.gz
                 tar -C /usr/local -xzf /usr/local/goreleaser_Linux_arm64.tar.gz
         - run:
             name: do a new release
@@ -191,7 +182,7 @@ jobs:
                 if [ "$LAST_GIT_MESSAGE" == 'do release' ]; then
                     echo "deploying with goreleaser"
                     source /etc/profile
-                    goreleaser --rm-dist -config .goreleaser.yml --debug --skip-validate
+                    /usr/local/goreleaser --rm-dist -config .goreleaser.yml --debug --skip-validate
                 fi
 
 workflows:
