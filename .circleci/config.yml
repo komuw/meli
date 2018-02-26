@@ -147,8 +147,6 @@ jobs:
                             snapd \
                             snapcraft \
                             nano
-                pip install -U pip
-                pip install -U docker-compose
         - run:
             name: install golang
             command: |
