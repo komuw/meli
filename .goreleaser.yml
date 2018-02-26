@@ -33,7 +33,7 @@ build:
 #   install: |
 #     bin.install "meli"
 
-fpm:
+nfpm:
   vendor: komuW.
   homepage: https://github.com/komuw/meli
   maintainer: komuW <komuw05@gmail.com>
