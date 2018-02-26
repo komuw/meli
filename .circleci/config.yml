@@ -175,8 +175,7 @@ jobs:
             command: |
                 source /etc/profile && \
                 go get -u github.com/golang/dep/cmd/dep && \
-                go get -u github.com/goreleaser/goreleaser && \
-                dep ensure
+                dep ensure -v
         - run:
             name: Install Docker client
             command: |
@@ -185,6 +184,11 @@ jobs:
                 curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
                 tar -xz -C /tmp -f /tmp/docker-$VER.tgz
                 mv /tmp/docker/* /usr/bin
+        - run:
+            name: go releaser
+            command: |
+                wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/v0.54.2/goreleaser_Linux_arm64.tar.gz
+                tar -C /usr/local -xzf /usr/local/goreleaser_Linux_arm64.tar.gz
         - run:
             name: do a new release
             command: |
@@ -195,7 +199,7 @@ jobs:
                     echo "deploying with goreleaser"
                     source /etc/profile
                     docker login -u $DOCKER_USER -p $DOCKER_PASS
-                    goreleaser --rm-dist -config .goreleaser.yml --debug --snapshot
+                    goreleaser --rm-dist -config .goreleaser.yml --debug --skip-validate
                 fi
 
 workflows:
