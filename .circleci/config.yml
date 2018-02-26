@@ -169,8 +169,8 @@ jobs:
         - run:
             name: go releaser
             command: |
-                wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/v0.54.3/goreleaser_Linux_arm64.tar.gz
-                tar -C /usr/local -xzf /usr/local/goreleaser_Linux_arm64.tar.gz
+                wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/v0.54.3/goreleaser_Linux_x86_64.tar.gz
+                tar -C /usr/local -xzf /usr/local/goreleaser_Linux_x86_64.tar.gz
         - run:
             name: do a new release
             command: |
