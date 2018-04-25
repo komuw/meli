@@ -1,3 +1,38 @@
+/*
+Package api provides programming interface to interact with the docker daemon.
+
+Example usage:
+	package main
+
+	import (
+		"context"
+		"log"
+		"os"
+
+		"github.com/docker/docker/client"
+		"github.com/komuw/meli/api"
+	)
+
+	func main() {
+		dc := &api.DockerContainer{
+			ComposeService: api.ComposeService{Image: "busybox"},
+			LogMedium:      os.Stdout,
+			FollowLogs:     true}
+
+		ctx := context.Background()
+		cli, err := client.NewEnvClient()
+		if err != nil {
+			log.Fatal(err, " :unable to intialize docker client")
+		}
+		defer cli.Close()
+
+		api.GetAuth() // read dockerhub info
+		err = api.PullDockerImage(ctx, cli, dc)
+		log.Println(err)
+
+	}
+
+*/
 package api
 
 import (
