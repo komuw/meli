@@ -38,7 +38,7 @@ func TestCreateContainer(t *testing.T) {
 			nil},
 	}
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	for _, v := range tt {
 		alreadyCreated, actual, err := CreateContainer(ctx, cli, v.dc)
 		if err != nil {
@@ -61,7 +61,7 @@ func TestContainerStart(t *testing.T) {
 		{&DockerContainer{ContainerID: "myContainerId"}, nil},
 	}
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	for _, v := range tt {
 		err := ContainerStart(ctx, cli, v.dc)
 		if err != nil {
@@ -79,7 +79,7 @@ func TestContainerLogs(t *testing.T) {
 		{&DockerContainer{ContainerID: "myContainerId", FollowLogs: false, LogMedium: ioutil.Discard}, nil},
 	}
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	for _, v := range tt {
 		err := ContainerLogs(ctx, cli, v.dc)
 		if err != nil {
@@ -90,7 +90,7 @@ func TestContainerLogs(t *testing.T) {
 
 func BenchmarkCreateContainer(b *testing.B) {
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	dc := &DockerContainer{
 		ComposeService:    ComposeService{Image: "busybox", Restart: "unless-stopped"},
 		ServiceName:       "myservice",
@@ -105,7 +105,7 @@ func BenchmarkCreateContainer(b *testing.B) {
 
 func BenchmarkContainerStart(b *testing.B) {
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	for n := 0; n < b.N; n++ {
 		_ = ContainerStart(ctx, cli, &DockerContainer{ContainerID: "containerId"})
 	}
@@ -113,7 +113,7 @@ func BenchmarkContainerStart(b *testing.B) {
 
 func BenchmarkContainerLogs(b *testing.B) {
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	for n := 0; n < b.N; n++ {
 		_ = ContainerLogs(ctx, cli, &DockerContainer{ContainerID: "containerId", LogMedium: ioutil.Discard})
 	}

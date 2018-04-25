@@ -14,7 +14,7 @@ func TestGetNetwork(t *testing.T) {
 		{"myNetWorkName", "myNetworkId002", nil},
 	}
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	for _, v := range tt {
 		actual, err := GetNetwork(ctx, v.input, cli)
 		if err != nil {
@@ -38,7 +38,7 @@ func TestConnectNetwork(t *testing.T) {
 			nil},
 	}
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 
 	for _, v := range tt {
 		err := ConnectNetwork(ctx, cli, v.dc)
@@ -50,7 +50,7 @@ func TestConnectNetwork(t *testing.T) {
 
 func BenchmarkGetNetwork(b *testing.B) {
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	for n := 0; n < b.N; n++ {
 		_, _ = GetNetwork(ctx, "myNetWorkName", cli)
 	}
@@ -58,7 +58,7 @@ func BenchmarkGetNetwork(b *testing.B) {
 
 func BenchmarkConnectNetwork(b *testing.B) {
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	dc := &DockerContainer{NetworkID: "myNetWorkID", ContainerID: "myContainerID003"}
 	for n := 0; n < b.N; n++ {
 		_ = ConnectNetwork(ctx, cli, dc)

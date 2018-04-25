@@ -16,6 +16,7 @@ import (
 	"github.com/docker/docker/api/types"
 )
 
+// PullDockerImage pulls a docker from a registry via docker daemon
 func PullDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) error {
 	imageName := dc.ComposeService.Image
 	result, _ := AuthInfo.Load("dockerhub")
@@ -34,7 +35,7 @@ func PullDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 			newErr:      fmt.Errorf(" :unable to pull image %s", imageName)}
 	}
 
-	var imgProg ImageProgress
+	var imgProg imageProgress
 	scanner := bufio.NewScanner(imagePullResp)
 	for scanner.Scan() {
 		_ = json.Unmarshal(scanner.Bytes(), &imgProg)
@@ -99,6 +100,7 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 	}
 }
 
+// BuildDockerImage builds a docker image via docker daemon
 func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
@@ -108,7 +110,7 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 	if dockerFile == "" {
 		dockerFile = "Dockerfile"
 	}
-	formattedDockerComposePath := FormatComposePath(dc.DockerComposeFile)
+	formattedDockerComposePath := formatComposePath(dc.DockerComposeFile)
 	if len(formattedDockerComposePath) == 0 {
 		// very unlikely to hit this situation, but
 		return "", fmt.Errorf(" :docker-compose file is empty %s", dc.DockerComposeFile)
@@ -202,7 +204,7 @@ func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContaine
 			newErr:      errors.New(" :unable to build docker image")}
 	}
 
-	var imgProg ImageProgress
+	var imgProg imageProgress
 	scanner := bufio.NewScanner(imageBuildResponse.Body)
 	for scanner.Scan() {
 		_ = json.Unmarshal(scanner.Bytes(), &imgProg)

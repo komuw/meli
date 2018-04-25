@@ -51,7 +51,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err, " :unable to get the current working directory")
 	}
-	networkName := "meli_network_" + api.GetCwdName(curentDir)
+	networkName := "meli_network_" + getCwdName(curentDir)
 	networkID, err := api.GetNetwork(ctx, networkName, cli)
 	if err != nil {
 		log.Fatal(err, " :unable to create/get network")
@@ -143,4 +143,18 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
+}
+
+func getCwdName(path string) string {
+	//TODO: investigate if this will work cross platform
+	// it might be  :unable to handle paths in windows OS
+	f := func(c rune) bool {
+		if c == 47 {
+			// 47 is the '/' character
+			return true
+		}
+		return false
+	}
+	pathSlice := strings.FieldsFunc(path, f)
+	return pathSlice[len(pathSlice)-1]
 }

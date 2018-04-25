@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestFormatContainerName(t *testing.T) {
+func TestformatContainerName(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected string
@@ -16,14 +16,14 @@ func TestFormatContainerName(t *testing.T) {
 		{"yolo:ala", "meli_yolo."},
 	}
 	for _, v := range tt {
-		actual := FormatContainerName(v.input, ".")
+		actual := formatContainerName(v.input, ".")
 		if actual != v.expected {
-			t.Errorf("\nCalled FormatContainerName(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled formatContainerName(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
 
-func TestFormatLabels(t *testing.T) {
+func TestformatLabels(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected []string
@@ -32,14 +32,14 @@ func TestFormatLabels(t *testing.T) {
 		{"env:prod", []string{"env", "prod"}},
 	}
 	for _, v := range tt {
-		actual := FormatLabels(v.input)
+		actual := formatLabels(v.input)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nCalled FormatLabels(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled formatLabels(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
 
-func TestFormatPorts(t *testing.T) {
+func TestformatPorts(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected []string
@@ -47,14 +47,14 @@ func TestFormatPorts(t *testing.T) {
 		{"6300:6379", []string{"6300", "6379"}},
 	}
 	for _, v := range tt {
-		actual := FormatPorts(v.input)
+		actual := formatPorts(v.input)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nCalled TestFormatPorts(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled TestformatPorts(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
 
-func TestFormatServiceVolumes(t *testing.T) {
+func TestformatServiceVolumes(t *testing.T) {
 	currentDir, _ := os.Getwd()
 	tt := []struct {
 		volume            string
@@ -68,14 +68,14 @@ func TestFormatServiceVolumes(t *testing.T) {
 		{"$HOME/.aws:/root/.aws", "composefile", []string{os.ExpandEnv("$HOME/.aws"), "/root/.aws"}},
 	}
 	for _, v := range tt {
-		actual := FormatServiceVolumes(v.volume, v.dockerComposeFile)
+		actual := formatServiceVolumes(v.volume, v.dockerComposeFile)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nCalled FormatServiceVolumes(%#+v) \ngot %#+v \nwanted %#+v", v.volume, actual, v.expected)
+			t.Errorf("\nCalled formatServiceVolumes(%#+v) \ngot %#+v \nwanted %#+v", v.volume, actual, v.expected)
 		}
 	}
 }
 
-func TestFormatRegistryAuth(t *testing.T) {
+func TestformatRegistryAuth(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected []string
@@ -83,14 +83,14 @@ func TestFormatRegistryAuth(t *testing.T) {
 		{"myUsername:myPassword001", []string{"myUsername", "myPassword001"}},
 	}
 	for _, v := range tt {
-		actual := FormatRegistryAuth(v.input)
+		actual := formatRegistryAuth(v.input)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nCalled FormatRegistryAuth(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled formatRegistryAuth(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
 
-func TestFormatComposePath(t *testing.T) {
+func TestformatComposePath(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected []string
@@ -98,35 +98,35 @@ func TestFormatComposePath(t *testing.T) {
 		{"testdata/dockerFile", []string{"testdata", "dockerFile"}},
 	}
 	for _, v := range tt {
-		actual := FormatComposePath(v.input)
+		actual := formatComposePath(v.input)
 		if !reflect.DeepEqual(actual, v.expected) {
-			t.Errorf("\nCalled FormatComposePath(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
+			t.Errorf("\nCalled formatComposePath(%#+v) \ngot %#+v \nwanted %#+v", v.input, actual, v.expected)
 		}
 	}
 }
 
-func BenchmarkFormatLabels(b *testing.B) {
-	// run the FormatLabels function b.N times
+func BenchmarkformatLabels(b *testing.B) {
+	// run the formatLabels function b.N times
 	for n := 0; n < b.N; n++ {
-		_ = FormatLabels("traefik.backend=web")
+		_ = formatLabels("traefik.backend=web")
 	}
 }
 
-func BenchmarkFormatPorts(b *testing.B) {
+func BenchmarkformatPorts(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_ = FormatPorts("6300:6379")
+		_ = formatPorts("6300:6379")
 	}
 }
 
-func BenchmarkFormatServiceVolumes(b *testing.B) {
+func BenchmarkformatServiceVolumes(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_ = FormatServiceVolumes("data-volume:/home", "composeFile")
+		_ = formatServiceVolumes("data-volume:/home", "composeFile")
 	}
 }
 
-func BenchmarkFormatContainerName(b *testing.B) {
+func BenchmarkformatContainerName(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_ = FormatContainerName("build_with_no_specified_dockerfile", ".")
+		_ = formatContainerName("build_with_no_specified_dockerfile", ".")
 	}
 
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/docker/docker-credential-helpers/client"
 )
 
+// AuthInfo stores a users' docker registry/hub info
 var AuthInfo sync.Map
 
 func useCredStore(server string) (string, string) {
@@ -34,6 +35,7 @@ func useCredStore(server string) (string, string) {
 	return cred.Username, cred.Secret
 }
 
+// GetAuth loads a users' docker registry/hub info into AuthInfo
 func GetAuth() {
 	usr, err := user.Current()
 	if err != nil {
@@ -92,8 +94,8 @@ func GetAuth() {
 		quayUsername, quayPassword = useCredStore(quayRegistryURL)
 
 	} else {
-		dockerUserPass := FormatRegistryAuth(string(dockerAuth))
-		quayUserPass := FormatRegistryAuth(string(quayAuth))
+		dockerUserPass := formatRegistryAuth(string(dockerAuth))
+		quayUserPass := formatRegistryAuth(string(quayAuth))
 
 		if len(dockerUserPass) < 2 {
 			dockerUsername, dockerPassword = "", ""
