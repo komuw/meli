@@ -5,6 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/komuw/meli)](https://goreportcard.com/report/github.com/komuw/meli)          
 
 
+
 Meli is supposed to be a faster alternative to docker-compose. Faster in the sense that, Meli will try to pull as many services(docker containers) 
 as it can in parallel. 
 
