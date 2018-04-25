@@ -34,7 +34,7 @@ func TestBuildDockerImage(t *testing.T) {
 				ServiceName:       "myservicename",
 				DockerComposeFile: "docker-compose.yml",
 				ComposeService: ComposeService{
-					Build: Buildstruct{Dockerfile: "../testdata/Dockerfile"}},
+					Build: Buildstruct{Dockerfile: "testdata/Dockerfile"}},
 				LogMedium: ioutil.Discard},
 			"meli_myservicename",
 			nil},
@@ -43,7 +43,7 @@ func TestBuildDockerImage(t *testing.T) {
 				ServiceName:       "myservicename",
 				DockerComposeFile: "docker-compose.yml",
 				ComposeService: ComposeService{
-					Build: Buildstruct{Dockerfile: "../testdata/Dockerfile"}},
+					Build: Buildstruct{Dockerfile: "testdata/Dockerfile"}},
 				LogMedium: ioutil.Discard,
 				Rebuild:   true,
 			},
@@ -81,7 +81,7 @@ func BenchmarkBuildDockerImage(b *testing.B) {
 	dc := &DockerContainer{
 		ServiceName: "myservicename",
 		ComposeService: ComposeService{
-			Build: Buildstruct{Dockerfile: "../testdata/Dockerfile"}},
+			Build: Buildstruct{Dockerfile: "testdata/Dockerfile"}},
 		LogMedium: ioutil.Discard}
 	for n := 0; n < b.N; n++ {
 		_, _ = BuildDockerImage(ctx, cli, dc)
