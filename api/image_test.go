@@ -14,7 +14,7 @@ func TestPullDockerImage(t *testing.T) {
 		{&DockerContainer{ComposeService: ComposeService{Image: "busybox"}, LogMedium: ioutil.Discard}, nil},
 	}
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	for _, v := range tt {
 		err := PullDockerImage(ctx, cli, v.dc)
 		if err != nil {
@@ -52,7 +52,7 @@ func TestBuildDockerImage(t *testing.T) {
 	}
 
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	GetAuth()
 	for _, v := range tt {
 		actual, err := BuildDockerImage(ctx, cli, v.dc)
@@ -67,7 +67,7 @@ func TestBuildDockerImage(t *testing.T) {
 
 func BenchmarkPullDockerImage(b *testing.B) {
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	dc := &DockerContainer{ComposeService: ComposeService{Image: "busybox"}, LogMedium: ioutil.Discard}
 	GetAuth()
 	for n := 0; n < b.N; n++ {
@@ -77,7 +77,7 @@ func BenchmarkPullDockerImage(b *testing.B) {
 
 func BenchmarkBuildDockerImage(b *testing.B) {
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	dc := &DockerContainer{
 		ServiceName: "myservicename",
 		ComposeService: ComposeService{

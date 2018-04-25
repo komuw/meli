@@ -1,3 +1,6 @@
+/*
+Package cli provides the command line interface for the meli application.
+*/
 package cli
 
 import (
@@ -6,6 +9,7 @@ import (
 	"os"
 )
 
+// Cli parses input from stdin
 func Cli() (bool, bool, bool, string) {
 	// TODO; use a more sensible cli lib.
 	var showVersion bool

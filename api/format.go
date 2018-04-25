@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func FormatContainerName(containerName, curentDir string) string {
+func formatContainerName(containerName, curentDir string) string {
 	// container names are supposed to be unique
 	// we are using the docker-compose service name as well as current dir as the container name
 	f := func(c rune) bool {
@@ -23,7 +23,7 @@ func FormatContainerName(containerName, curentDir string) string {
 	return contName
 }
 
-func FormatLabels(label string) []string {
+func formatLabels(label string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -39,7 +39,7 @@ func FormatLabels(label string) []string {
 	return strings.FieldsFunc(label, f)
 }
 
-func FormatPorts(port string) []string {
+func formatPorts(port string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -55,7 +55,7 @@ func FormatPorts(port string) []string {
 	return strings.FieldsFunc(port, f)
 }
 
-func FormatServiceVolumes(volume, dockerComposeFile string) []string {
+func formatServiceVolumes(volume, dockerComposeFile string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -82,7 +82,7 @@ func FormatServiceVolumes(volume, dockerComposeFile string) []string {
 	return hostAndContainerPath
 }
 
-func FormatRegistryAuth(auth string) []string {
+func formatRegistryAuth(auth string) []string {
 	f := func(c rune) bool {
 		if c == 58 {
 			// 58 is the ':' character
@@ -95,7 +95,7 @@ func FormatRegistryAuth(auth string) []string {
 	return strings.FieldsFunc(auth, f)
 }
 
-func FormatComposePath(path string) []string {
+func formatComposePath(path string) []string {
 	f := func(c rune) bool {
 		// TODO; check if this is cross platform
 		if c == 47 {
