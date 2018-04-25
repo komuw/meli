@@ -7,7 +7,7 @@ services:
       - type=database
     ports:
       - "6300:6379"
-      - "6400:22"
+      - "22"
 
   nats:
     image: nats
