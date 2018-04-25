@@ -1,5 +1,5 @@
 build:
-  main: main.go
+  main: cli/cli.go
   binary: meli
   ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
   env:

@@ -57,7 +57,7 @@ jobs:
                 mv /tmp/docker/* /usr/bin
                 docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-        - run: source /etc/profile && go build --race -o meli main.go
+        - run: source /etc/profile && go build --race -o meli cli/cli.go
         - run: ./meli -v
         - run: ./meli -up -d -f testdata/docker-compose.yml
         - run:
@@ -112,7 +112,7 @@ jobs:
 
         # benchmark against docker-compose
         - run: rm meli
-        - run: source /etc/profile && go build -o meli main.go
+        - run: source /etc/profile && go build -o meli cli/cli.go
         - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
         - run:
             name: show docker-compose version

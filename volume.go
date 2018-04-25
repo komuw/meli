@@ -1,4 +1,4 @@
-package api
+package meli
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 )
 
+// CreateDockerVolume creates a docker volume
 func CreateDockerVolume(ctx context.Context, cli MeliAPiClient, name, driver string, dst io.Writer) (string, error) {
 	volume, err := cli.VolumeCreate(
 		ctx,

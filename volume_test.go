@@ -1,4 +1,4 @@
-package api
+package meli
 
 import (
 	"context"
@@ -16,7 +16,7 @@ func TestCreateDockerVolume(t *testing.T) {
 		{"MyVolumeName", "local", "MyVolume007", nil},
 	}
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	dst := ioutil.Discard
 	for _, v := range tt {
 		actual, err := CreateDockerVolume(ctx, cli, v.name, v.driver, dst)
@@ -31,7 +31,7 @@ func TestCreateDockerVolume(t *testing.T) {
 
 func BenchmarkCreateDockerVolume(b *testing.B) {
 	var ctx = context.Background()
-	cli := &MockDockerClient{}
+	cli := &mockDockerClient{}
 	dst := ioutil.Discard
 	for n := 0; n < b.N; n++ {
 		_, _ = CreateDockerVolume(ctx, cli, "name", "local", dst)

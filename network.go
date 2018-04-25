@@ -1,9 +1,8 @@
-package api
+package meli
 
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
@@ -44,6 +43,7 @@ func GetNetwork(ctx context.Context, networkName string, cli MeliAPiClient) (str
 
 }
 
+// ConnectNetwork connects a container to an existent docker network.
 func ConnectNetwork(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) error {
 	err := cli.NetworkConnect(
 		ctx,
@@ -57,18 +57,4 @@ func ConnectNetwork(ctx context.Context, cli MeliAPiClient, dc *DockerContainer)
 
 	}
 	return nil
-}
-
-func GetCwdName(path string) string {
-	//TODO: investigate if this will work cross platform
-	// it might be  :unable to handle paths in windows OS
-	f := func(c rune) bool {
-		if c == 47 {
-			// 47 is the '/' character
-			return true
-		}
-		return false
-	}
-	pathSlice := strings.FieldsFunc(path, f)
-	return pathSlice[len(pathSlice)-1]
 }

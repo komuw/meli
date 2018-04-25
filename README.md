@@ -81,12 +81,12 @@ import (
 	"os"
 
 	"github.com/docker/docker/client"
-	"github.com/komuw/meli/api"
+	"github.com/komuw/meli"
 )
 
 func main() {
-	dc := &api.DockerContainer{
-		ComposeService: api.ComposeService{Image: "busybox"},
+	dc := &meli.DockerContainer{
+		ComposeService: meli.ComposeService{Image: "busybox"},
 		LogMedium:      os.Stdout,
 		FollowLogs:     true}
 
@@ -97,12 +97,11 @@ func main() {
 	}
 	defer cli.Close()
 
-	api.GetAuth() // read dockerhub info
-	err = api.PullDockerImage(ctx, cli, dc)
+	meli.GetAuth() // read dockerhub info
+	err = meli.PullDockerImage(ctx, cli, dc)
 	log.Println(err)
 
 }
-
 ```
 
 
@@ -134,7 +133,7 @@ However, I'm not making a tool to take docker-compose to the races.
 
 # Build                   
 `git clone git@github.com:komuW/meli.git`           
-`go build -o meli main.go`           
+`go build -o meli cli/cli.go`           
 `./meli -up -f /path/to/docker-compose-file.yml`                   
 
 
