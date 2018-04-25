@@ -6,3 +6,6 @@ debug
 
 # goreleaser distribution folder.
 /dist/
+
+# binary
+meli
