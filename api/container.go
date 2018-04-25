@@ -53,8 +53,16 @@ func CreateContainer(ctx context.Context, cli MeliAPiClient, dc *DockerContainer
 	if len(dc.ComposeService.Ports) > 0 {
 		for _, v := range dc.ComposeService.Ports {
 			oneport := FormatPorts(v)
-			hostport := oneport[0]
-			containerport := oneport[1]
+			// issues/96
+			hostport := ""
+			containerport := ""
+			if len(oneport) == 1 {
+				hostport = ""
+				containerport = oneport[0]
+			} else {
+				hostport = oneport[0]
+				containerport = oneport[1]
+			}
 			myPortBinding := nat.PortBinding{HostPort: hostport}
 			port, shadowErr := nat.NewPort("tcp", containerport)
 			if shadowErr != nil {
