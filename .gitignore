@@ -1,5 +1,8 @@
 .vscode/*
 debug
+debug.test
+coverage.txt
+.DS_Store
 
 # go-pry debug stuff
 .main.gopry
