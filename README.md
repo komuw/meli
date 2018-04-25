@@ -133,7 +133,7 @@ However, I'm not making a tool to take docker-compose to the races.
 
 # Build                   
 `git clone git@github.com:komuW/meli.git`           
-`go build -o meli cli/*.go`           
+`go build -o meli cli/cli.go`           
 `./meli -up -f /path/to/docker-compose-file.yml`                   
 
 
