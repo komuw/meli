@@ -11,7 +11,7 @@ import (
 )
 
 // GetNetwork gets or creates newtwork(if it doesn't exist yet.)
-func GetNetwork(ctx context.Context, networkName string, cli MeliAPiClient) (string, error) {
+func GetNetwork(ctx context.Context, networkName string, cli APIclient) (string, error) {
 	// return early if network exists
 	netList, err := cli.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
@@ -44,7 +44,7 @@ func GetNetwork(ctx context.Context, networkName string, cli MeliAPiClient) (str
 }
 
 // ConnectNetwork connects a container to an existent docker network.
-func ConnectNetwork(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) error {
+func ConnectNetwork(ctx context.Context, cli APIclient, dc *DockerContainer) error {
 	err := cli.NetworkConnect(
 		ctx,
 		dc.NetworkID,

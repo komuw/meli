@@ -17,7 +17,7 @@ import (
 )
 
 // PullDockerImage pulls a docker from a registry via docker daemon
-func PullDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) error {
+func PullDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) error {
 	imageName := dc.ComposeService.Image
 	result, _ := AuthInfo.Load("dockerhub")
 	if strings.Contains(imageName, "quay") {
@@ -101,7 +101,7 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 }
 
 // BuildDockerImage builds a docker image via docker daemon
-func BuildDockerImage(ctx context.Context, cli MeliAPiClient, dc *DockerContainer) (string, error) {
+func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (string, error) {
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 	defer tw.Close()

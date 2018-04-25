@@ -60,8 +60,8 @@ func (dc *DockerContainer) UpdateContainerID(containerID string) {
 	dc.ContainerID = containerID
 }
 
-// MeliAPiClient is meli's client to interact with the docker daemon server
-type MeliAPiClient interface {
+// APIclient is meli's client to interact with the docker daemon server
+type APIclient interface {
 	// we implement this interface so that we can be able to mock it in tests
 	// https://medium.com/@zach_4342/dependency-injection-in-golang-e587c69478a8
 	ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error)
