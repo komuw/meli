@@ -81,7 +81,7 @@ import (
 	"os"
 
 	"github.com/docker/docker/client"
-	"github.com/komuw/meli/meli"
+	"github.com/komuw/meli"
 )
 
 func main() {

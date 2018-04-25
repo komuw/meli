@@ -10,7 +10,7 @@ Example usage:
 		"os"
 
 		"github.com/docker/docker/client"
-		"github.com/komuw/meli/meli"
+		"github.com/komuw/meli"
 	)
 
 	func main() {
@@ -29,7 +29,6 @@ Example usage:
 		meli.GetAuth() // read dockerhub info
 		err = meli.PullDockerImage(ctx, cli, dc)
 		log.Println(err)
-
 	}
 
 */
