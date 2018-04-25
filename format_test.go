@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestformatContainerName(t *testing.T) {
+func TestFormatContainerName(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected string
@@ -23,7 +23,7 @@ func TestformatContainerName(t *testing.T) {
 	}
 }
 
-func TestformatLabels(t *testing.T) {
+func TestFormatLabels(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected []string
@@ -39,7 +39,7 @@ func TestformatLabels(t *testing.T) {
 	}
 }
 
-func TestformatPorts(t *testing.T) {
+func TestFormatPorts(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected []string
@@ -54,7 +54,7 @@ func TestformatPorts(t *testing.T) {
 	}
 }
 
-func TestformatServiceVolumes(t *testing.T) {
+func TestFormatServiceVolumes(t *testing.T) {
 	currentDir, _ := os.Getwd()
 	tt := []struct {
 		volume            string
@@ -75,7 +75,7 @@ func TestformatServiceVolumes(t *testing.T) {
 	}
 }
 
-func TestformatRegistryAuth(t *testing.T) {
+func TestFormatRegistryAuth(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected []string
@@ -90,7 +90,7 @@ func TestformatRegistryAuth(t *testing.T) {
 	}
 }
 
-func TestformatComposePath(t *testing.T) {
+func TestFormatComposePath(t *testing.T) {
 	tt := []struct {
 		input    string
 		expected []string
@@ -105,26 +105,26 @@ func TestformatComposePath(t *testing.T) {
 	}
 }
 
-func BenchmarkformatLabels(b *testing.B) {
+func BenchmarkFormatLabels(b *testing.B) {
 	// run the formatLabels function b.N times
 	for n := 0; n < b.N; n++ {
 		_ = formatLabels("traefik.backend=web")
 	}
 }
 
-func BenchmarkformatPorts(b *testing.B) {
+func BenchmarkFormatPorts(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_ = formatPorts("6300:6379")
 	}
 }
 
-func BenchmarkformatServiceVolumes(b *testing.B) {
+func BenchmarkFormatServiceVolumes(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_ = formatServiceVolumes("data-volume:/home", "composeFile")
 	}
 }
 
-func BenchmarkformatContainerName(b *testing.B) {
+func BenchmarkFormatContainerName(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_ = formatContainerName("build_with_no_specified_dockerfile", ".")
 	}
