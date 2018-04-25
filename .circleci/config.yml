@@ -109,6 +109,12 @@ jobs:
         - run:
             name: run benchmarks
             command: source /etc/profile && go test -timeout 1m -race -run=XXXX -bench=. ./...
+        - run:
+            name: codecov
+            command: |
+                source /etc/profile && \
+                go test -timeout 1m -v -race -cover -coverprofile=coverage.txt ./... && \
+                bash <(curl -s https://codecov.io/bash)
 
         # benchmark against docker-compose
         - run: rm meli
