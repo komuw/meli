@@ -1,4 +1,4 @@
-package api
+package meli
 
 import (
 	"encoding/base64"

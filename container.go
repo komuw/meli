@@ -1,5 +1,5 @@
 /*
-Package api provides programming interface to interact with the docker daemon.
+Package meli provides programming interface to interact with the docker daemon.
 
 Example usage:
 	package main
@@ -10,12 +10,12 @@ Example usage:
 		"os"
 
 		"github.com/docker/docker/client"
-		"github.com/komuw/meli/api"
+		"github.com/komuw/meli/meli"
 	)
 
 	func main() {
-		dc := &api.DockerContainer{
-			ComposeService: api.ComposeService{Image: "busybox"},
+		dc := &meli.DockerContainer{
+			ComposeService: meli.ComposeService{Image: "busybox"},
 			LogMedium:      os.Stdout,
 			FollowLogs:     true}
 
@@ -26,14 +26,14 @@ Example usage:
 		}
 		defer cli.Close()
 
-		api.GetAuth() // read dockerhub info
-		err = api.PullDockerImage(ctx, cli, dc)
+		meli.GetAuth() // read dockerhub info
+		err = meli.PullDockerImage(ctx, cli, dc)
 		log.Println(err)
 
 	}
 
 */
-package api
+package meli
 
 import (
 	"bufio"

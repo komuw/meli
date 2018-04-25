@@ -208,7 +208,7 @@ github_api() {
   source_url=$2
   header=""
   case "$source_url" in
-    https://api.github.com*)
+    https://meli.github.com*)
       test -z "$GITHUB_TOKEN" || header="Authorization: token $GITHUB_TOKEN"
       ;;
   esac
@@ -216,7 +216,7 @@ github_api() {
 }
 github_last_release() {
   owner_repo=$1
-  giturl="https://api.github.com/repos/${owner_repo}/releases/latest"
+  giturl="https://meli.github.com/repos/${owner_repo}/releases/latest"
   html=$(github_api - "$giturl")
   version=$(echo "$html" | tr ',' '\n' | grep -m 1 "\"tag_name\":" | cut -f4 -d'"')
   test -z "$version" && return 1

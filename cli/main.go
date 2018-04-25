@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"context"
@@ -10,8 +10,7 @@ import (
 	"sync"
 
 	"github.com/docker/docker/client"
-	"github.com/komuw/meli/api"
-	"github.com/komuw/meli/cli"
+	"github.com/komuw/meli"
 
 	"gopkg.in/yaml.v2"
 )
@@ -24,7 +23,7 @@ import (
 var version string
 
 func main() {
-	showVersion, followLogs, rebuild, dockerComposeFile := cli.Cli()
+	showVersion, followLogs, rebuild, dockerComposeFile := Cli()
 	if showVersion {
 		fmt.Println("Meli version: ", version)
 		os.Exit(0)
@@ -35,7 +34,7 @@ func main() {
 		log.Fatal(err, " :unable to read docker-compose file")
 	}
 
-	var dockerCyaml api.DockerComposeConfig
+	var dockerCyaml meli.DockerComposeConfig
 	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
 	if err != nil {
 		log.Fatal(err, " :unable to parse docker-compose file contents")
@@ -52,11 +51,11 @@ func main() {
 		log.Fatal(err, " :unable to get the current working directory")
 	}
 	networkName := "meli_network_" + getCwdName(curentDir)
-	networkID, err := api.GetNetwork(ctx, networkName, cli)
+	networkID, err := meli.GetNetwork(ctx, networkName, cli)
 	if err != nil {
 		log.Fatal(err, " :unable to create/get network")
 	}
-	api.GetAuth()
+	meli.GetAuth()
 
 	// Create top level volumes, if any
 	if len(dockerCyaml.Volumes) > 0 {
@@ -67,7 +66,7 @@ func main() {
 			// than volumes, so the sync in the for loop for containers is enough
 			// 2. since we intend to stream logs as containers run(see; issues/24);
 			// then meli will be up long enough for the volume creation goroutines to have finished.
-			go api.CreateDockerVolume(ctx, cli, "meli_"+k, "local", os.Stdout)
+			go meli.CreateDockerVolume(ctx, cli, "meli_"+k, "local", os.Stdout)
 		}
 	}
 
@@ -80,7 +79,7 @@ func main() {
 		dotFormattedrCurentDir := r.Replace(curentDir)
 		v.Labels = append(v.Labels, fmt.Sprintf("meli_service=meli_%s%s", k, dotFormattedrCurentDir))
 
-		dc := &api.DockerContainer{
+		dc := &meli.DockerContainer{
 			ServiceName:       k,
 			ComposeService:    v,
 			NetworkID:         networkID,
@@ -95,7 +94,7 @@ func main() {
 	wg.Wait()
 }
 
-func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, dc *api.DockerContainer) {
+func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, dc *meli.DockerContainer) {
 	defer wg.Done()
 
 	/*
@@ -107,7 +106,7 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 	*/
 
 	if len(dc.ComposeService.Image) > 0 {
-		err := api.PullDockerImage(ctx, cli, dc)
+		err := meli.PullDockerImage(ctx, cli, dc)
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
@@ -115,7 +114,7 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 			return
 		}
 	}
-	alreadyCreated, _, err := api.CreateContainer(ctx, cli, dc)
+	alreadyCreated, _, err := meli.CreateContainer(ctx, cli, dc)
 	if err != nil {
 		// clean exit since we want other goroutines for fetching other images
 		// to continue running
@@ -124,7 +123,7 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 	}
 
 	if !alreadyCreated {
-		err = api.ConnectNetwork(ctx, cli, dc)
+		err = meli.ConnectNetwork(ctx, cli, dc)
 		if err != nil {
 			// create whitespace so that error is visible to human
 			fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
@@ -132,13 +131,13 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 		}
 	}
 
-	err = api.ContainerStart(ctx, cli, dc)
+	err = meli.ContainerStart(ctx, cli, dc)
 	if err != nil {
 		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
 	}
 
-	err = api.ContainerLogs(ctx, cli, dc)
+	err = meli.ContainerLogs(ctx, cli, dc)
 	if err != nil {
 		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
 		return
