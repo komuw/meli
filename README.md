@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/komuw/meli)](https://goreportcard.com/report/github.com/komuw/meli)          
 
 
-Meli is supposed to be a faster alternative to docker-compose. Faster in the sense that, Meli will try to pull as many services(docker containers) 
+Meli is supposed to be a faster, and drop in, alternative to docker-compose. Faster in the sense that, Meli will try to pull as many services(docker containers) 
 as it can in parallel. 
 
 Meli is a Swahili word meaning ship; so think of Meli as a ship carrying your docker containers safely across the treacherous container seas.

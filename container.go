@@ -1,10 +1,14 @@
 /*
 Package meli provides programming interface to interact with the docker daemon.
+meli also has a command line application(cli) that is a faster and drop in alternative to docker-compose.
+The installation instructions for the cli application can be found: https://github.com/komuw/meli#installingupgrading
+
 
 Example usage:
 	package main
 
 	import (
+	"github.com/gogo/protobuf/vanity/command"
 		"context"
 		"log"
 		"os"
