@@ -19,7 +19,7 @@ func CreateDockerVolume(ctx context.Context, cli APIclient, name, driver string,
 	if err != nil {
 		return "", &popagateError{originalErr: err, newErr: errors.New(" :unable to create docker volume")}
 	}
-	fmt.Fprintf(dst, "\ndocker volume: %s created succesfully.\n", volume.Name)
+	fmt.Fprintf(dst, "\ndocker volume: %s created successfully.\n", volume.Name)
 
 	return volume.Name, nil
 }

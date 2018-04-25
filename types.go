@@ -55,7 +55,7 @@ type DockerContainer struct {
 	Rebuild           bool
 }
 
-// UpdateContainerID updates a conatiners ID
+// UpdateContainerID updates a containers ID
 func (dc *DockerContainer) UpdateContainerID(containerID string) {
 	dc.ContainerID = containerID
 }

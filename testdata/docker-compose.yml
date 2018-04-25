@@ -29,7 +29,7 @@ services:
     build:
       context: .
 
-  # we will backup this conatiners /home directory
+  # we will backup this containers /home directory
   # using the service below called backup
   # also mount hosts /var/run/docker.sock into container at same path
   db:
