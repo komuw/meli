@@ -1,7 +1,7 @@
 /*
-Package cli provides the command line interface for the meli application.
+Package main provides the command line interface for the meli application.
 */
-package cli
+package main
 
 import (
 	"flag"
