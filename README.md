@@ -1,6 +1,8 @@
 # meli            
 
-[![CircleCI](https://circleci.com/gh/komuw/meli.svg?style=svg)](https://circleci.com/gh/komuw/meli)        
+[![CircleCI](https://circleci.com/gh/komuw/meli.svg?style=svg)](https://circleci.com/gh/komuw/meli)
+[![GoDoc](https://godoc.org/github.com/komuw/meli?status.svg)](https://godoc.org/github.com/komuw/meli)
+[![Go Report Card](https://goreportcard.com/badge/github.com/komuw/meli)](https://goreportcard.com/report/github.com/komuw/meli)          
 
 
 Meli is supposed to be a faster alternative to docker-compose. Faster in the sense that, Meli will try to pull as many services(docker containers) 
