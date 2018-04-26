@@ -119,7 +119,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err, " :unable to create/get network")
 	}
-	meli.GetAuth()
+	meli.LoadAuth()
 
 	// Create top level volumes, if any
 	if len(dockerCyaml.Volumes) > 0 {

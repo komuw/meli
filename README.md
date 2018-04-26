@@ -100,7 +100,7 @@ func main() {
 	}
 	defer cli.Close()
 
-	meli.GetAuth() // read dockerhub info
+	meli.LoadAuth() // load dockerhub info
 	err = meli.PullDockerImage(ctx, cli, dc)
 	log.Println(err)
 

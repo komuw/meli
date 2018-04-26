@@ -30,7 +30,7 @@ Example usage:
 		}
 		defer cli.Close()
 
-		meli.GetAuth() // read dockerhub info
+		meli.LoadAuth() // read dockerhub info
 		err = meli.PullDockerImage(ctx, cli, dc)
 		log.Println(err)
 	}

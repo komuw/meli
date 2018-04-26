@@ -2,7 +2,7 @@ package meli
 
 import "testing"
 
-func TestGetAuth(t *testing.T) {
+func TestLoadAuth(t *testing.T) {
 	_, okDocker := AuthInfo.Load("dockerhub")
 	_, okQuay := AuthInfo.Load("quay")
 
@@ -13,7 +13,7 @@ func TestGetAuth(t *testing.T) {
 		t.Errorf("AuthInfo should not be loaded, we got %t", okQuay)
 	}
 
-	GetAuth()
+	LoadAuth()
 	_, okDocker = AuthInfo.Load("dockerhub")
 	_, okQuay = AuthInfo.Load("quay")
 	if okDocker != true {
@@ -24,8 +24,8 @@ func TestGetAuth(t *testing.T) {
 	}
 }
 
-func BenchmarkGetAuth(b *testing.B) {
+func BenchmarkLoadAuth(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		GetAuth()
+		LoadAuth()
 	}
 }

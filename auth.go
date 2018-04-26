@@ -35,8 +35,8 @@ func useCredStore(server string) (string, string) {
 	return cred.Username, cred.Secret
 }
 
-// GetAuth loads a users' docker registry/hub info into AuthInfo
-func GetAuth() {
+// LoadAuth loads a users' docker registry/hub info into AuthInfo
+func LoadAuth() {
 	usr, err := user.Current()
 	if err != nil {
 		AuthInfo.Store("quay", map[string]string{"registryURL": "", "username": "", "password": ""})

@@ -53,7 +53,7 @@ func TestBuildDockerImage(t *testing.T) {
 
 	var ctx = context.Background()
 	cli := &mockDockerClient{}
-	GetAuth()
+	LoadAuth()
 	for _, v := range tt {
 		actual, err := BuildDockerImage(ctx, cli, v.dc)
 		if err != nil {
@@ -69,7 +69,7 @@ func BenchmarkPullDockerImage(b *testing.B) {
 	var ctx = context.Background()
 	cli := &mockDockerClient{}
 	dc := &DockerContainer{ComposeService: ComposeService{Image: "busybox"}, LogMedium: ioutil.Discard}
-	GetAuth()
+	LoadAuth()
 	for n := 0; n < b.N; n++ {
 		_ = PullDockerImage(ctx, cli, dc)
 	}
