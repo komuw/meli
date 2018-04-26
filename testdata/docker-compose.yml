@@ -19,11 +19,19 @@ services:
     image: 'busybox'
     command: tail -fn10 .dockerenv
     restart: unless-stopped
+    env_file: busybox.env
 
+  # Environment variables declared in the environment section override
+  # https://docs.docker.com/compose/compose-file/#env_file
   buildservice:
     build:
       context: .
       dockerfile: buildserviceDockerfile
+    environment:
+      - VAL_TO_BE_OVERRIDEN=originalValue
+    env_file:
+      - ./buildservice1.env
+      - buildservice2.env
 
   build_with_no_specified_dockerfile:
     build:
