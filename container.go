@@ -175,6 +175,10 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 				fmt.Println("err::", err)
 			}
 			fmt.Printf("fileName:%v", f.Name())
+			// TODO: read contents from file as a []string
+			// and add them to dc.ComposeService.Environment
+			// any that already exist in dc.ComposeService.Environment should
+			// take precedent
 		}
 	}
 
