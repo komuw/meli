@@ -152,7 +152,8 @@ func main() {
 			DockerComposeFile: dockerComposeFile,
 			LogMedium:         os.Stdout,
 			CurentDir:         dotFormattedrCurentDir,
-			Rebuild:           rebuild}
+			Rebuild:           rebuild,
+			EnvFile:           v.EnvFile}
 		go startComposeServices(ctx, cli, &wg, dc)
 	}
 	wg.Wait()

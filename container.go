@@ -43,6 +43,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -50,6 +52,7 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/go-connections/nat"
+	"github.com/sanity-io/litter"
 )
 
 // CreateContainer creates a docker container
@@ -152,6 +155,26 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 			// TODO: handle other read/write modes
 			whatToBind := vol[0] + ":" + vol[1] + ":rw"
 			binds = append(binds, whatToBind)
+		}
+	}
+
+	// 7. process env_files
+	if len(dc.ComposeService.EnvFile) > 0 {
+		formattedDockerComposePath := formatComposePath(dc.DockerComposeFile)
+		fmt.Println("formattedDockerComposePath", formattedDockerComposePath)
+		pathToDockerFile := formattedDockerComposePath[0]
+
+		litter.Dump("dc.ComposeService.EnvFile", dc.ComposeService.EnvFile)
+		for _, v := range dc.ComposeService.EnvFile {
+			litter.Dump("v", v)
+			pathhh := filepath.Join(pathToDockerFile, v)
+			fmt.Println("pathhh::", pathhh)
+
+			f, err := os.Open(pathhh)
+			if err != nil {
+				fmt.Println("err::", err)
+			}
+			fmt.Printf("fileName:%v", f.Name())
 		}
 	}
 

@@ -54,6 +54,7 @@ type DockerContainer struct {
 	LogMedium         io.Writer
 	CurentDir         string
 	Rebuild           bool
+	EnvFile           []string
 }
 
 // UpdateContainerID updates a containers ID
