@@ -106,6 +106,8 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	tw := tar.NewWriter(buf)
 	defer tw.Close()
 
+	// TODO: I dont like the way we are handling paths here.
+	// look at dirWithComposeFile in container.go
 	dockerFile := dc.ComposeService.Build.Dockerfile
 	if dockerFile == "" {
 		dockerFile = "Dockerfile"

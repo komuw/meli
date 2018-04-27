@@ -8,6 +8,7 @@ Example usage:
 	package main
 
 	import (
+	"github.com/sanity-io/litter"
 	"github.com/gogo/protobuf/vanity/command"
 		"context"
 		"log"
@@ -43,6 +44,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -155,12 +158,38 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 		}
 	}
 
+	// 7. process env_files
+	containerEnv := []string{}
+	envMap := map[string]string{}
+	if len(dc.ComposeService.EnvFile) > 0 {
+		dirWithComposeFile := filepath.Dir(dc.DockerComposeFile)
+		for _, v := range dc.ComposeService.EnvFile {
+			dotEnvFile := filepath.Join(dirWithComposeFile, v)
+			f, shadowErr := os.Open(dotEnvFile)
+			if err != nil {
+				return false, "", &popagateError{originalErr: shadowErr}
+			}
+			// TODO: replace env with a []string since ComposeService.Environment is a []string
+			env := parsedotenv(f)
+			for k, v := range env {
+				envMap[k] = v
+			}
+		}
+	}
+	// TODO: replace env in parseDotEnv.go with a []string since ComposeService.Environment is a []string
+	// that way we wont have to incur this for loop
+	for k, v := range envMap {
+		envMap[k] = v
+		containerEnv = append(containerEnv, fmt.Sprintf("%s=%s", k, v))
+	}
+	containerEnv = append(containerEnv, dc.ComposeService.Environment...)
+
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
 			Image:        imageName,
 			Labels:       labelsMap,
-			Env:          dc.ComposeService.Environment,
+			Env:          containerEnv,
 			ExposedPorts: portsMap,
 			Cmd:          cmd,
 			Volumes:      volume},

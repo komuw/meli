@@ -32,6 +32,7 @@ type ComposeService struct {
 	Build       Buildstruct `yaml:"build,omitempty"`
 	Volumes     []string    `yaml:"volumes,omitempty"`
 	Links       []string    `yaml:"links,omitempty"`
+	EnvFile     []string    `yaml:"env_file,omitempty"`
 }
 
 // DockerComposeConfig represents a docker-compose file
@@ -53,6 +54,7 @@ type DockerContainer struct {
 	LogMedium         io.Writer
 	CurentDir         string
 	Rebuild           bool
+	EnvFile           []string
 }
 
 // UpdateContainerID updates a containers ID
