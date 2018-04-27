@@ -29,6 +29,7 @@ services:
       dockerfile: buildserviceDockerfile
     environment:
       - VAL_TO_BE_OVERRIDEN=originalValue
+      - ALA=sijui
     env_file:
       - ./buildservice1.env
       - buildservice2.env
