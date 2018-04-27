@@ -19,7 +19,7 @@ services:
     image: 'busybox'
     command: tail -fn10 .dockerenv
     restart: unless-stopped
-    env_file: busybox.env
+    # env_file: busybox.env not yet supported. raises cannot unmarshal !!str `busybox...` into []string :unable to parse docker-compose file contents
 
   # Environment variables declared in the environment section override
   # https://docs.docker.com/compose/compose-file/#env_file
