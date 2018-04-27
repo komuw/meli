@@ -92,6 +92,19 @@ jobs:
                 if [ "$num_containers" != "11" ]; then
                     echo "wanted 11 containers, got $num_containers" && exit 500
                 fi
+        - run:
+            name: check that docker linking works
+            command: |
+                docker exec -it backup ping -w3 redis
+                docker exec -it backup ping -w3 eminem.com
+        - run:
+            name: check that docker .env file works
+            command: |
+                CHECK_ENV_VAR=$(docker exec -it buildservice printenv | grep NAME_IN_ENV_FILE)
+                echo "env var from .env file is; $CHECK_ENV_VAR"
+                if [[ $CHECK_ENV_VAR != *"Mutabaruka"* ]]; then
+                    echo "wanted env var NAME_IN_ENV_FILE=Mutabaruka, got $CHECK_ENV_VAR"
+                fi
         # test rebuild, stop (BUT DO NOT remove) containers from previous command
         # BUT because of this error; https://circleci.com/docs/1.0/docker-btrfs-error/
         # we cant do that on circleCI(though it works locally).
