@@ -52,7 +52,6 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/go-connections/nat"
-	"github.com/sanity-io/litter"
 )
 
 // CreateContainer creates a docker container
@@ -159,25 +158,19 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 	}
 
 	// 7. process env_files
+	containerEnv := []string{}
 	envMap := map[string]string{}
 	if len(dc.ComposeService.EnvFile) > 0 {
 		formattedDockerComposePath := formatComposePath(dc.DockerComposeFile)
-		fmt.Println("formattedDockerComposePath", formattedDockerComposePath)
 		pathToDockerFile := formattedDockerComposePath[0]
-
-		litter.Dump("dc.ComposeService.EnvFile", dc.ComposeService.EnvFile)
 		for _, v := range dc.ComposeService.EnvFile {
-			litter.Dump("v", v)
-			pathhh := filepath.Join(pathToDockerFile, v)
-			fmt.Println("pathhh::", pathhh)
-
-			f, err := os.Open(pathhh)
+			dotEnvFile := filepath.Join(pathToDockerFile, v)
+			f, err := os.Open(dotEnvFile)
 			if err != nil {
-				fmt.Println("err:", err)
+				return false, "", &popagateError{originalErr: err}
 			}
 			// TODO: replace env with a []string since ComposeService.Environment is a []string
 			env := parsedotenv(f)
-
 			for k, v := range env {
 				envMap[k] = v
 			}
@@ -185,14 +178,11 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 	}
 	// TODO: replace env in parseDotEnv.go with a []string since ComposeService.Environment is a []string
 	// that way we wont have to incur this for loop
-	containerEnv := []string{}
 	for k, v := range envMap {
 		envMap[k] = v
-		x := fmt.Sprintf("%s=%s", k, v)
-		containerEnv = append(containerEnv, x)
+		containerEnv = append(containerEnv, fmt.Sprintf("%s=%s", k, v))
 	}
 	containerEnv = append(containerEnv, dc.ComposeService.Environment...)
-	fmt.Printf("\n\n containerEnv 2:%v \n", containerEnv)
 
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
