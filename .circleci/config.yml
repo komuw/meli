@@ -73,6 +73,14 @@ jobs:
             command: |
                 docker exec -it backup ping -w3 redis
                 docker exec -it backup ping -w3 eminem.com
+        - run:
+            name: check that docker .env file works
+            command: |
+                CHECK_ENV_VAR=$(docker exec -it buildservice printenv | grep NAME_IN_ENV_FILE)
+                echo "env var from .env file is; $CHECK_ENV_VAR"
+                if [ "$CHECK_ENV_VAR" != "NAME_IN_ENV_FILE=Mutabaruka" ]; then
+                    echo "wanted env var NAME_IN_ENV_FILE=Mutabaruka, got $CHECK_ENV_VAR" && exit 500
+                fi
         # remove the containers running from the previous command
         - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
         - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
