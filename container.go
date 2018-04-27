@@ -8,6 +8,7 @@ Example usage:
 	package main
 
 	import (
+	"github.com/sanity-io/litter"
 	"github.com/gogo/protobuf/vanity/command"
 		"context"
 		"log"
@@ -161,10 +162,9 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 	containerEnv := []string{}
 	envMap := map[string]string{}
 	if len(dc.ComposeService.EnvFile) > 0 {
-		formattedDockerComposePath := formatComposePath(dc.DockerComposeFile)
-		pathToDockerFile := formattedDockerComposePath[0]
+		dirWithComposeFile := filepath.Dir(dc.DockerComposeFile)
 		for _, v := range dc.ComposeService.EnvFile {
-			dotEnvFile := filepath.Join(pathToDockerFile, v)
+			dotEnvFile := filepath.Join(dirWithComposeFile, v)
 			f, err := os.Open(dotEnvFile)
 			if err != nil {
 				return false, "", &popagateError{originalErr: err}
