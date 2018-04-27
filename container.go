@@ -159,6 +159,7 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 	}
 
 	// 7. process env_files
+	envMap := map[string]string{}
 	if len(dc.ComposeService.EnvFile) > 0 {
 		formattedDockerComposePath := formatComposePath(dc.DockerComposeFile)
 		fmt.Println("formattedDockerComposePath", formattedDockerComposePath)
@@ -172,22 +173,33 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 
 			f, err := os.Open(pathhh)
 			if err != nil {
-				fmt.Println("err::", err)
+				fmt.Println("err:", err)
 			}
-			fmt.Printf("fileName:%v", f.Name())
-			// TODO: read contents from file as a []string
-			// and add them to dc.ComposeService.Environment
-			// any that already exist in dc.ComposeService.Environment should
-			// take precedent
+			// TODO: replace env with a []string since ComposeService.Environment is a []string
+			env := parsedotenv(f)
+
+			for k, v := range env {
+				envMap[k] = v
+			}
 		}
 	}
+	// TODO: replace env in parseDotEnv.go with a []string since ComposeService.Environment is a []string
+	// that way we wont have to incur this for loop
+	containerEnv := []string{}
+	for k, v := range envMap {
+		envMap[k] = v
+		x := fmt.Sprintf("%s=%s", k, v)
+		containerEnv = append(containerEnv, x)
+	}
+	containerEnv = append(containerEnv, dc.ComposeService.Environment...)
+	fmt.Printf("\n\n containerEnv 2:%v \n", containerEnv)
 
 	containerCreateResp, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
 			Image:        imageName,
 			Labels:       labelsMap,
-			Env:          dc.ComposeService.Environment,
+			Env:          containerEnv,
 			ExposedPorts: portsMap,
 			Cmd:          cmd,
 			Volumes:      volume},

@@ -23,6 +23,7 @@ const (
 )
 
 // env holds key/value pair of valid environment variable
+// TODO: replace env with a []string since ComposeService.Environment is a []string
 type env map[string]string
 
 // parsedotenv is a function to parse line by line any io.Reader supplied and returns the valid Env key/value pair of valid variables.
