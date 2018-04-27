@@ -165,9 +165,9 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 		dirWithComposeFile := filepath.Dir(dc.DockerComposeFile)
 		for _, v := range dc.ComposeService.EnvFile {
 			dotEnvFile := filepath.Join(dirWithComposeFile, v)
-			f, err := os.Open(dotEnvFile)
+			f, shadowErr := os.Open(dotEnvFile)
 			if err != nil {
-				return false, "", &popagateError{originalErr: err}
+				return false, "", &popagateError{originalErr: shadowErr}
 			}
 			// TODO: replace env with a []string since ComposeService.Environment is a []string
 			env := parsedotenv(f)

@@ -30,15 +30,15 @@ type env map[string]string
 // It expands the value of a variable from environment variable, but does not set the value to the environment itself.
 // This function is skipping any invalid lines and only processing the valid one.
 func parsedotenv(r io.Reader) env {
-	env, _ := strictParse(r)
-	return env
+	e, _ := strictParse(r)
+	return e
 }
 
 // StrictParse is a function to parse line by line any io.Reader supplied and returns the valid Env key/value pair of valid variables.
 // It expands the value of a variable from environment variable, but does not set the value to the environment itself.
 // This function is returning an error if there is any invalid lines.
 func strictParse(r io.Reader) (env, error) {
-	env := make(env)
+	e := make(env)
 	scanner := bufio.NewScanner(r)
 
 	i := 1
@@ -53,13 +53,13 @@ func strictParse(r io.Reader) (env, error) {
 
 		i++
 
-		err := parseLine(line, env)
+		err := parseLine(line, e)
 		if err != nil {
-			return env, err
+			return e, err
 		}
 	}
 
-	return env, nil
+	return e, nil
 }
 
 func parseLine(s string, env env) error {
