@@ -135,7 +135,7 @@ You can [checkout the current benchmark results from circleCI](https://circleci.
 However, I'm not making a tool to take docker-compose to the races.                   
 
 # Build                   
-`git clone git@github.com:komuW/meli.git`           
+`git clone git@github.com:komuw/meli.git`           
 `go build -o meli cli/cli.go`           
 `./meli -up -f /path/to/docker-compose-file.yml`                   
 
