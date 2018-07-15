@@ -1,5 +1,7 @@
 module github.com/komuw/meli
 
+//you can add comments
+
 require (
 	github.com/Microsoft/go-winio v0.4.8
 	github.com/docker/distribution v0.0.0-20170720211245-48294d928ced
