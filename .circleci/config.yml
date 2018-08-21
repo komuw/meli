@@ -40,14 +40,6 @@ jobs:
                 echo "export LANG=C.UTF-8" >> /etc/profile
                 source /etc/profile
         - run:
-            name: install golang pkgs
-            command: |
-                source /etc/profile && \
-                go get -u github.com/golang/dep/cmd/dep && \
-                go get -u github.com/goreleaser/goreleaser && \
-                dep ensure
-
-        - run:
             name: Install Docker client
             command: |
                 set -x
@@ -186,12 +178,7 @@ jobs:
                 echo "export LC_ALL=C.UTF-8" >> /etc/profile
                 echo "export LANG=C.UTF-8" >> /etc/profile
                 source /etc/profile
-        - run:
-            name: install golang pkgs
-            command: |
-                source /etc/profile && \
-                go get -u github.com/golang/dep/cmd/dep && \
-                dep ensure -v
+
         # use custom package that still has --skip-validate
         - run:
             name: go releaser
