@@ -25,9 +25,12 @@ jobs:
                             build-essential \
                             snapd \
                             snapcraft \
-                            nano
+                            nano \
+                            apt-transport-https \
+                            ca-certificates
                 # pip install -U pip # see; https://github.com/pypa/pip/issues/5221
                 pip install -U docker-compose
+
         - run:
             name: install golang
             command: |
