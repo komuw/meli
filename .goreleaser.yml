@@ -10,7 +10,6 @@ build:
     - windows
   goarch:
     - amd64
-    - 386
 
 # see issues/72
 # dockers:
