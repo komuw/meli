@@ -13,6 +13,7 @@ jobs:
         - run:
             name: install apt and pip deps
             command: |
+                pwd; ls -lsha
                 apt-get -y update
                 apt -y install \
                             curl \
