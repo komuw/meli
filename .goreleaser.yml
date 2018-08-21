@@ -11,6 +11,60 @@ build:
   goarch:
     - amd64
 
+archive:
+  name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+  replacements:
+    darwin: macOS
+    linux: Linux
+    windows: Windows
+    386: i386
+    amd64: x86_64
+  format_overrides:
+  - goos: windows
+    format: zip
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+sign:
+   artifacts: checksum
+
+nfpm:
+  vendor: komuW.
+  homepage: https://github.com/komuw/meli
+  maintainer: komuW <komuw05@gmail.com>
+  description: Meli is supposed to be a faster alternative to docker-compose.\n Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel.
+  license: MIT
+  name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+  formats:
+    - deb
+  replacements:
+    darwin: macOS
+    linux: Linux
+    windows: Windows
+    386: i386
+    amd64: x86_64
+
+snapcraft:
+  name: meli
+  # 79 char long at most.
+  summary: Meli is supposed to be a faster alternative to docker-compose.
+  # Keep dscription under 100 words though
+  description: |
+    Meli is supposed to be a faster alternative to docker-compose.
+    Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel.
+  # https://snapcraft.io/docs/reference/channels
+  grade: stable
+  # https://snapcraft.io/docs/reference/confinement
+  confinement: strict
+  name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+  replacements:
+    darwin: macOS
+    linux: Linux
+    windows: Windows
+    386: i386
+    amd64: x86_64
+
+
 # see issues/72
 # dockers:
 #   -
@@ -31,25 +85,3 @@ build:
 #     system "#{bin}/meli", "--version"
 #   install: |
 #     bin.install "meli"
-
-nfpm:
-  vendor: komuW.
-  homepage: https://github.com/komuw/meli
-  maintainer: komuW <komuw05@gmail.com>
-  description: Meli is supposed to be a faster alternative to docker-compose.\n Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel.
-  license: MIT
-  formats:
-    - deb
-
-snapcraft:
-  name: meli
-  # 79 char long at most.
-  summary: Meli is supposed to be a faster alternative to docker-compose.
-  # Keep dscription under 100 words though
-  description: |
-    Meli is supposed to be a faster alternative to docker-compose.
-    Faster in the sense that, Meli will try to pull as many services(docker containers) as it can in parallel.
-  # https://snapcraft.io/docs/reference/channels
-  grade: stable
-  # https://snapcraft.io/docs/reference/confinement
-  confinement: strict
