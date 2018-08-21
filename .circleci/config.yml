@@ -6,7 +6,7 @@ jobs:
   build:
     docker:
         - image: ubuntu:16.04
-    working_directory: ~/go/src/github.com/komuw/meli
+    working_directory: ~/stuff/notgopath/meli
     steps:
         - checkout
         - setup_remote_docker
@@ -38,6 +38,7 @@ jobs:
                 echo "export PATH=$PATH:~/go/bin" >> /etc/profile
                 echo "export LC_ALL=C.UTF-8" >> /etc/profile
                 echo "export LANG=C.UTF-8" >> /etc/profile
+                echo "export GO111MODULE=on" >> /etc/profile
                 source /etc/profile
         - run:
             name: Install Docker client
@@ -147,7 +148,7 @@ jobs:
   deploy:
     docker:
         - image: ubuntu:16.04
-    working_directory: ~/go/src/github.com/komuw/meli
+    working_directory: ~/stuff/notgopath/meli
     steps:
         - checkout
         - setup_remote_docker
@@ -177,6 +178,7 @@ jobs:
                 echo "export PATH=$PATH:~/go/bin" >> /etc/profile
                 echo "export LC_ALL=C.UTF-8" >> /etc/profile
                 echo "export LANG=C.UTF-8" >> /etc/profile
+                echo "export GO111MODULE=on" >> /etc/profile
                 source /etc/profile
 
         # use custom package that still has --skip-validate
