@@ -20,7 +20,7 @@ import (
 
 /* DOCS:
 1. https://godoc.org/github.com/moby/moby/client
-2. https://docs.docker.com/engine/api/v1.31/
+2. https://docs.docker.com/engine/api/latest
 */
 
 var version string
