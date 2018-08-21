@@ -34,8 +34,10 @@ jobs:
         - run:
             name: install golang
             command: |
-                wget --directory-prefix=/usr/local https://dl.google.com/go/go1.10.linux-amd64.tar.gz
-                tar -C /usr/local -xzf /usr/local/go1.10.linux-amd64.tar.gz
+                VER="go1.11rc1"
+                wget --directory-prefix=/usr/local https://dl.google.com/go/$VER.linux-amd64.tar.gz
+                tar -C /usr/local -xzf /usr/local/$VER.linux-amd64.tar.gz
+                ls -lsha /usr/local
                 export PATH=$PATH:/usr/local/go/bin
                 echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
                 mkdir -p ~/go/bin
@@ -173,8 +175,9 @@ jobs:
         - run:
             name: install golang
             command: |
-                wget --directory-prefix=/usr/local https://dl.google.com/go/go1.10.linux-amd64.tar.gz
-                tar -C /usr/local -xzf /usr/local/go1.10.linux-amd64.tar.gz
+                VER="go1.11rc1"
+                wget --directory-prefix=/usr/local https://dl.google.com/go/$VER.linux-amd64.tar.gz
+                tar -C /usr/local -xzf /usr/local/$VER.linux-amd64.tar.gz
                 export PATH=$PATH:/usr/local/go/bin
                 echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
                 mkdir -p ~/go/bin
