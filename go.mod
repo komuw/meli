@@ -22,6 +22,8 @@ require (
 	gopkg.in/yaml.v2 v2.2.1
 )
 
+// github.com/docker/engine v18.06.1-ce
 replace github.com/docker/docker => github.com/docker/engine v0.0.0-20180816081446-320063a2ad06
 
+// github.com/docker/distribution master
 replace github.com/docker/distribution => github.com/docker/distribution v2.6.0-rc.1.0.20180820212402-02bf4a2887a4+incompatible
