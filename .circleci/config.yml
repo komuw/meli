@@ -9,7 +9,9 @@ jobs:
     working_directory: ~/stuff/notgopath/meli
     steps:
         - checkout
+        # the docker version specified here should be same as the docker version of the client you install.
         - setup_remote_docker
+            version: 18.06.0-ce
         - run:
             name: install apt and pip deps
             command: |
@@ -52,7 +54,7 @@ jobs:
                 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
                 apt-key fingerprint 0EBFCD88
                 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) test"
-                apt -y update && apt -y autoremove && apt -y install docker-ce
+                apt -y update && apt -y autoremove && apt -y install docker-ce=18.06.0-ce-tp0
                 docker version
 
         - run: source /etc/profile && go build --race -o meli cli/cli.go
@@ -156,7 +158,6 @@ jobs:
     working_directory: ~/stuff/notgopath/meli
     steps:
         - checkout
-        - setup_remote_docker
         - run:
             name: install apt and pip deps
             command: |
