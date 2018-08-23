@@ -34,7 +34,7 @@ jobs:
         - run:
             name: install golang
             command: |
-                VER="go1.11rc1"
+                VER="go1.11rc2"
                 wget --directory-prefix=/usr/local https://dl.google.com/go/$VER.linux-amd64.tar.gz
                 tar -C /usr/local -xzf /usr/local/$VER.linux-amd64.tar.gz
                 export PATH=$PATH:/usr/local/go/bin
@@ -174,7 +174,7 @@ jobs:
         - run:
             name: install golang
             command: |
-                VER="go1.11rc1"
+                VER="go1.11rc2"
                 wget --directory-prefix=/usr/local https://dl.google.com/go/$VER.linux-amd64.tar.gz
                 tar -C /usr/local -xzf /usr/local/$VER.linux-amd64.tar.gz
                 export PATH=$PATH:/usr/local/go/bin
