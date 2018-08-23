@@ -4,7 +4,6 @@ require (
 	github.com/Microsoft/go-winio v0.4.10 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.6.2+incompatible // indirect
-	// docker v17.03.2-ce
 	github.com/docker/docker v0.0.0-20170601211448-f5ec1e2936dc
 	github.com/docker/docker-credential-helpers v0.6.1
 	github.com/docker/go-connections v0.4.0
@@ -19,3 +18,6 @@ require (
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.2.1
 )
+
+replace github.com/docker/docker => github.com/docker/engine v18.06.1-ce
+replace github.com/docker/distribution => github.com/docker/distribution master
