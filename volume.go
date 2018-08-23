@@ -13,7 +13,7 @@ import (
 func CreateDockerVolume(ctx context.Context, cli APIclient, name, driver string, dst io.Writer) (string, error) {
 	volume, err := cli.VolumeCreate(
 		ctx,
-		volume.VolumesCreateBody{
+		volume.VolumeCreateBody{
 			Driver: driver,
 			Name:   name})
 	if err != nil {

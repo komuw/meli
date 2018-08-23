@@ -9,7 +9,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
-	volumetypes "github.com/docker/docker/api/types/volume"
+	"github.com/docker/docker/api/types/volume"
 )
 
 type emptyStruct struct{}
@@ -74,7 +74,7 @@ type APIclient interface {
 	NetworkList(ctx context.Context, options types.NetworkListOptions) ([]types.NetworkResource, error)
 	NetworkCreate(ctx context.Context, name string, options types.NetworkCreate) (types.NetworkCreateResponse, error)
 	NetworkConnect(ctx context.Context, networkID, containerID string, config *network.EndpointSettings) error
-	VolumeCreate(ctx context.Context, options volumetypes.VolumesCreateBody) (types.Volume, error)
+	VolumeCreate(ctx context.Context, options volume.VolumeCreateBody) (types.Volume, error)
 	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
 	ContainerRemove(ctx context.Context, containerID string, options types.ContainerRemoveOptions) error
 }
@@ -117,7 +117,7 @@ func (m *mockDockerClient) NetworkConnect(ctx context.Context, networkID, contai
 	return nil
 }
 
-func (m *mockDockerClient) VolumeCreate(ctx context.Context, options volumetypes.VolumesCreateBody) (types.Volume, error) {
+func (m *mockDockerClient) VolumeCreate(ctx context.Context, options volume.VolumeCreateBody) (types.Volume, error) {
 	return types.Volume{Name: "MyVolume007"}, nil
 }
 
