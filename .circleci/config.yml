@@ -53,6 +53,7 @@ jobs:
                 apt-key fingerprint 0EBFCD88
                 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) test"
                 apt -y update && apt -y autoremove && apt -y install docker-ce
+                docker version
 
         - run: source /etc/profile && go build --race -o meli cli/cli.go
         - run: ./meli -v
