@@ -13,7 +13,7 @@ derivative works of any Contribution, under the MIT License.
 - fork this repo.
 - make the changes you want on your fork.
 - your changes should have backward compatibility in mind unless it is impossible to do so.
-- add your name and contact(optional) to CONTRIBUTORS.md
+- add release notes to .github/RELEASE_NOTES.md
 - add tests and benchmarks
 - format your code using gofmt:                                          
 - run tests(with race flag) and make sure everything is passing:

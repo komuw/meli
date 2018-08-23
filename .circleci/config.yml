@@ -6,13 +6,14 @@ jobs:
   build:
     docker:
         - image: ubuntu:16.04
-    working_directory: ~/go/src/github.com/komuw/meli
+    working_directory: ~/stuff/notgopath/meli
     steps:
         - checkout
         - setup_remote_docker
         - run:
             name: install apt and pip deps
             command: |
+                pwd; ls -lsha
                 apt-get -y update
                 apt -y install \
                             curl \
@@ -24,38 +25,34 @@ jobs:
                             build-essential \
                             snapd \
                             snapcraft \
-                            nano
+                            nano \
+                            apt-transport-https \
+                            ca-certificates
                 # pip install -U pip # see; https://github.com/pypa/pip/issues/5221
                 pip install -U docker-compose
+
         - run:
             name: install golang
             command: |
-                wget --directory-prefix=/usr/local https://dl.google.com/go/go1.10.linux-amd64.tar.gz
-                tar -C /usr/local -xzf /usr/local/go1.10.linux-amd64.tar.gz
+                VER="go1.11rc2"
+                wget --directory-prefix=/usr/local https://dl.google.com/go/$VER.linux-amd64.tar.gz
+                tar -C /usr/local -xzf /usr/local/$VER.linux-amd64.tar.gz
                 export PATH=$PATH:/usr/local/go/bin
                 echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
                 mkdir -p ~/go/bin
                 echo "export PATH=$PATH:~/go/bin" >> /etc/profile
                 echo "export LC_ALL=C.UTF-8" >> /etc/profile
                 echo "export LANG=C.UTF-8" >> /etc/profile
+                echo "export GO111MODULE=on" >> /etc/profile
                 source /etc/profile
-        - run:
-            name: install golang pkgs
-            command: |
-                source /etc/profile && \
-                go get -u github.com/golang/dep/cmd/dep && \
-                go get -u github.com/goreleaser/goreleaser && \
-                dep ensure
-
         - run:
             name: Install Docker client
             command: |
                 set -x
-                VER="17.03.0-ce"
-                curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
-                tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-                mv /tmp/docker/* /usr/bin
-                docker login -u $DOCKER_USER -p $DOCKER_PASS
+                curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+                apt-key fingerprint 0EBFCD88
+                add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) test"
+                apt -y update && apt -y autoremove && apt -y install docker-ce
 
         - run: source /etc/profile && go build --race -o meli cli/cli.go
         - run: ./meli -v
@@ -155,7 +152,7 @@ jobs:
   deploy:
     docker:
         - image: ubuntu:16.04
-    working_directory: ~/go/src/github.com/komuw/meli
+    working_directory: ~/stuff/notgopath/meli
     steps:
         - checkout
         - setup_remote_docker
@@ -177,26 +174,22 @@ jobs:
         - run:
             name: install golang
             command: |
-                wget --directory-prefix=/usr/local https://dl.google.com/go/go1.10.linux-amd64.tar.gz
-                tar -C /usr/local -xzf /usr/local/go1.10.linux-amd64.tar.gz
+                VER="go1.11rc2"
+                wget --directory-prefix=/usr/local https://dl.google.com/go/$VER.linux-amd64.tar.gz
+                tar -C /usr/local -xzf /usr/local/$VER.linux-amd64.tar.gz
                 export PATH=$PATH:/usr/local/go/bin
                 echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
                 mkdir -p ~/go/bin
                 echo "export PATH=$PATH:~/go/bin" >> /etc/profile
                 echo "export LC_ALL=C.UTF-8" >> /etc/profile
                 echo "export LANG=C.UTF-8" >> /etc/profile
+                echo "export GO111MODULE=on" >> /etc/profile
                 source /etc/profile
-        - run:
-            name: install golang pkgs
-            command: |
-                source /etc/profile && \
-                go get -u github.com/golang/dep/cmd/dep && \
-                dep ensure -v
-        # use custom package that still has --skip-validate
+
         - run:
             name: go releaser
             command: |
-                wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/v0.54.3/goreleaser_Linux_x86_64.tar.gz
+                wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/v0.83.3/goreleaser_Linux_x86_64.tar.gz
                 tar -C /usr/local -xzf /usr/local/goreleaser_Linux_x86_64.tar.gz
         - run:
             name: do a new release
@@ -207,7 +200,7 @@ jobs:
                 if [ "$LAST_GIT_MESSAGE" == 'do release' ]; then
                     echo "deploying with goreleaser"
                     source /etc/profile
-                    /usr/local/goreleaser --rm-dist -config .goreleaser.yml --debug --skip-validate --release-notes .github/RELEASE_NOTES.md
+                    /usr/local/goreleaser --rm-dist -config=.goreleaser.yml --debug --skip-validate --release-notes=.github/RELEASE_NOTES.md
                 fi
 
 workflows:
