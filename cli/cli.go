@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
+	"runtime/pprof"
 	"strings"
 	"sync"
 
@@ -26,7 +28,7 @@ import (
 var version string
 
 // Cli parses input from stdin
-func Cli() (bool, bool, bool, string) {
+func Cli() (bool, bool, bool, string, *string, *string) {
 	// TODO; use a more sensible cli lib.
 	var showVersion bool
 	var up bool
@@ -35,6 +37,9 @@ func Cli() (bool, bool, bool, string) {
 	var dockerComposeFile = "docker-compose.yml"
 	var followLogs = true
 	var rebuild = false
+
+	var cpuprofile = ""
+	var memprofile = ""
 
 	flag.BoolVar(
 		&showVersion,
@@ -67,10 +72,17 @@ func Cli() (bool, bool, bool, string) {
 		"docker-compose.yml",
 		"path to docker-compose.yml file.")
 
+	flag.StringVar(&cpuprofile, "cpuprofile", "", "write cpu profile to `file`")
+	flag.StringVar(&memprofile, "memprofile", "", "write memory profile to `file`")
+
 	flag.Parse()
 
+	fmt.Println()
+	fmt.Println("pspfsflpp::")
+	fmt.Println(cpuprofile)
+
 	if showVersion {
-		return true, followLogs, rebuild, ""
+		return true, followLogs, rebuild, "", &cpuprofile, &memprofile
 	}
 	if !up {
 		fmt.Println("to use Meli, run: \n\n\t meli -up")
@@ -83,11 +95,24 @@ func Cli() (bool, bool, bool, string) {
 		rebuild = true
 	}
 
-	return false, followLogs, rebuild, dockerComposeFile
+	return false, followLogs, rebuild, dockerComposeFile, &cpuprofile, &memprofile
 }
 
 func main() {
-	showVersion, followLogs, rebuild, dockerComposeFile := Cli()
+	showVersion, followLogs, rebuild, dockerComposeFile, cpuprofile, memprofile := Cli()
+	fmt.Println("in main")
+	fmt.Println(*cpuprofile)
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
 	if showVersion {
 		fmt.Println("Meli version: ", version)
 		os.Exit(0)
@@ -157,6 +182,18 @@ func main() {
 		go startComposeServices(ctx, cli, &wg, dc)
 	}
 	wg.Wait()
+	fmt.Println("mem Profile::")
+	if *memprofile != "" {
+		f, err := os.Create(*memprofile)
+		if err != nil {
+			log.Fatal("could not create memory profile: ", err)
+		}
+		runtime.GC() // get up-to-date statistics
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal("could not write memory profile: ", err)
+		}
+		f.Close()
+	}
 }
 
 func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, dc *meli.DockerContainer) {
