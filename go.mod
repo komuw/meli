@@ -26,4 +26,6 @@ require (
 replace github.com/docker/docker => github.com/docker/engine v0.0.0-20180816081446-320063a2ad06
 
 // github.com/docker/distribution master
+// a proper tagged release is expected in early fall(September 2018)
+// see; https://github.com/docker/distribution/issues/2693
 replace github.com/docker/distribution => github.com/docker/distribution v2.6.0-rc.1.0.20180820212402-02bf4a2887a4+incompatible
