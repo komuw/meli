@@ -79,10 +79,14 @@ func BenchmarkBuildDockerImage(b *testing.B) {
 	var ctx = context.Background()
 	cli := &mockDockerClient{}
 	dc := &DockerContainer{
-		ServiceName: "myservicename",
+		ServiceName:       "myservicename",
+		DockerComposeFile: "docker-compose.yml",
 		ComposeService: ComposeService{
 			Build: Buildstruct{Dockerfile: "testdata/Dockerfile"}},
-		LogMedium: ioutil.Discard}
+		LogMedium: ioutil.Discard,
+		Rebuild:   true,
+	}
+	LoadAuth()
 	for n := 0; n < b.N; n++ {
 		_, _ = BuildDockerImage(ctx, cli, dc)
 	}
