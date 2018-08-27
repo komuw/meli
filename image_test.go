@@ -96,6 +96,16 @@ and
 
 We need to reduce the allocations in ioutil.ReadAll(f) and tw.Write(readFile)
 */
+/*
+with a newer implemenation that uses sync.Pool
+.          .     93:
+         .          .     94:		tr := io.TeeReader(f, tw)
+         .   119.48MB     95:		_, err = poolReadFrom(tr)
+         .          .     96:		if err != nil {
+         .          .     97:			return err
+         .          .     98:		}
+
+*/
 func BenchmarkBuildDockerImage(b *testing.B) {
 	var ctx = context.Background()
 	cli := &mockDockerClient{}
