@@ -165,6 +165,9 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 		When the value supplied is a relative path, it is interpreted as relative to the location of the Compose file.
 		This directory is also the build context that is sent to the Docker daemon.
 		- https://docs.docker.com/compose/compose-file/#context
+
+		So it looks like, we only need to send one of
+		UserContext or dockerFileContextPath to docker server and not two.
 	*/
 	UserProvidedContextPath := filepath.Dir(dc.ComposeService.Build.Context + "/")
 	if dc.ComposeService.Build.Context == "." {
