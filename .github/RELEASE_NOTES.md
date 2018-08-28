@@ -1,5 +1,7 @@
 # Release Notes
 ## v0.2.0
+- fixed a memory leak bug: https://github.com/komuw/meli/pull/114
+- upgraded docker-client from v17.03.2-ce to v18.06.1-ce: https://github.com/komuw/meli/pull/112
 - added Go module support: https://github.com/komuw/meli/pull/106
 - upgraded docker client from verion v1.13.1 to version v17.03.2-ce : https://github.com/komuw/meli/pull/109
 - removed vendor directory and dep files: https://github.com/komuw/meli/pull/107
