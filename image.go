@@ -108,7 +108,7 @@ var blackHolePool = sync.Pool{
 		// we could find the size of the file we want to tar
 		// then pass that in as the size. That way we will
 		// always create a right sized slice and not have to incure cost of slice regrowth(if any)
-		b := make([]byte, 8)
+		b := make([]byte, 512)
 		return &b
 	},
 }
