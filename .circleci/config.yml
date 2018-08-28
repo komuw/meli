@@ -150,6 +150,16 @@ jobs:
         - run:
             name: time meli -up
             command: time ./meli -up -d -f testdata/docker-compose.yml
+        - run:
+            name: check if changes have release notes 
+            command: |
+                ChangedFiles=`git diff --name-only origin/master`
+                case "$ChangedFiles" in
+                    *RELEASE_NOTES.*)
+                        printf "\n Thanks, your commits include update to release notes.";;
+                    *)
+                        printf "\n You should add release notes to .github/RELEASE_NOTES.md" && exit 77;;
+                esac
 
   deploy:
     docker:
