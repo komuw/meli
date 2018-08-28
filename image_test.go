@@ -75,37 +75,6 @@ func BenchmarkPullDockerImage(b *testing.B) {
 	}
 }
 
-/*
-If you run this benchmark:
-  go test -memprofile mem.prof -bench=BenchmarkBuildDockerImage -run=XXX .
-then
-  pprof -sample_index=alloc_space meli.test mem.prof
-and
-  list walkFnClosure
-
- 3.35GB     91:		readFile, err := ioutil.ReadAll(f)
-         .          .     92:		if err != nil {
-         .          .     93:			return err
-         .          .     94:		}
-         .     4.31GB     95:		_, err = tw.Write(readFile)
-         .          .     96:		if err != nil {
-         .          .     97:			return err
-         .          .     98:		}
-         .          .     99:		return nil
-		 .          .    100:	}
-
-We need to reduce the allocations in ioutil.ReadAll(f) and tw.Write(readFile)
-*/
-/*
-with a newer implemenation that uses sync.Pool
-.          .     93:
-         .          .     94:		tr := io.TeeReader(f, tw)
-         .   119.48MB     95:		_, err = poolReadFrom(tr)
-         .          .     96:		if err != nil {
-         .          .     97:			return err
-         .          .     98:		}
-
-*/
 func BenchmarkBuildDockerImage(b *testing.B) {
 	var ctx = context.Background()
 	cli := &mockDockerClient{}
