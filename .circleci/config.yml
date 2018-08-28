@@ -153,13 +153,17 @@ jobs:
         - run:
             name: check if changes have release notes 
             command: |
-                ChangedFiles=`git diff --name-only $CIRCLE_BRANCH origin/master`
-                case "$ChangedFiles" in
-                    *RELEASE_NOTES.*)
-                        printf "\n Thanks, your commits include update to release notes. \n";;
-                    *)
-                        printf "\n You should add release notes to .github/RELEASE_NOTES.md \n" && exit 77;;
-                esac
+                if [ "$CIRCLE_BRANCH" == "master" ]; then
+                    printf "\n $CIRCLE_BRANCH branch, ignoring check for relese notes \n"
+                else
+                    ChangedFiles=`git diff --name-only $CIRCLE_BRANCH origin/master`
+                    case "$ChangedFiles" in
+                        *RELEASE_NOTES.*)
+                            printf "\n Thanks, your commits include update to release notes. \n";;
+                        *)
+                            printf "\n You should add release notes to .github/RELEASE_NOTES.md \n" && exit 77;;
+                    esac
+                fi
 
   deploy:
     docker:
