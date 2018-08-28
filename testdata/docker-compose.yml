@@ -2,5 +2,5 @@ version: '3'
 services:
   usercontext:
     build:
-      context: nestedDir/level1/file1
+      context: nestedDir/level1/
       dockerfile: UserContextDockerfile
