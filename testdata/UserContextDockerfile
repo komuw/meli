@@ -1,0 +1,4 @@
+FROM busybox
+
+# add a check to guard against issues/XXXX
+RUN ls -lsa && cat nestedDir/level1/file1

@@ -86,5 +86,10 @@ services:
     build:
       context: .
 
+  usercontext:
+    build:
+      context: nestedDir/level1/file1
+      dockerfile: UserContextDockerfile
+
 volumes:
   data-volume:
