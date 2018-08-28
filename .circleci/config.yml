@@ -153,7 +153,7 @@ jobs:
         - run:
             name: check if changes have release notes 
             command: |
-                ChangedFiles=`git diff --name-only origin/master`
+                ChangedFiles=`git diff --name-only $CIRCLE_BRANCH origin/master`
                 case "$ChangedFiles" in
                     *RELEASE_NOTES.*)
                         printf "\n Thanks, your commits include update to release notes. \n";;
