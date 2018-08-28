@@ -8,10 +8,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/docker/docker/api/types"
 )
@@ -88,15 +90,43 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 		if err != nil {
 			return err
 		}
-		readFile, err := ioutil.ReadAll(f)
+
+		tr := io.TeeReader(f, tw)
+		_, err = poolReadFrom(tr)
 		if err != nil {
 			return err
 		}
-		_, err = tw.Write(readFile)
-		if err != nil {
-			return err
-		}
+
 		return nil
+	}
+}
+
+// this is taken from io.util
+var blackHolePool = sync.Pool{
+	New: func() interface{} {
+		// TODO: change this size accordingly
+		// we could find the size of the file we want to tar
+		// then pass that in as the size. That way we will
+		// always create a right sized slice and not have to incure cost of slice regrowth(if any)
+		b := make([]byte, 512)
+		return &b
+	},
+}
+
+// this is taken from io.util
+func poolReadFrom(r io.Reader) (n int64, err error) {
+	bufp := blackHolePool.Get().(*[]byte)
+	readSize := 0
+	for {
+		readSize, err = r.Read(*bufp)
+		n += int64(readSize)
+		if err != nil {
+			blackHolePool.Put(bufp)
+			if err == io.EOF {
+				return n, nil
+			}
+			return
+		}
 	}
 }
 
