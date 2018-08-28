@@ -1,5 +1,6 @@
 # Release Notes
 ## v0.2.0
+- We no longer have curl | bash installs, you should download releases from github: https://github.com/komuw/meli/pull/116
 - fixed a memory leak bug: https://github.com/komuw/meli/pull/114
 - upgraded docker-client from v17.03.2-ce to v18.06.1-ce: https://github.com/komuw/meli/pull/112
 - added Go module support: https://github.com/komuw/meli/pull/106
