@@ -160,14 +160,20 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	}
 
 	dockerFileContextPath := filepath.Dir(dockerFile)
-	// UserProvidedContextPath := filepath.Dir(dc.ComposeService.Build.Context + "/")
-	// if dc.ComposeService.Build.Context == "." {
-	// 	// context will be the directory containing the compose file
-	// 	UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
-	// } else if dc.ComposeService.Build.Context == "" {
-	// 	// context will be the directory containing the compose file
-	// 	UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
-	// }
+	/*
+		Context is either a path to a directory containing a Dockerfile, or a url to a git repository.
+		When the value supplied is a relative path, it is interpreted as relative to the location of the Compose file.
+		This directory is also the build context that is sent to the Docker daemon.
+		- https://docs.docker.com/compose/compose-file/#context
+	*/
+	UserProvidedContextPath := filepath.Dir(dc.ComposeService.Build.Context + "/")
+	if dc.ComposeService.Build.Context == "." {
+		// context will be the directory containing the compose file
+		UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
+	} else if dc.ComposeService.Build.Context == "" {
+		// context will be the directory containing the compose file
+		UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
+	}
 
 	dockerFileReader, err := os.Open(dockerFilePath)
 	if err != nil {
@@ -208,12 +214,12 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 			originalErr: err,
 			newErr:      fmt.Errorf(" :unable to walk dockefile context path %s", dockerFile)}
 	}
-	// err = filepath.Walk(UserProvidedContextPath, walkFnClosure(UserProvidedContextPath, tw, buf))
-	// if err != nil {
-	// 	return "", &popagateError{
-	// 		originalErr: err,
-	// 		newErr:      fmt.Errorf(" :unable to walk user provided context path %s", dockerFile)}
-	// }
+	err = filepath.Walk(UserProvidedContextPath, walkFnClosure(UserProvidedContextPath, tw, buf))
+	if err != nil {
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf(" :unable to walk user provided context path %s", dockerFile)}
+	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 
 	dockerFileName := filepath.Base(dockerFile)
