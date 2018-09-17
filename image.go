@@ -138,10 +138,6 @@ func poolReadFrom(r io.Reader) (n int64, err error) {
 
 // BuildDockerImage builds a docker image via docker daemon
 func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (string, error) {
-	buf := new(bytes.Buffer)
-	tw := tar.NewWriter(buf)
-	defer tw.Close()
-
 	// TODO: I dont like the way we are handling paths here.
 	// look at dirWithComposeFile in container.go
 	dockerFile := dc.ComposeService.Build.Dockerfile
