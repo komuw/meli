@@ -148,17 +148,22 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	if dockerFile == "" {
 		dockerFile = "Dockerfile"
 	}
-	formattedDockerComposePath := formatComposePath(dc.DockerComposeFile)
-	if len(formattedDockerComposePath) == 0 {
-		// very unlikely to hit this situation, but
-		return "", fmt.Errorf(" :docker-compose file is empty %s", dc.DockerComposeFile)
+	dirWithComposeFile := filepath.Dir(dc.DockerComposeFile)
+	dirWithComposeFileAbs, err := filepath.Abs(dirWithComposeFile)
+	if err != nil {
+		return "", &popagateError{
+			originalErr: err,
+			newErr:      fmt.Errorf(" :unable to get path to docker-compose file %s", dc.DockerComposeFile)}
 	}
-	pathToDockerFile := formattedDockerComposePath[0]
-	if pathToDockerFile != "docker-compose.yml" {
-		dockerFile = filepath.Join(pathToDockerFile, dockerFile)
+	userContext := filepath.Dir(dc.ComposeService.Build.Context + "/")
+	userContextAbs := filepath.Join(dirWithComposeFileAbs, userContext)
+	if filepath.IsAbs(userContext) {
+		// For user Contexts that are absolute paths,
+		// do NOT join them with anything. They should be used as is.
+		userContextAbs = userContext
 	}
-
-	dockerFilePath, err := filepath.Abs(dockerFile)
+	dockerFilePath, err := filepath.Abs(
+		filepath.Join(userContextAbs, dockerFile))
 	if err != nil {
 		return "", &popagateError{
 			originalErr: err,
