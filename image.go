@@ -207,10 +207,7 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 		This directory is also the build context that is sent to the Docker daemon.
 		- https://docs.docker.com/compose/compose-file/#context
 	*/
-	UserProvidedContext := filepath.Dir(dc.ComposeService.Build.Context + "/")
-	UserProvidedContextPath := filepath.Dir(
-		filepath.Join(filepath.Dir(dc.DockerComposeFile), UserProvidedContext) +
-			"/")
+	UserProvidedContextPath := filepath.Dir(userContextAbs + "/")
 	err = filepath.Walk(UserProvidedContextPath, walkFnClosure(UserProvidedContextPath, tw, buf))
 	if err != nil {
 		return "", &popagateError{
