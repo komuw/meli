@@ -89,7 +89,7 @@ services:
   another_nestedservice:
     build:
       context: .
-      dockerfile: nestedDir/level1/level2/nestedDockerfile
+      dockerfile: nestedDir/level1/level2/AnotherNestedDockerfile
     labels:
       - "type=nestedservice"
 
