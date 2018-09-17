@@ -9,6 +9,7 @@
 - we no longer release meli for 386 arch on github releases.  
   We now ONLY release amd64 for darwin, linux and windows
 - Fixed a bug where buffers from sync.Pool were not reset before use: https://github.com/komuw/meli/pull/119
+- Fixed a memory leak bug: https://github.com/komuw/meli/pull/117
 
 
 ## v0.1.9.8
