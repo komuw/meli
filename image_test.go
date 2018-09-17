@@ -94,9 +94,6 @@ func BenchmarkBuildDockerImage(b *testing.B) {
 }
 
 func BenchmarkPoolReadFrom(b *testing.B) {
-	// go test -run=XXX -bench=BenchmarkPoolReadFrom
-	// BenchmarkPoolReadFrom-4   	30000000	        36.0 ns/op
-	// after fixing issues/118:                         50.1 ns/op
 	r := strings.NewReader("hello")
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
