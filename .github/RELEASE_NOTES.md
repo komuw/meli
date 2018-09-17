@@ -8,6 +8,7 @@
 - removed vendor directory and dep files: https://github.com/komuw/meli/pull/107
 - we no longer release meli for 386 arch on github releases.  
   We now ONLY release amd64 for darwin, linux and windows
+- Fixed a bug where buffers from sync.Pool were not reset before use: https://github.com/komuw/meli/pull/119
 
 
 ## v0.1.9.8
