@@ -219,7 +219,6 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 
-	dockerFileName := filepath.Base(dockerFile)
 	imageBuildResponse, err := cli.ImageBuild(
 		ctx,
 		dockerFileTarReader,
@@ -230,7 +229,7 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 			Remove:         true, //remove intermediary containers after build
 			NoCache:        dc.Rebuild,
 			SuppressOutput: false,
-			Dockerfile:     dockerFileName,
+			Dockerfile:     dockerFile,
 			Context:        dockerFileTarReader,
 			AuthConfigs:    AuthConfigs})
 	if err != nil {
