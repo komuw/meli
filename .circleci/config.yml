@@ -215,7 +215,7 @@ jobs:
                 if [ "$LAST_GIT_MESSAGE" == 'do release' ]; then
                     echo "deploying with goreleaser"
                     source /etc/profile
-                    /usr/local/goreleaser --rm-dist -config=.goreleaser.yml --debug --skip-validate --release-notes=.github/RELEASE_NOTES.md
+                    /usr/local/goreleaser --rm-dist --config=.goreleaser.yml --debug --skip-validate --release-notes=.github/RELEASE_NOTES.md
                 fi
 
 workflows:
