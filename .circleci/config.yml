@@ -60,12 +60,12 @@ jobs:
         - run: ./meli -v
         - run: ./meli -up -d -f testdata/docker-compose.yml
         - run:
-            name: echo number of running containers (expected=11), actual;
+            name: echo number of running containers (expected=12), actual;
             command: |
                 num_containers=$(docker ps -q | wc -l)
                 echo "number of containers are; $num_containers"
-                if [ "$num_containers" != "11" ]; then
-                    echo "wanted 11 containers, got $num_containers" && exit 500
+                if [ "$num_containers" != "12" ]; then
+                    echo "wanted 12 containers, got $num_containers" && exit 500
                 fi
         - run:
             name: check that docker linking works
@@ -84,12 +84,12 @@ jobs:
         - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
         - run: cp meli testdata/ && cd testdata/ && ./meli -up -d
         - run:
-            name: echo number of running containers (expected=11), actual;
+            name: echo number of running containers (expected=12), actual;
             command: |
                 num_containers=$(docker ps -q | wc -l)
                 echo "number of containers are; $num_containers"
-                if [ "$num_containers" != "11" ]; then
-                    echo "wanted 11 containers, got $num_containers" && exit 500
+                if [ "$num_containers" != "12" ]; then
+                    echo "wanted 12 containers, got $num_containers" && exit 500
                 fi
         - run:
             name: check that docker linking works
@@ -111,14 +111,14 @@ jobs:
         - run: docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
         - run: ./meli -up -d -f testdata/docker-compose.yml -build
         - run:
-            name: echo number of running containers (expected=11), actual;
+            name: echo number of running containers (expected=12), actual;
             command: |
                 all_containers=$(docker ps -aq | wc -l)
                 running_containers=$(docker ps -q | wc -l)
                 echo "number of all containers; $all_containers"
                 echo "number of running containers are; $running_containers"
-                if [ "$running_containers" != "11" ]; then
-                    echo "wanted 11 containers, got $running_containers" && exit 500
+                if [ "$running_containers" != "12" ]; then
+                    echo "wanted 12 containers, got $running_containers" && exit 500
                 fi
         - run:
              name: go vet

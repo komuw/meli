@@ -86,14 +86,12 @@ services:
     build:
       context: .
 
-  # TODO: fix this
-  # this works with docker-compose but fails with meli
-  # another_nestedservice:
-  #   build:
-  #     context: .
-  #     dockerfile: nestedDir/level1/level2/nestedDockerfile
-  #   labels:
-  #     - "type=nestedservice"
+  another_nestedservice:
+    build:
+      context: .
+      dockerfile: nestedDir/level1/level2/nestedDockerfile
+    labels:
+      - "type=nestedservice"
 
 volumes:
   data-volume:
