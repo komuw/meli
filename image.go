@@ -205,6 +205,9 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	AuthConfigs := make(map[string]types.AuthConfig)
 	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}
 
+	buf := new(bytes.Buffer)
+	tw := tar.NewWriter(buf)
+	defer tw.Close()
 	/*
 		Context is either a path to a directory containing a Dockerfile, or a url to a git repository.
 		When the value supplied is a relative path, it is interpreted as relative to the location of the Compose file.
