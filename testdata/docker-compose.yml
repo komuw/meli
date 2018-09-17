@@ -77,14 +77,23 @@ services:
 
   nestedservice:
     build:
-      context: .
-      dockerfile: nestedDir/level1/level2/nestedDockerfile
+      context: nestedDir/level1/level2/
+      dockerfile: nestedDockerfile
     labels:
       - "type=nestedservice"
 
   symbolic-link-service:
     build:
       context: .
+
+  # TODO: fix this
+  # this works with docker-compose but fails with meli
+  # another_nestedservice:
+  #   build:
+  #     context: .
+  #     dockerfile: nestedDir/level1/level2/nestedDockerfile
+  #   labels:
+  #     - "type=nestedservice"
 
 volumes:
   data-volume:
