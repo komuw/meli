@@ -88,6 +88,7 @@ func BenchmarkBuildDockerImage(b *testing.B) {
 		Rebuild:   true,
 	}
 	LoadAuth()
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		_, _ = BuildDockerImage(ctx, cli, dc)
 	}
