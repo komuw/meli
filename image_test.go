@@ -50,6 +50,20 @@ func TestBuildDockerImage(t *testing.T) {
 			},
 			"meli_myservicename",
 			nil},
+		{
+
+			&DockerContainer{
+				ServiceName:       "myservicename",
+				DockerComposeFile: "testdata/docker-compose.yml",
+				ComposeService: ComposeService{
+					Build: Buildstruct{
+						Dockerfile: "nestedDockerfile",
+						Context:    "nestedDir/level1/level2/"}},
+				LogMedium: ioutil.Discard,
+				Rebuild:   true,
+			},
+			"meli_myservicename",
+			nil},
 	}
 
 	var ctx = context.Background()
