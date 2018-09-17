@@ -165,25 +165,6 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 			newErr:      fmt.Errorf(" :unable to get path to Dockerfile %s", dockerFile)}
 	}
 
-	dockerFileContextPath := filepath.Dir(dockerFile)
-	/*
-		Context is either a path to a directory containing a Dockerfile, or a url to a git repository.
-		When the value supplied is a relative path, it is interpreted as relative to the location of the Compose file.
-		This directory is also the build context that is sent to the Docker daemon.
-		- https://docs.docker.com/compose/compose-file/#context
-
-		So it looks like, we only need to send one of
-		UserContext or dockerFileContextPath to docker server and not two.
-	*/
-	UserProvidedContextPath := filepath.Dir(dc.ComposeService.Build.Context + "/")
-	if dc.ComposeService.Build.Context == "." {
-		// context will be the directory containing the compose file
-		UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
-	} else if dc.ComposeService.Build.Context == "" {
-		// context will be the directory containing the compose file
-		UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
-	}
-
 	dockerFileReader, err := os.Open(dockerFilePath)
 	if err != nil {
 		return "", &popagateError{
@@ -215,6 +196,7 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	AuthConfigs := make(map[string]types.AuthConfig)
 	AuthConfigs[registryURL] = types.AuthConfig{Username: username, Password: password}
 
+	dockerFileContextPath := filepath.Dir(dockerFile)
 	// TODO: stop calling filepath.Walk twice; once for dockerfile context and then for uer context
 	// Both the user provided context and that of the DockerFile needs to be in the tar file.
 	err = filepath.Walk(dockerFileContextPath, walkFnClosure(dockerFileContextPath, tw, buf))
@@ -222,6 +204,23 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 		return "", &popagateError{
 			originalErr: err,
 			newErr:      fmt.Errorf(" :unable to walk dockefile context path %s", dockerFile)}
+	}
+	/*
+		Context is either a path to a directory containing a Dockerfile, or a url to a git repository.
+		When the value supplied is a relative path, it is interpreted as relative to the location of the Compose file.
+		This directory is also the build context that is sent to the Docker daemon.
+		- https://docs.docker.com/compose/compose-file/#context
+
+		So it looks like, we only need to send one of
+		UserContext or dockerFileContextPath to docker server and not two.
+	*/
+	UserProvidedContextPath := filepath.Dir(dc.ComposeService.Build.Context + "/")
+	if dc.ComposeService.Build.Context == "." {
+		// context will be the directory containing the compose file
+		UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
+	} else if dc.ComposeService.Build.Context == "" {
+		// context will be the directory containing the compose file
+		UserProvidedContextPath = filepath.Dir(dc.DockerComposeFile)
 	}
 	err = filepath.Walk(UserProvidedContextPath, walkFnClosure(UserProvidedContextPath, tw, buf))
 	if err != nil {
