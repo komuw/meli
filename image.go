@@ -116,6 +116,12 @@ var blackHolePool = sync.Pool{
 // this is taken from io.util
 func poolReadFrom(r io.Reader) (n int64, err error) {
 	bufp := blackHolePool.Get().(*[]byte)
+	// reset the buffer since it may contain data from a previous round
+	// see issues/118
+	for i := range *bufp {
+		(*bufp)[i] = 0
+
+	}
 	readSize := 0
 	for {
 		readSize, err = r.Read(*bufp)

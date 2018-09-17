@@ -156,7 +156,7 @@ jobs:
                 if [ "$CIRCLE_BRANCH" == "master" ]; then
                     printf "\n $CIRCLE_BRANCH branch, ignoring check for relese notes \n"
                 else
-                    ChangedFiles=`git diff --name-only $CIRCLE_BRANCH origin/master`
+                    ChangedFiles=`git diff --name-only origin/master`
                     case "$ChangedFiles" in
                         *RELEASE_NOTES.*)
                             printf "\n Thanks, your commits include update to release notes. \n";;

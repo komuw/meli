@@ -3,6 +3,7 @@ package meli
 import (
 	"context"
 	"io/ioutil"
+	"strings"
 	"testing"
 )
 
@@ -89,5 +90,13 @@ func BenchmarkBuildDockerImage(b *testing.B) {
 	LoadAuth()
 	for n := 0; n < b.N; n++ {
 		_, _ = BuildDockerImage(ctx, cli, dc)
+	}
+}
+
+func BenchmarkPoolReadFrom(b *testing.B) {
+	r := strings.NewReader("hello")
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		_, _ = poolReadFrom(r)
 	}
 }
