@@ -162,6 +162,10 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 		// do NOT join them with anything. They should be used as is.
 		userContextAbs = userContext
 	}
+	if userContextAbs == "/" {
+		// ie: dc.ComposeService.Build.Context=="" because user didn't provide any
+		userContextAbs = dirWithComposeFile
+	}
 	dockerFilePath, err := filepath.Abs(
 		filepath.Join(userContextAbs, dockerFile))
 	if err != nil {
