@@ -9,7 +9,7 @@ require (
 	github.com/docker/docker-credential-helpers v0.6.1
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-units v0.3.3 // indirect
-	github.com/gogo/protobuf v1.1.1 // indirect
+	github.com/gogo/protobuf v1.2.0 // indirect
 	github.com/google/go-cmp v0.2.0 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.6.2 // indirect
@@ -18,10 +18,13 @@ require (
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/pkg/errors v0.8.0 // indirect
 	github.com/sirupsen/logrus v1.2.0 // indirect
-	golang.org/x/net v0.0.0-20181201002055-351d144fa1fc // indirect
-	golang.org/x/sys v0.0.0-20181128092732-4ed8d59d0b35 // indirect
+	golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9 // indirect
+	golang.org/x/net v0.0.0-20181220203305-927f97764cc3 // indirect
+	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4 // indirect
+	golang.org/x/sys v0.0.0-20181221143128-b4a75ba826a6 // indirect
 	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c // indirect
-	google.golang.org/grpc v1.16.0 // indirect
+	google.golang.org/genproto v0.0.0-20181221175505-bd9b4fb69e2f // indirect
+	google.golang.org/grpc v1.17.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.2.2
 	gotest.tools v2.2.0+incompatible // indirect
