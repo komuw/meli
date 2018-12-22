@@ -44,6 +44,8 @@ require (
 	gotest.tools v2.1.0+incompatible // indirect
 )
 
+// look at: https://github.com/golang/go/issues/29376#issuecomment-449416502
+
 // github.com/docker/engine v18.06.1-ce
 replace github.com/docker/docker => github.com/docker/engine v0.0.0-20180816081446-320063a2ad06
 
