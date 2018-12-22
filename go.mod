@@ -33,4 +33,4 @@ require (
 // look at: https://github.com/golang/go/issues/29376#issuecomment-449416502
 
 // github.com/docker/engine  v18.09.1-rc1
-replace github.com/docker/docker => github.com/docker/engine v18.09.1-rc1
+replace github.com/docker/docker => github.com/docker/engine v0.0.0-20181203220643-82a4418f57d5
