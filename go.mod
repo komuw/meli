@@ -4,8 +4,8 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/Microsoft/go-winio v0.4.11 // indirect
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
-	github.com/docker/distribution v2.6.2+incompatible // indirect
-	github.com/docker/docker v0.0.0-20170601211448-f5ec1e2936dc
+	github.com/docker/distribution v2.7.0+incompatible // indirect
+	github.com/docker/docker v0.7.3-0.20181221150755-2cb26cfe9cbf
 	github.com/docker/docker-credential-helpers v0.6.1
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-units v0.3.3 // indirect
@@ -30,9 +30,4 @@ require (
 // look at: https://github.com/golang/go/issues/29376#issuecomment-449416502
 
 // github.com/docker/engine v18.09.0
-replace github.com/docker/docker => github.com/docker/engine v0.0.0-20181106193140-f5749085e9cb
-
-// github.com/docker/distribution v2.7.0-rc.0
-// a proper tagged release is expected in early fall(September 2018)
-// see; https://github.com/docker/distribution/issues/2693
-replace github.com/docker/distribution => github.com/docker/distribution v2.7.0-rc.0+incompatible
+// replace github.com/docker/docker => github.com/docker/engine v0.0.0-20181106193140-f5749085e9cb
