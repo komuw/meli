@@ -145,7 +145,7 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	dirWithComposeFile := filepath.Dir(dc.DockerComposeFile)
 	dirWithComposeFileAbs, err := filepath.Abs(dirWithComposeFile)
 	if err != nil {
-		return "", errors.Wrapf(err, "unable to get path to docker-compose file %v", dc.DockerComposeFile)
+		return "", errors.Wrapf(err, "unable to get absolute path of %v", dirWithComposeFile)
 	}
 	userContext := filepath.Dir(dc.ComposeService.Build.Context + "/")
 	userContextAbs := filepath.Join(dirWithComposeFileAbs, userContext)
