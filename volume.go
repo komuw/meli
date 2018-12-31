@@ -2,11 +2,11 @@ package meli
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 
 	"github.com/docker/docker/api/types/volume"
+	"github.com/pkg/errors"
 )
 
 // CreateDockerVolume creates a docker volume
@@ -17,7 +17,7 @@ func CreateDockerVolume(ctx context.Context, cli APIclient, name, driver string,
 			Driver: driver,
 			Name:   name})
 	if err != nil {
-		return "", &popagateError{originalErr: err, newErr: errors.New(" :unable to create docker volume")}
+		return "", errors.Wrapf(err, "unable to create docker volume %v", name)
 	}
 	fmt.Fprintf(dst, "\ndocker volume: %s created successfully.\n", volume.Name)
 
