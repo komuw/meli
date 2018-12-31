@@ -1,7 +1,6 @@
 package meli
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -106,13 +105,4 @@ func formatComposePath(path string) []string {
 	}
 	// TODO: we should trim any whitespace before returning.
 	return strings.FieldsFunc(path, f)
-}
-
-type popagateError struct {
-	originalErr error
-	newErr      error
-}
-
-func (p *popagateError) Error() string {
-	return fmt.Sprintf("originalErr:: %s \nThisErr:: %s", p.originalErr, p.newErr)
 }

@@ -11,7 +11,7 @@ jobs:
         - checkout
         # the docker version specified here should be same as the docker version of the client you install.
         - setup_remote_docker:
-            version: 18.09.0-ce
+            version: 18.06.0-ce
         - run:
             name: install apt and pip deps
             command: |
@@ -51,7 +51,7 @@ jobs:
             name: Install Docker client
             command: |
                 set -x
-                DOCKER_VER="18.09.0-ce"
+                DOCKER_VER="18.06.0-ce"
                 curl -L -o /tmp/docker-$DOCKER_VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VER.tgz
                 tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
                 mv /tmp/docker/* /usr/bin

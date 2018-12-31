@@ -16,7 +16,7 @@ require (
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
-	github.com/pkg/errors v0.8.0 // indirect
+	github.com/pkg/errors v0.8.0
 	github.com/sirupsen/logrus v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9 // indirect
 	golang.org/x/net v0.0.0-20181220203305-927f97764cc3 // indirect
@@ -32,5 +32,5 @@ require (
 
 // look at: https://github.com/golang/go/issues/29376#issuecomment-449416502
 
-// github.com/docker/engine v18.09.0
-// replace github.com/docker/docker => github.com/docker/engine v0.0.0-20181106193140-f5749085e9cb
+// github.com/docker/engine  v18.09.1-rc1
+replace github.com/docker/docker => github.com/docker/engine v0.0.0-20181203220643-82a4418f57d5
