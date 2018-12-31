@@ -87,6 +87,8 @@ func Cli() (showVersion, followLogs, rebuild bool, dockerComposeFile string, cpu
 	}
 	if d {
 		followLogs = false
+	} else {
+		followLogs = true
 	}
 	if build {
 		rebuild = true
