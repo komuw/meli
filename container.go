@@ -248,9 +248,7 @@ func ContainerLogs(ctx context.Context, cli APIclient, dc *DockerContainer) erro
 			Tail:       "all"})
 
 	if err != nil {
-		if err != nil {
-			return errors.Wrapf(err, "unable to get logs for container %v of service %v", dc.ContainerID, dc.ServiceName)
-		}
+		return errors.Wrapf(err, "unable to get logs for container %v of service %v", dc.ContainerID, dc.ServiceName)
 	}
 
 	scanner := bufio.NewScanner(containerLogResp)
