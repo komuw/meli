@@ -13,7 +13,7 @@ func GetNetwork(ctx context.Context, networkName string, cli APIclient) (string,
 	// return early if network exists
 	netList, err := cli.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
-		return "", errors.Wrap(err, "unable to intialize docker client")
+		return "", errors.Wrap(err, "unable to list docker networks")
 
 	}
 	for _, v := range netList {
