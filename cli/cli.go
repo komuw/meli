@@ -127,7 +127,7 @@ func main() {
 	var dockerCyaml meli.DockerComposeConfig
 	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
 	if err != nil {
-		e := errors.Wrap(err, "unable to parse docker-compose file contents")
+		e := errors.Wrap(err, "unable to unmarshal docker-compose file contents")
 		log.Fatalf("%+v", e)
 	}
 
@@ -144,7 +144,7 @@ func main() {
 		log.Fatalf("%+v", e)
 	}
 	networkName := "meli_network_" + getCwdName(curentDir)
-	networkID, _ := meli.GetNetwork(ctx, networkName, cli)
+	networkID, err := meli.GetNetwork(ctx, networkName, cli)
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
