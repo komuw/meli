@@ -166,7 +166,7 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 
 	dockerFileReader, err := os.Open(dockerFilePath)
 	if err != nil {
-		return "", errors.Wrapf(err, "unable to open Dockerfile %v", dockerFile)
+		return "", errors.Wrapf(err, "unable to open Dockerfile %v", dockerFilePath)
 	}
 	readDockerFile, err := ioutil.ReadAll(dockerFileReader)
 	if err != nil {
@@ -203,7 +203,7 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	UserProvidedContextPath := filepath.Dir(userContextAbs + "/")
 	err = filepath.Walk(UserProvidedContextPath, walkFnClosure(UserProvidedContextPath, tw, buf))
 	if err != nil {
-		return "", errors.Wrapf(err, "unable to walk user provided context path %v", dockerFile)
+		return "", errors.Wrapf(err, "unable to walk user provided context path %v", UserProvidedContextPath)
 	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 
