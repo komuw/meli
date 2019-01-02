@@ -10,11 +10,7 @@ func formatContainerName(containerName, curentDir string) string {
 	// container names are supposed to be unique
 	// we are using the docker-compose service name as well as current dir as the container name
 	f := func(c rune) bool {
-		if c == 58 {
-			// 58 is the ':' character
-			return true
-		}
-		return false
+		return c == 58 // 58 is the ':' character
 	}
 	formattedContainerName := strings.FieldsFunc(containerName, f)[0]
 	contName := "meli_" + formattedContainerName + curentDir
@@ -56,11 +52,7 @@ func formatPorts(port string) []string {
 
 func formatServiceVolumes(volume, dockerComposeFile string) []string {
 	f := func(c rune) bool {
-		if c == 58 {
-			// 58 is the ':' character
-			return true
-		}
-		return false
+		return c == 58 // 58 is the ':' character
 	}
 	volume = os.ExpandEnv(volume)
 	// TODO: we should trim any whitespace before returning.
@@ -83,11 +75,7 @@ func formatServiceVolumes(volume, dockerComposeFile string) []string {
 
 func formatRegistryAuth(auth string) []string {
 	f := func(c rune) bool {
-		if c == 58 {
-			// 58 is the ':' character
-			return true
-		}
-		return false
+		return c == 58 // 58 is the ':' character
 	}
 	// TODO: we should trim any whitespace before returning.
 	// this will prevent labels like type= web
@@ -97,11 +85,7 @@ func formatRegistryAuth(auth string) []string {
 func formatComposePath(path string) []string {
 	f := func(c rune) bool {
 		// TODO; check if this is cross platform
-		if c == 47 {
-			// 47 is the '/' character
-			return true
-		}
-		return false
+		return c == 47 // 47 is the '/' character
 	}
 	// TODO: we should trim any whitespace before returning.
 	return strings.FieldsFunc(path, f)

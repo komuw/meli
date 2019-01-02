@@ -132,7 +132,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	cli, err := client.NewEnvClient()
+	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		e := errors.Wrap(err, "unable to intialize docker client")
 		log.Fatalf("%+v", e)
@@ -256,11 +256,7 @@ func getCwdName(path string) string {
 	//TODO: investigate if this will work cross platform
 	// it might be  :unable to handle paths in windows OS
 	f := func(c rune) bool {
-		if c == 47 {
-			// 47 is the '/' character
-			return true
-		}
-		return false
+		return c == 47 // 47 is the '/' character
 	}
 	pathSlice := strings.FieldsFunc(path, f)
 	return pathSlice[len(pathSlice)-1]
