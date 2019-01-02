@@ -84,10 +84,10 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 
 		// open files for taring
 		f, err := os.Open(path)
-		defer f.Close()
 		if err != nil {
 			return err
 		}
+		defer f.Close()
 
 		tr := io.TeeReader(f, tw)
 		_, err = poolReadFrom(tr)
