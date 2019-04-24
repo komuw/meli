@@ -17,6 +17,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/komuw/meli"
+	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -86,6 +87,8 @@ func Cli() (showVersion, followLogs, rebuild bool, dockerComposeFile string, cpu
 	}
 	if d {
 		followLogs = false
+	} else {
+		followLogs = true
 	}
 	if build {
 		rebuild = true
@@ -100,10 +103,12 @@ func main() {
 	if cpuprofile != "" {
 		f, err := os.Create(cpuprofile)
 		if err != nil {
-			log.Fatal(err, " :could not create CPU profile")
+			e := errors.Wrap(err, "could not create CPU profile")
+			log.Fatalf("%+v", e)
 		}
 		if err := pprof.StartCPUProfile(f); err != nil {
-			log.Fatal(err, " :could not start CPU profile")
+			e := errors.Wrap(err, "could not start CPU profile")
+			log.Fatalf("%+v", e)
 		}
 		defer pprof.StopCPUProfile()
 	}
@@ -115,29 +120,33 @@ func main() {
 
 	data, err := ioutil.ReadFile(dockerComposeFile)
 	if err != nil {
-		log.Fatal(err, " :unable to read docker-compose file")
+		e := errors.Wrap(err, "unable to read docker-compose file")
+		log.Fatalf("%+v", e)
 	}
 
 	var dockerCyaml meli.DockerComposeConfig
 	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
 	if err != nil {
-		log.Fatal(err, " :unable to parse docker-compose file contents")
+		e := errors.Wrap(err, "unable to unmarshal docker-compose file contents")
+		log.Fatalf("%+v", e)
 	}
 
 	ctx := context.Background()
-	cli, err := client.NewEnvClient()
+	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		log.Fatal(err, " :unable to intialize docker client")
+		e := errors.Wrap(err, "unable to intialize docker client")
+		log.Fatalf("%+v", e)
 	}
 	defer cli.Close()
 	curentDir, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err, " :unable to get the current working directory")
+		e := errors.Wrap(err, "unable to get the current working directory")
+		log.Fatalf("%+v", e)
 	}
 	networkName := "meli_network_" + getCwdName(curentDir)
 	networkID, err := meli.GetNetwork(ctx, networkName, cli)
 	if err != nil {
-		log.Fatal(err, " :unable to create/get network")
+		log.Fatalf("%+v", err)
 	}
 	meli.LoadAuth()
 
@@ -181,11 +190,13 @@ func main() {
 	if memprofile != "" {
 		f, err := os.Create(memprofile)
 		if err != nil {
-			log.Fatal(err, " :could not create memory profile")
+			e := errors.Wrap(err, "could not create memory profile")
+			log.Fatalf("%+v", e)
 		}
 		runtime.GC() // get up-to-date statistics
 		if err := pprof.WriteHeapProfile(f); err != nil {
-			log.Fatal(err, " :could not write memory profile")
+			e := errors.Wrap(err, "could not write memory profile")
+			log.Fatalf("%+v", e)
 		}
 		f.Close()
 	}
@@ -207,7 +218,7 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 		if err != nil {
 			// clean exit since we want other goroutines for fetching other images
 			// to continue running
-			fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
+			fmt.Printf("\n\n%+v", err)
 			return
 		}
 	}
@@ -215,7 +226,7 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 	if err != nil {
 		// clean exit since we want other goroutines for fetching other images
 		// to continue running
-		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
+		fmt.Printf("\n\n%+v", err)
 		return
 	}
 
@@ -223,20 +234,20 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 		err = meli.ConnectNetwork(ctx, cli, dc)
 		if err != nil {
 			// create whitespace so that error is visible to human
-			fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
+			fmt.Printf("\n\n%+v", err)
 			return
 		}
 	}
 
 	err = meli.ContainerStart(ctx, cli, dc)
 	if err != nil {
-		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
+		fmt.Printf("\n\n%+v", err)
 		return
 	}
 
 	err = meli.ContainerLogs(ctx, cli, dc)
 	if err != nil {
-		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
+		fmt.Printf("\n\n%+v", err)
 		return
 	}
 }
@@ -245,11 +256,7 @@ func getCwdName(path string) string {
 	//TODO: investigate if this will work cross platform
 	// it might be  :unable to handle paths in windows OS
 	f := func(c rune) bool {
-		if c == 47 {
-			// 47 is the '/' character
-			return true
-		}
-		return false
+		return c == 47 // 47 is the '/' character
 	}
 	pathSlice := strings.FieldsFunc(path, f)
 	return pathSlice[len(pathSlice)-1]

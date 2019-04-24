@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,6 +15,7 @@ import (
 	"sync"
 
 	"github.com/docker/docker/api/types"
+	"github.com/pkg/errors"
 )
 
 // PullDockerImage pulls a docker from a registry via docker daemon
@@ -32,9 +32,7 @@ func PullDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) er
 		imageName,
 		types.ImagePullOptions{RegistryAuth: GetRegistryAuth})
 	if err != nil {
-		return &popagateError{
-			originalErr: err,
-			newErr:      fmt.Errorf(" :unable to pull image %s", imageName)}
+		return errors.Wrapf(err, "unable to pull image %v", imageName)
 	}
 
 	var imgProg imageProgress
@@ -86,10 +84,10 @@ func walkFnClosure(src string, tw *tar.Writer, buf *bytes.Buffer) filepath.WalkF
 
 		// open files for taring
 		f, err := os.Open(path)
-		defer f.Close()
 		if err != nil {
 			return err
 		}
+		defer f.Close()
 
 		tr := io.TeeReader(f, tw)
 		_, err = poolReadFrom(tr)
@@ -147,9 +145,7 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	dirWithComposeFile := filepath.Dir(dc.DockerComposeFile)
 	dirWithComposeFileAbs, err := filepath.Abs(dirWithComposeFile)
 	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      fmt.Errorf(" :unable to get path to docker-compose file %s", dc.DockerComposeFile)}
+		return "", errors.Wrapf(err, "unable to get absolute path of %v", dirWithComposeFile)
 	}
 	userContext := filepath.Dir(dc.ComposeService.Build.Context + "/")
 	userContextAbs := filepath.Join(dirWithComposeFileAbs, userContext)
@@ -165,22 +161,16 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	dockerFilePath, err := filepath.Abs(
 		filepath.Join(userContextAbs, dockerFile))
 	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      fmt.Errorf(" :unable to get path to Dockerfile %s", dockerFile)}
+		return "", errors.Wrapf(err, "unable to get path to Dockerfile %v", dockerFile)
 	}
 
 	dockerFileReader, err := os.Open(dockerFilePath)
 	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      fmt.Errorf(" :unable to open Dockerfile %s", dockerFile)}
+		return "", errors.Wrapf(err, "unable to open Dockerfile %v", dockerFilePath)
 	}
 	readDockerFile, err := ioutil.ReadAll(dockerFileReader)
 	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to read dockerfile")}
+		return "", errors.Wrapf(err, "unable to read dockerfile %v", dockerFile)
 	}
 
 	imageName := "meli_" + strings.ToLower(dc.ServiceName)
@@ -213,9 +203,7 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 	UserProvidedContextPath := filepath.Dir(userContextAbs + "/")
 	err = filepath.Walk(UserProvidedContextPath, walkFnClosure(UserProvidedContextPath, tw, buf))
 	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      fmt.Errorf(" :unable to walk user provided context path %s", dockerFile)}
+		return "", errors.Wrapf(err, "unable to walk user provided context path %v", UserProvidedContextPath)
 	}
 	dockerFileTarReader := bytes.NewReader(buf.Bytes())
 
@@ -233,9 +221,7 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 			Context:        dockerFileTarReader,
 			AuthConfigs:    AuthConfigs})
 	if err != nil {
-		return "", &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to build docker image")}
+		return "", errors.Wrapf(err, "unable to build docker image %v for service %v", imageName, dc.ServiceName)
 	}
 
 	var imgProg imageProgress

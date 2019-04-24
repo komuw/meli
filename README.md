@@ -130,10 +130,18 @@ Thus, meli appears to be 2.6 times faster than docker-compose(by wall clock time
 You can [checkout the current benchmark results from circleCI](https://circleci.com/gh/komuW/meli/)              
 However, I'm not making a tool to take docker-compose to the races.                   
 
-# Build                   
+# Development
+#### Build                   
 `git clone git@github.com:komuw/meli.git`           
 `go build -o meli cli/cli.go`           
 `./meli -up -f /path/to/docker-compose-file.yml`                   
+
+#### debug
+`go build -o meli cli/cli.go`       
+`dlv exec ./meli -- -up -f testdata/docker-compose.yml`         
+`(dlv) help`        
+`(dlv) break cli/cli.go:246`        
+`(dlv) continue`          
 
 
 # TODO

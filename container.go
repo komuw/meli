@@ -8,6 +8,7 @@ Example usage:
 	package main
 
 	import (
+	"errors"
 	"github.com/sanity-io/litter"
 	"github.com/gogo/protobuf/vanity/command"
 		"context"
@@ -42,7 +43,6 @@ package meli
 import (
 	"bufio"
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -53,6 +53,7 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/go-connections/nat"
+	"github.com/pkg/errors"
 )
 
 // CreateContainer creates a docker container
@@ -137,7 +138,7 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 	if dc.ComposeService.Build != (Buildstruct{}) {
 		imageName, shadowErr := BuildDockerImage(ctx, cli, dc)
 		if shadowErr != nil {
-			return false, "", &popagateError{originalErr: shadowErr}
+			return false, "", errors.Wrapf(shadowErr, "unable to build image for service %v", dc.ServiceName)
 		}
 		// done this way so that we can manipulate the value of the
 		// imageName inside this scope
@@ -166,8 +167,8 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 		for _, v := range dc.ComposeService.EnvFile {
 			dotEnvFile := filepath.Join(dirWithComposeFile, v)
 			f, shadowErr := os.Open(dotEnvFile)
-			if err != nil {
-				return false, "", &popagateError{originalErr: shadowErr}
+			if shadowErr != nil {
+				return false, "", errors.Wrapf(shadowErr, "unable to open env file %v", dotEnvFile)
 			}
 			// TODO: replace env with a []string since ComposeService.Environment is a []string
 			env := parsedotenv(f)
@@ -213,9 +214,7 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 		nil,
 		dc.ServiceName)
 	if err != nil {
-		return false, "", &popagateError{
-			originalErr: err,
-			newErr:      errors.New(" :unable to create container")}
+		return false, "", errors.Wrapf(err, "unable to create container for service %v", dc.ServiceName)
 	}
 
 	dc.UpdateContainerID(containerCreateResp.ID)
@@ -229,9 +228,7 @@ func ContainerStart(ctx context.Context, cli APIclient, dc *DockerContainer) err
 		dc.ContainerID,
 		types.ContainerStartOptions{})
 	if err != nil {
-		return &popagateError{
-			originalErr: err,
-			newErr:      fmt.Errorf(" :unable to start container %s", dc.ContainerID)}
+		return errors.Wrapf(err, "unable to start container %v of service %v", dc.ContainerID, dc.ServiceName)
 
 	}
 	return nil
@@ -251,11 +248,7 @@ func ContainerLogs(ctx context.Context, cli APIclient, dc *DockerContainer) erro
 			Tail:       "all"})
 
 	if err != nil {
-		if err != nil {
-			return &popagateError{
-				originalErr: err,
-				newErr:      fmt.Errorf(" :unable to get container logs %s", dc.ContainerID)}
-		}
+		return errors.Wrapf(err, "unable to get logs for container %v of service %v", dc.ContainerID, dc.ServiceName)
 	}
 
 	scanner := bufio.NewScanner(containerLogResp)
