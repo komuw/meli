@@ -18,10 +18,11 @@ require (
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/pkg/errors v0.8.0
 	github.com/sirupsen/logrus v1.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9 // indirect
-	golang.org/x/net v0.0.0-20181220203305-927f97764cc3 // indirect
-	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4 // indirect
-	golang.org/x/sys v0.0.0-20181221143128-b4a75ba826a6 // indirect
+	golang.org/x/crypto v0.0.0-20190422183909-d864b10871cd // indirect
+	golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6 // indirect
+	golang.org/x/sync v0.0.0-20190423024810-112230192c58 // indirect
+	golang.org/x/sys v0.0.0-20190424160641-4347357a82bc // indirect
+	golang.org/x/text v0.3.1 // indirect
 	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c // indirect
 	google.golang.org/genproto v0.0.0-20181221175505-bd9b4fb69e2f // indirect
 	google.golang.org/grpc v1.17.0 // indirect
@@ -34,3 +35,5 @@ require (
 
 // github.com/docker/engine  v18.09.1-rc1
 replace github.com/docker/docker => github.com/docker/engine v0.0.0-20181203220643-82a4418f57d5
+
+go 1.13
