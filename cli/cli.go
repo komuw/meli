@@ -17,7 +17,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/komuw/meli"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v3"
 
 	"golang.org/x/sync/errgroup"
 )
