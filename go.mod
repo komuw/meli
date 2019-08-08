@@ -23,7 +23,6 @@ require (
 	golang.org/x/sync v0.0.0-20190423024810-112230192c58
 	golang.org/x/sys v0.0.0-20190804053845-51ab0e2deafa // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
-	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190801165951-fa694d86fc64 // indirect
 	google.golang.org/grpc v1.22.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
@@ -33,7 +32,7 @@ require (
 
 // look at: https://github.com/golang/go/issues/29376#issuecomment-449416502
 
-// github.com/docker/engine  v19.03.0-rc3
-replace github.com/docker/docker => github.com/docker/engine v0.0.0-20190618213011-b07f53d0a4e7
+// github.com/docker/engin v19.03.1
+replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20190725163905-fa8dd90ceb7b
 
 go 1.13
