@@ -32,7 +32,7 @@ require (
 
 // look at: https://github.com/golang/go/issues/29376#issuecomment-449416502
 
-// github.com/docker/engin v19.03.1
+// github.com/docker/engine v19.03.1
 replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20190725163905-fa8dd90ceb7b
 
 go 1.13
