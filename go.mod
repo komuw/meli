@@ -5,7 +5,7 @@ require (
 	github.com/Microsoft/go-winio v0.4.12 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v0.7.3-0.20181221150755-2cb26cfe9cbf
-	github.com/docker/docker-credential-helpers v0.6.2
+	github.com/docker/docker-credential-helpers v0.6.3
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/gogo/protobuf v1.2.1 // indirect
@@ -21,10 +21,11 @@ require (
 	github.com/stretchr/testify v1.3.0 // indirect
 	golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6 // indirect
 	golang.org/x/sync v0.0.0-20190423024810-112230192c58
-	golang.org/x/sys v0.0.0-20190624142023-c5567b49c5d0 // indirect
+	golang.org/x/sys v0.0.0-20190804053845-51ab0e2deafa // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
-	google.golang.org/genproto v0.0.0-20190620144150-6af8c5fc6601 // indirect
-	google.golang.org/grpc v1.21.1 // indirect
+	google.golang.org/appengine v1.4.0 // indirect
+	google.golang.org/genproto v0.0.0-20190801165951-fa694d86fc64 // indirect
+	google.golang.org/grpc v1.22.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.2.2
 	gotest.tools v2.2.0+incompatible // indirect
