@@ -56,7 +56,7 @@ jobs:
                 wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
                 mv /tmp/linux-amd64 /usr/local/bin/gobin
                 chmod +x /usr/local/bin/gobin
-                gobin honnef.co/go/tools/cmd/staticcheck@2019.1
+                gobin honnef.co/go/tools/cmd/staticcheck@2019.2.2
 
         - run:
             name: Install Docker client
@@ -136,7 +136,7 @@ jobs:
             command: source /etc/profile && go vet -v -all -shadow ./...
         - run:
             name: staticcheck
-            command: source /etc/profile && staticcheck -tests -show-ignored ./...
+            command: source /etc/profile && staticcheck -tests -show-ignored -go 1.13 -unused.whole-program ./...
         - run:
             name: run tests
             command: source /etc/profile && go test -timeout 1m -race -cover -v ./...
