@@ -17,10 +17,10 @@ variables:      # pipeline-level
   GOBIN_VERSION: "v0.0.12"
 
 - job: build
-  workingDirectory: '~/stuff/notgopath/meli'
+  workingDirectory: "~/stuff/notgopath/meli"
   timeoutInMinutes: 3
   pool:
-    vmImage: 'ubuntu-18.04'
+    vmImage: "ubuntu-18.04"
   steps:
 
     - bash: |
@@ -137,10 +137,10 @@ variables:      # pipeline-level
       displayName: test rebuild
 
 - job: tests_and_analysis
-  workingDirectory: '~/stuff/notgopath/meli'
+  workingDirectory: "~/stuff/notgopath/meli"
   timeoutInMinutes: 3
   pool:
-    vmImage: 'ubuntu-18.04'
+    vmImage: "ubuntu-18.04"
   steps:
     - bash: |
         pwd; ls -lsha
@@ -191,10 +191,10 @@ variables:      # pipeline-level
       displayName: codecov
 
 - job: benchmarks_against_docker_compose
-  workingDirectory: '~/stuff/notgopath/meli'
+  workingDirectory: "~/stuff/notgopath/meli"
   timeoutInMinutes: 3
   pool:
-    vmImage: 'ubuntu-18.04'
+    vmImage: "ubuntu-18.04"
   steps:
     - bash: |
         pwd; ls -lsha
@@ -250,16 +250,15 @@ variables:      # pipeline-level
       displayName: time meli -up
 
 - job: deploy
-  workingDirectory: '~/stuff/notgopath/meli'
-  dependsOn: build
+  workingDirectory: "~/stuff/notgopath/meli"
   dependsOn:
     - build
     - tests_and_analysis
     - benchmarks_against_docker_compose
-  condition: eq('refs/heads/master')
+  condition: eq("refs/heads/master")
   timeoutInMinutes: 3
   pool:
-    vmImage: 'ubuntu-18.04'
+    vmImage: "ubuntu-18.04"
   steps:
     - bash: |
         pwd; ls -lsha
@@ -303,7 +302,7 @@ variables:      # pipeline-level
         LAST_GIT_MESSAGE=$(git log -n1 --format=oneline --pretty=%B)
         echo "last git commit message on master:"
         echo $LAST_GIT_MESSAGE
-        if [ "$LAST_GIT_MESSAGE" == 'do release' ]; then
+        if [ "$LAST_GIT_MESSAGE" == "do release" ]; then
             echo "deploying with goreleaser"
             source /etc/profile
             /usr/local/goreleaser --rm-dist --config=.goreleaser.yml --debug --skip-validate --release-notes=.github/RELEASE_NOTES.md
