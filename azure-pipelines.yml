@@ -5,7 +5,8 @@
 
 # Each step runs in its own process on an agent and has access to the pipeline workspace on disk. 
 # This means environment variables are not preserved between steps but filesystem changes are.
-
+# NB: do not use double quotes in this file unless it is impossible.
+#     prefer single quotes. for some reason azure fails with double quotes
 
 variables:      # pipeline-level
   system.debug: true
