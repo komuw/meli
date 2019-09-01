@@ -83,9 +83,9 @@ jobs:
           ./meli -v
           ./meli -up -d -f testdata/docker-compose.yml
           num_containers=$(docker ps -q | wc -l)
-          echo 'number of containers are; $num_containers'
-          if [ '$num_containers' != '12' ]; then
-              echo 'wanted 12 containers, got $num_containers' && exit 500
+          echo "number of containers are; $num_containers"
+          if [ "$num_containers" != "12" ]; then
+              echo "wanted 12 containers, got $num_containers" && exit 500
           fi
         displayName: run meli
 
@@ -106,9 +106,9 @@ jobs:
           docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
           cp meli testdata/ && cd testdata/ && ./meli -up -d
           num_containers=$(docker ps -q | wc -l)
-          echo 'number of containers are; $num_containers'
-          if [ '$num_containers' != '12' ]; then
-              echo 'wanted 12 containers, got $num_containers' && exit 500
+          echo "number of containers are; $num_containers"
+          if [ "$num_containers" != "12" ]; then
+              echo "wanted 12 containers, got $num_containers" && exit 500
           fi
         displayName: run meli in testdata
 
