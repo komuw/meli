@@ -48,6 +48,7 @@ jobs:
           someEnvVarName: someEnvVarValue
 
       - bash: |
+          printf '\n\tbranch name; $BUILD_BRANCH_NAME\n'
           if [ '$BUILD_BRANCH_NAME' == 'master' ]; then
               printf '\n $BUILD_BRANCH_NAME branch, ignoring check for relese notes \n'
           else
