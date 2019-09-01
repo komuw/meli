@@ -9,6 +9,13 @@
 
 jobs:
 
+variables:      # pipeline-level
+  system.debug: true
+  GOLANG_VERSION: "go1.12"
+  DOCKER_VERSION: "18.09.6"
+  GORELEASER_VERSION: "v0.117.1"
+  GOBIN_VERSION: "v0.0.12"
+
 - job: build
   workingDirectory: '~/stuff/notgopath/meli'
   timeoutInMinutes: 3
@@ -55,9 +62,8 @@ jobs:
         BUILD_BRANCH_NAME: $(Build.SourceBranchName)
 
     - bash: |
-        VER="go1.12"
-        wget --directory-prefix=/usr/local https://dl.google.com/go/$VER.linux-amd64.tar.gz
-        tar -C /usr/local -xzf /usr/local/$VER.linux-amd64.tar.gz
+        wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
+        tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
         export PATH=$PATH:/usr/local/go/bin
         echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
         mkdir -p ~/go/bin
@@ -70,7 +76,6 @@ jobs:
 
     - bash: |
         source /etc/profile
-        GOBIN_VERSION=v0.0.4
         wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
         mv /tmp/linux-amd64 /usr/local/bin/gobin
         chmod +x /usr/local/bin/gobin
@@ -78,8 +83,6 @@ jobs:
       displayName: install tools
 
     - bash: |
-        set -x
-        DOCKER_VER="18.09.6"
         curl -L -o /tmp/docker-$DOCKER_VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VER.tgz
         tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
         mv /tmp/docker/* /usr/bin
@@ -151,9 +154,8 @@ jobs:
       displayName: install apt deps
 
     - bash: |
-        VER="go1.12"
-        wget --directory-prefix=/usr/local https://dl.google.com/go/$VER.linux-amd64.tar.gz
-        tar -C /usr/local -xzf /usr/local/$VER.linux-amd64.tar.gz
+        wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
+        tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
         export PATH=$PATH:/usr/local/go/bin
         echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
         mkdir -p ~/go/bin
@@ -166,7 +168,6 @@ jobs:
 
     - bash: |
         source /etc/profile
-        GOBIN_VERSION=v0.0.4
         wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
         mv /tmp/linux-amd64 /usr/local/bin/gobin
         chmod +x /usr/local/bin/gobin
@@ -216,9 +217,8 @@ jobs:
       displayName: install apt and pip deps
 
     - bash: |
-        VER="go1.12"
-        wget --directory-prefix=/usr/local https://dl.google.com/go/$VER.linux-amd64.tar.gz
-        tar -C /usr/local -xzf /usr/local/$VER.linux-amd64.tar.gz
+        wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
+        tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
         export PATH=$PATH:/usr/local/go/bin
         echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
         mkdir -p ~/go/bin
@@ -230,8 +230,6 @@ jobs:
       displayName: install golang
 
     - bash: |
-        set -x
-        DOCKER_VER="18.09.6"
         curl -L -o /tmp/docker-$DOCKER_VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VER.tgz
         tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
         mv /tmp/docker/* /usr/bin
@@ -284,9 +282,8 @@ jobs:
       displayName: install apt and pip deps
 
     - bash: |
-        VER="go1.12"
-        wget --directory-prefix=/usr/local https://dl.google.com/go/$VER.linux-amd64.tar.gz
-        tar -C /usr/local -xzf /usr/local/$VER.linux-amd64.tar.gz
+        wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
+        tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
         export PATH=$PATH:/usr/local/go/bin
         echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
         mkdir -p ~/go/bin
@@ -298,7 +295,7 @@ jobs:
       displayName: install golang
 
     - bash: |
-        wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/v0.117.1/goreleaser_Linux_x86_64.tar.gz
+        wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_VERSION/goreleaser_Linux_x86_64.tar.gz
         tar -C /usr/local -xzf /usr/local/goreleaser_Linux_x86_64.tar.gz
       displayName: install go releaser
 
