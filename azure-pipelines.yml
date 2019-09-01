@@ -13,6 +13,7 @@ variables:      # pipeline-level
   DOCKER_VERSION: "18.09.6"
   GORELEASER_VERSION: "v0.117.1"
   GOBIN_VERSION: "v0.0.12"
+  BUILD_BRANCH_NAME: $(Build.SourceBranchName)
 
 
 jobs:
@@ -59,7 +60,7 @@ jobs:
           fi
         displayName: check if changes have release notes 
         env:
-          BUILD_BRANCH_NAME: $(Build.SourceBranchName)
+          BUILD_BRANCH_NAME: $BUILD_BRANCH_NAME
 
       - bash: |
           wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
@@ -255,7 +256,7 @@ jobs:
       - build
       - tests_and_analysis
       - benchmarks_against_docker_compose
-    condition: eq("refs/heads/master")
+    condition: eq($BUILD_BRANCH_NAME, "master")
     timeoutInMinutes: 3
     pool:
       vmImage: "ubuntu-16.04"
