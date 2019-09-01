@@ -48,6 +48,7 @@ jobs:
 
       - bash: |
           ChangedFiles=`git diff --name-only origin/master`
+          printf '\t\n ChangedFiles; $ChangedFiles \n'
           case '$ChangedFiles' in
               *RELEASE_NOTES.*)
                   printf '\n Thanks, your commits include update to release notes. \n';;
