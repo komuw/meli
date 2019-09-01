@@ -171,9 +171,9 @@ jobs:
       - bash: |
           source /etc/profile
           wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
-          mv /tmp/linux-amd64 /usr/local/bin/gobin
-          chmod +x /usr/local/bin/gobin
-          gobin honnef.co/go/tools/cmd/staticcheck@2019.2.2
+          mv /tmp/linux-amd64 /tmp/gobin
+          chmod +x /tmp/gobin
+          /tmp/gobin honnef.co/go/tools/cmd/staticcheck@2019.2.2
         displayName: install tools
 
       - bash: |
