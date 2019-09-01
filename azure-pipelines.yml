@@ -21,7 +21,7 @@ jobs:
 
   - job: build
     # workingDirectory: '~/stuff/notgopath/meli'
-    timeoutInMinutes: 3
+    timeoutInMinutes: 5
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
@@ -140,7 +140,6 @@ jobs:
         displayName: test rebuild
 
   - job: tests_and_analysis
-    # workingDirectory: '~/stuff/notgopath/meli'
     timeoutInMinutes: 3
     pool:
       vmImage: 'ubuntu-16.04'
@@ -194,8 +193,7 @@ jobs:
         displayName: codecov
 
   - job: benchmarks_against_docker_compose
-    # workingDirectory: '~/stuff/notgopath/meli'
-    timeoutInMinutes: 3
+    timeoutInMinutes: 5
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
@@ -253,7 +251,6 @@ jobs:
         displayName: time meli -up
 
   - job: deploy
-    # workingDirectory: '~/stuff/notgopath/meli'
     dependsOn:
       - build
       - tests_and_analysis
