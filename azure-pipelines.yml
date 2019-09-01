@@ -1,13 +1,53 @@
 # Starter pipeline
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# for reference see: https://aka.ms/yaml
 
-trigger:
-- master
+# Each step runs in its own process on an agent and has access to the pipeline workspace on disk. 
+# This means environment variables are not preserved between steps but filesystem changes are.
 
-pool:
-  vmImage: 'ubuntu-latest'
+
+jobs:
+
+- job: build
+  workingDirectory: '~/stuff/notgopath/meli'
+  timeoutInMinutes: 1
+  pool:
+    vmImage: 'ubuntu-18.04'
+  steps:
+  - bash: |
+      pwd; ls -lsha
+      apt-get -y update
+      apt -y install \
+                  curl \
+                  wget \
+                  git \
+                  python \
+                  python-pip \
+                  software-properties-common \
+                  build-essential \
+                  snapd \
+                  snapcraft \
+                  nano \
+                  apt-transport-https \
+                  ca-certificates
+      # pip install -U pip # see; https://github.com/pypa/pip/issues/5221
+      pip install -U docker-compose
+    displayName: install apt and pip deps
+    env:
+      name: Microsoft
+
+
+- job: deploy
+  workingDirectory: '~/stuff/notgopath/meli'
+  dependsOn: build
+  condition: eq('refs/heads/master')
+  timeoutInMinutes: 1
+  pool:
+    vmImage: 'ubuntu-18.04'
+  steps:
+  - bash: echo "Hello world"
+
 
 steps:
 - script: echo Hello, world!
