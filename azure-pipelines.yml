@@ -17,7 +17,7 @@ variables:      # pipeline-level
   GOBIN_VERSION: "v0.0.12"
 
 - job: build
-  workingDirectory: "~/stuff/notgopath/meli"
+  workingDirectory: '~/stuff/notgopath/meli'
   timeoutInMinutes: 3
   pool:
     vmImage: "ubuntu-18.04"
@@ -43,7 +43,7 @@ variables:      # pipeline-level
         pip install -U docker-compose
       displayName: install apt and pip deps
       env:
-        name: someEnvVar
+        someEnvVarName: someEnvVarValue
 
     - bash: |
         if [ "$BUILD_BRANCH_NAME" == "master" ]; then
