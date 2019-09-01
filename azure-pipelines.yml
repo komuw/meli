@@ -90,7 +90,7 @@ jobs:
         displayName: run meli
 
       - bash: |
-          docker exec backup ping -w3 redis
+          docker exec backup ping -w3 redis;
           docker exec backup ping -w3 eminem.com
         displayName: check that docker linking works
 
