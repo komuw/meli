@@ -11,7 +11,7 @@ jobs:
         - checkout
         # the docker version specified here should be same as the docker version of the client you install.
         - setup_remote_docker:
-            version: 18.09.3 
+            version: 19.03.1
         - run:
             name: install apt and pip deps
             command: |
