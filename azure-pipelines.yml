@@ -62,7 +62,7 @@ jobs:
           fi
         displayName: check if changes have release notes 
         env:
-          BUILD_BRANCH_NAME: $BUILD_BRANCH_NAME
+          BUILD_BRANCH_NAME: $(BUILD_BRANCH_NAME)
 
       - bash: |
           wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
