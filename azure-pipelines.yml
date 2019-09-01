@@ -78,14 +78,6 @@ jobs:
         displayName: install golang
 
       - bash: |
-          source /etc/profile
-          wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
-          mv /tmp/linux-amd64 /usr/local/bin/gobin
-          chmod +x /usr/local/bin/gobin
-          gobin honnef.co/go/tools/cmd/staticcheck@2019.2.2
-        displayName: install tools
-
-      - bash: |
           curl -L -o /tmp/docker-$DOCKER_VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VER.tgz
           tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
           mv /tmp/docker/* /usr/bin
@@ -175,10 +167,12 @@ jobs:
           chmod +x /tmp/gobin
           /tmp/gobin honnef.co/go/tools/cmd/staticcheck@2019.2.2
         displayName: install tools
+        env:
+          GOBIN: /tmp
 
       - bash: |
           source /etc/profile && go vet -v -all ./...
-          source /etc/profile && staticcheck -tests -show-ignored -go 1.13 -unused.whole-program ./...
+          source /etc/profile && /tmp/staticcheck -tests -show-ignored -go 1.13 -unused.whole-program ./...
         displayName: static analysis
 
       - bash: |
