@@ -21,7 +21,7 @@ jobs:
     # workingDirectory: "~/stuff/notgopath/meli"
     timeoutInMinutes: 3
     pool:
-      vmImage: "ubuntu-18.04"
+      vmImage: "ubuntu-16.04"
     steps:
       - bash: |
           pwd; ls -lsha
@@ -140,7 +140,7 @@ jobs:
 #   workingDirectory: "~/stuff/notgopath/meli"
 #   timeoutInMinutes: 3
 #   pool:
-#     vmImage: "ubuntu-18.04"
+#     vmImage: "ubuntu-16.04"
 #   steps:
 #     - bash: |
 #         pwd; ls -lsha
@@ -194,7 +194,7 @@ jobs:
 #   workingDirectory: "~/stuff/notgopath/meli"
 #   timeoutInMinutes: 3
 #   pool:
-#     vmImage: "ubuntu-18.04"
+#     vmImage: "ubuntu-16.04"
 #   steps:
 #     - bash: |
 #         pwd; ls -lsha
@@ -258,7 +258,7 @@ jobs:
 #   condition: eq("refs/heads/master")
 #   timeoutInMinutes: 3
 #   pool:
-#     vmImage: "ubuntu-18.04"
+#     vmImage: "ubuntu-16.04"
 #   steps:
 #     - bash: |
 #         pwd; ls -lsha
