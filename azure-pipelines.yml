@@ -13,7 +13,7 @@ variables:      # pipeline-level
   GOLANG_VERSION: 'go1.12'
   DOCKER_VERSION: '18.09.6'
   GORELEASER_VERSION: 'v0.117.1'
-  GOBIN_VERSION: 'v0.0.12'
+  GOBIN_VERSION: 'v0.0.11'
   BUILD_BRANCH_NAME: $(Build.SourceBranchName)
 
 
