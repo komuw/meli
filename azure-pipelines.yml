@@ -55,7 +55,7 @@ jobs:
                   printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
           esac
         displayName: check if changes have release notes
-        condition: neq(variables['Build.SourceBranch'], 'refs/heads/master')
+        condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
 
       - bash: |
           wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
