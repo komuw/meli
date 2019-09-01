@@ -14,7 +14,6 @@ variables:      # pipeline-level
   DOCKER_VERSION: '18.09.6'
   GORELEASER_VERSION: 'v0.117.1'
   GOBIN_VERSION: 'v0.0.11'
-  BUILD_BRANCH_NAME: $(Build.SourceBranchName)
 
 
 jobs:
@@ -48,21 +47,15 @@ jobs:
           someEnvVarName: someEnvVarValue
 
       - bash: |
-          printf '\n\tbranch name; $BUILD_BRANCH_NAME\n'
-          if [ '$BUILD_BRANCH_NAME' == 'master' ]; then
-              printf '\n $BUILD_BRANCH_NAME branch, ignoring check for relese notes \n'
-          else
-              ChangedFiles=`git diff --name-only origin/master`
-              case '$ChangedFiles' in
-                  *RELEASE_NOTES.*)
-                      printf '\n Thanks, your commits include update to release notes. \n';;
-                  *)
-                      printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
-              esac
-          fi
-        displayName: check if changes have release notes 
-        env:
-          BUILD_BRANCH_NAME: $(BUILD_BRANCH_NAME)
+          ChangedFiles=`git diff --name-only origin/master`
+          case '$ChangedFiles' in
+              *RELEASE_NOTES.*)
+                  printf '\n Thanks, your commits include update to release notes. \n';;
+              *)
+                  printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
+          esac
+        displayName: check if changes have release notes
+        condition: neq(variables['Build.SourceBranch'], 'refs/heads/master')
 
       - bash: |
           wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
