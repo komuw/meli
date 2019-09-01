@@ -18,40 +18,32 @@ variables:      # pipeline-level
 jobs:
 
   - job: build
-    workingDirectory: "~/stuff/notgopath/meli"
+    # workingDirectory: "~/stuff/notgopath/meli"
     timeoutInMinutes: 3
     pool:
       vmImage: "ubuntu-18.04"
     steps:
-    - bash: |
-        which bash
-        echo Hello $name
-      displayName: Multiline Bash script
-      env:
-        someEnvVarName: someEnvVarValue
-
-  # steps:
-  #   - bash: |
-  #       pwd; ls -lsha
-  #       apt-get -y update
-  #       apt -y install \
-  #                   curl \
-  #                   wget \
-  #                   git \
-  #                   python \
-  #                   python-pip \
-  #                   software-properties-common \
-  #                   build-essential \
-  #                   snapd \
-  #                   snapcraft \
-  #                   nano \
-  #                   apt-transport-https \
-  #                   ca-certificates
-  #       # pip install -U pip # see; https://github.com/pypa/pip/issues/5221
-  #       pip install -U docker-compose
-  #     displayName: install apt and pip deps
-  #     env:
-  #       someEnvVarName: someEnvVarValue
+      - bash: |
+          pwd; ls -lsha
+          apt-get -y update
+          apt -y install \
+                      curl \
+                      wget \
+                      git \
+                      python \
+                      python-pip \
+                      software-properties-common \
+                      build-essential \
+                      snapd \
+                      snapcraft \
+                      nano \
+                      apt-transport-https \
+                      ca-certificates
+          # pip install -U pip # see; https://github.com/pypa/pip/issues/5221
+          pip install -U docker-compose
+        displayName: install apt and pip deps
+        env:
+          someEnvVarName: someEnvVarValue
 
 #     - bash: |
 #         if [ "$BUILD_BRANCH_NAME" == "master" ]; then
