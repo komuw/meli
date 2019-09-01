@@ -13,12 +13,13 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"strings"
-	"sync"
 
 	"github.com/docker/docker/client"
 	"github.com/komuw/meli"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v3"
+
+	"golang.org/x/sync/errgroup"
 )
 
 /* DOCS:
@@ -163,10 +164,8 @@ func main() {
 		}
 	}
 
-	var wg sync.WaitGroup
+	var eg errgroup.Group
 	for k, v := range dockerCyaml.Services {
-		wg.Add(1)
-
 		// use dotted filepath. make it also work for windows
 		r := strings.NewReplacer("/", ".", ":", ".", "\\", ".")
 		dotFormattedrCurentDir := r.Replace(curentDir)
@@ -183,9 +182,16 @@ func main() {
 			CurentDir:         dotFormattedrCurentDir,
 			Rebuild:           rebuild,
 			EnvFile:           v.EnvFile}
-		go startComposeServices(ctx, cli, &wg, dc)
+
+		eg.Go(func() error {
+			err := startComposeServices(ctx, cli, dc)
+			return err
+		})
 	}
-	wg.Wait()
+	err = eg.Wait()
+	if err != nil {
+		log.Fatalf("\n\t %+v", err)
+	}
 
 	if memprofile != "" {
 		f, err := os.Create(memprofile)
@@ -202,9 +208,7 @@ func main() {
 	}
 }
 
-func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, dc *meli.DockerContainer) {
-	defer wg.Done()
-
+func startComposeServices(ctx context.Context, cli *client.Client, dc *meli.DockerContainer) error {
 	/*
 		1. Pull Image
 		2. Create a container
@@ -216,40 +220,32 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 	if len(dc.ComposeService.Image) > 0 {
 		err := meli.PullDockerImage(ctx, cli, dc)
 		if err != nil {
-			// clean exit since we want other goroutines for fetching other images
-			// to continue running
-			fmt.Printf("\n\n%+v", err)
-			return
+			return err
 		}
 	}
 	alreadyCreated, _, err := meli.CreateContainer(ctx, cli, dc)
 	if err != nil {
-		// clean exit since we want other goroutines for fetching other images
-		// to continue running
-		fmt.Printf("\n\n%+v", err)
-		return
+		return err
 	}
 
 	if !alreadyCreated {
 		err = meli.ConnectNetwork(ctx, cli, dc)
 		if err != nil {
-			// create whitespace so that error is visible to human
-			fmt.Printf("\n\n%+v", err)
-			return
+			return err
 		}
 	}
 
 	err = meli.ContainerStart(ctx, cli, dc)
 	if err != nil {
-		fmt.Printf("\n\n%+v", err)
-		return
+		return err
 	}
 
 	err = meli.ContainerLogs(ctx, cli, dc)
 	if err != nil {
-		fmt.Printf("\n\n%+v", err)
-		return
+		return err
 	}
+
+	return nil
 }
 
 func getCwdName(path string) string {
