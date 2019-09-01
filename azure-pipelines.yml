@@ -44,266 +44,266 @@ variables:      # pipeline-level
       env:
         someEnvVarName: someEnvVarValue
 
-    - bash: |
-        if [ "$BUILD_BRANCH_NAME" == "master" ]; then
-            printf "\n $BUILD_BRANCH_NAME branch, ignoring check for relese notes \n"
-        else
-            ChangedFiles=`git diff --name-only origin/master`
-            case "$ChangedFiles" in
-                *RELEASE_NOTES.*)
-                    printf "\n Thanks, your commits include update to release notes. \n";;
-                *)
-                    printf "\n You should add release notes to .github/RELEASE_NOTES.md \n" && exit 77;;
-            esac
-        fi
-      displayName: check if changes have release notes 
-      env:
-        BUILD_BRANCH_NAME: $(Build.SourceBranchName)
+#     - bash: |
+#         if [ "$BUILD_BRANCH_NAME" == "master" ]; then
+#             printf "\n $BUILD_BRANCH_NAME branch, ignoring check for relese notes \n"
+#         else
+#             ChangedFiles=`git diff --name-only origin/master`
+#             case "$ChangedFiles" in
+#                 *RELEASE_NOTES.*)
+#                     printf "\n Thanks, your commits include update to release notes. \n";;
+#                 *)
+#                     printf "\n You should add release notes to .github/RELEASE_NOTES.md \n" && exit 77;;
+#             esac
+#         fi
+#       displayName: check if changes have release notes 
+#       env:
+#         BUILD_BRANCH_NAME: $(Build.SourceBranchName)
 
-    - bash: |
-        wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
-        tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
-        export PATH=$PATH:/usr/local/go/bin
-        echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
-        mkdir -p ~/go/bin
-        echo "export PATH=$PATH:~/go/bin" >> /etc/profile
-        echo "export LC_ALL=C.UTF-8" >> /etc/profile
-        echo "export LANG=C.UTF-8" >> /etc/profile
-        echo "export GO111MODULE=on" >> /etc/profile
-        source /etc/profile
-      displayName: install golang
+#     - bash: |
+#         wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
+#         tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
+#         export PATH=$PATH:/usr/local/go/bin
+#         echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
+#         mkdir -p ~/go/bin
+#         echo "export PATH=$PATH:~/go/bin" >> /etc/profile
+#         echo "export LC_ALL=C.UTF-8" >> /etc/profile
+#         echo "export LANG=C.UTF-8" >> /etc/profile
+#         echo "export GO111MODULE=on" >> /etc/profile
+#         source /etc/profile
+#       displayName: install golang
 
-    - bash: |
-        source /etc/profile
-        wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
-        mv /tmp/linux-amd64 /usr/local/bin/gobin
-        chmod +x /usr/local/bin/gobin
-        gobin honnef.co/go/tools/cmd/staticcheck@2019.2.2
-      displayName: install tools
+#     - bash: |
+#         source /etc/profile
+#         wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
+#         mv /tmp/linux-amd64 /usr/local/bin/gobin
+#         chmod +x /usr/local/bin/gobin
+#         gobin honnef.co/go/tools/cmd/staticcheck@2019.2.2
+#       displayName: install tools
 
-    - bash: |
-        curl -L -o /tmp/docker-$DOCKER_VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VER.tgz
-        tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
-        mv /tmp/docker/* /usr/bin
-        docker version
-      displayName: Install Docker
+#     - bash: |
+#         curl -L -o /tmp/docker-$DOCKER_VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VER.tgz
+#         tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
+#         mv /tmp/docker/* /usr/bin
+#         docker version
+#       displayName: Install Docker
 
-    - bash: |
-        source /etc/profile && go build --race -o meli cli/cli.go
-        ./meli -v
-        ./meli -up -d -f testdata/docker-compose.yml
-        num_containers=$(docker ps -q | wc -l)
-        echo "number of containers are; $num_containers"
-        if [ "$num_containers" != "12" ]; then
-            echo "wanted 12 containers, got $num_containers" && exit 500
-        fi
-      displayName: run meli
+#     - bash: |
+#         source /etc/profile && go build --race -o meli cli/cli.go
+#         ./meli -v
+#         ./meli -up -d -f testdata/docker-compose.yml
+#         num_containers=$(docker ps -q | wc -l)
+#         echo "number of containers are; $num_containers"
+#         if [ "$num_containers" != "12" ]; then
+#             echo "wanted 12 containers, got $num_containers" && exit 500
+#         fi
+#       displayName: run meli
 
-    - bash: |
-        docker exec -it backup ping -w3 redis
-        docker exec -it backup ping -w3 eminem.com
-      displayName: check that docker linking works
+#     - bash: |
+#         docker exec -it backup ping -w3 redis
+#         docker exec -it backup ping -w3 eminem.com
+#       displayName: check that docker linking works
 
-    - bash: |
-        CHECK_ENV_VAR=$(docker exec -it buildservice printenv | grep NAME_IN_ENV_FILE)
-        echo "env var from .env file is; $CHECK_ENV_VAR"
-        if [[ $CHECK_ENV_VAR != *"Mutabaruka"* ]]; then
-            echo "wanted env var NAME_IN_ENV_FILE=Mutabaruka, got $CHECK_ENV_VAR"
-        fi
-      displayName: check that docker .env file works
+#     - bash: |
+#         CHECK_ENV_VAR=$(docker exec -it buildservice printenv | grep NAME_IN_ENV_FILE)
+#         echo "env var from .env file is; $CHECK_ENV_VAR"
+#         if [[ $CHECK_ENV_VAR != *"Mutabaruka"* ]]; then
+#             echo "wanted env var NAME_IN_ENV_FILE=Mutabaruka, got $CHECK_ENV_VAR"
+#         fi
+#       displayName: check that docker .env file works
 
-    - bash: |
-        docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
-        cp meli testdata/ && cd testdata/ && ./meli -up -d
-        num_containers=$(docker ps -q | wc -l)
-        echo "number of containers are; $num_containers"
-        if [ "$num_containers" != "12" ]; then
-            echo "wanted 12 containers, got $num_containers" && exit 500
-        fi
-      displayName: run meli in testdata
+#     - bash: |
+#         docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+#         cp meli testdata/ && cd testdata/ && ./meli -up -d
+#         num_containers=$(docker ps -q | wc -l)
+#         echo "number of containers are; $num_containers"
+#         if [ "$num_containers" != "12" ]; then
+#             echo "wanted 12 containers, got $num_containers" && exit 500
+#         fi
+#       displayName: run meli in testdata
 
-    # test rebuild, stop (BUT DO NOT remove) containers from previous command
-    - bash: |
-         docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
-         ./meli -up -d -f testdata/docker-compose.yml -build
-         all_containers=$(docker ps -aq | wc -l)
-          running_containers=$(docker ps -q | wc -l)
-          echo "number of all containers; $all_containers"
-          echo "number of running containers are; $running_containers"
-          if [ "$running_containers" != "12" ]; then
-              echo "wanted 12 containers, got $running_containers" && exit 500
-          fi
-      displayName: test rebuild
+#     # test rebuild, stop (BUT DO NOT remove) containers from previous command
+#     - bash: |
+#          docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+#          ./meli -up -d -f testdata/docker-compose.yml -build
+#          all_containers=$(docker ps -aq | wc -l)
+#           running_containers=$(docker ps -q | wc -l)
+#           echo "number of all containers; $all_containers"
+#           echo "number of running containers are; $running_containers"
+#           if [ "$running_containers" != "12" ]; then
+#               echo "wanted 12 containers, got $running_containers" && exit 500
+#           fi
+#       displayName: test rebuild
 
-- job: tests_and_analysis
-  workingDirectory: "~/stuff/notgopath/meli"
-  timeoutInMinutes: 3
-  pool:
-    vmImage: "ubuntu-18.04"
-  steps:
-    - bash: |
-        pwd; ls -lsha
-        apt-get -y update
-        apt -y install \
-                    curl \
-                    wget \
-                    git \
-                    apt-transport-https \
-                    ca-certificates
-      displayName: install apt deps
+# - job: tests_and_analysis
+#   workingDirectory: "~/stuff/notgopath/meli"
+#   timeoutInMinutes: 3
+#   pool:
+#     vmImage: "ubuntu-18.04"
+#   steps:
+#     - bash: |
+#         pwd; ls -lsha
+#         apt-get -y update
+#         apt -y install \
+#                     curl \
+#                     wget \
+#                     git \
+#                     apt-transport-https \
+#                     ca-certificates
+#       displayName: install apt deps
 
-    - bash: |
-        wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
-        tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
-        export PATH=$PATH:/usr/local/go/bin
-        echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
-        mkdir -p ~/go/bin
-        echo "export PATH=$PATH:~/go/bin" >> /etc/profile
-        echo "export LC_ALL=C.UTF-8" >> /etc/profile
-        echo "export LANG=C.UTF-8" >> /etc/profile
-        echo "export GO111MODULE=on" >> /etc/profile
-        source /etc/profile
-      displayName: install golang
+#     - bash: |
+#         wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
+#         tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
+#         export PATH=$PATH:/usr/local/go/bin
+#         echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
+#         mkdir -p ~/go/bin
+#         echo "export PATH=$PATH:~/go/bin" >> /etc/profile
+#         echo "export LC_ALL=C.UTF-8" >> /etc/profile
+#         echo "export LANG=C.UTF-8" >> /etc/profile
+#         echo "export GO111MODULE=on" >> /etc/profile
+#         source /etc/profile
+#       displayName: install golang
 
-    - bash: |
-        source /etc/profile
-        wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
-        mv /tmp/linux-amd64 /usr/local/bin/gobin
-        chmod +x /usr/local/bin/gobin
-        gobin honnef.co/go/tools/cmd/staticcheck@2019.2.2
-      displayName: install tools
+#     - bash: |
+#         source /etc/profile
+#         wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
+#         mv /tmp/linux-amd64 /usr/local/bin/gobin
+#         chmod +x /usr/local/bin/gobin
+#         gobin honnef.co/go/tools/cmd/staticcheck@2019.2.2
+#       displayName: install tools
 
-    - bash: |
-        source /etc/profile && go vet -v -all -shadow ./...
-        source /etc/profile && staticcheck -tests -show-ignored -go 1.13 -unused.whole-program ./...
-      displayName: static analysis
+#     - bash: |
+#         source /etc/profile && go vet -v -all -shadow ./...
+#         source /etc/profile && staticcheck -tests -show-ignored -go 1.13 -unused.whole-program ./...
+#       displayName: static analysis
 
-    - bash: |
-        source /etc/profile && go test -timeout 1m -race -cover -v ./...
-        source /etc/profile && go test -timeout 1m -race -run=XXXX -bench=. ./...
-      displayName: tests and benchmarks
+#     - bash: |
+#         source /etc/profile && go test -timeout 1m -race -cover -v ./...
+#         source /etc/profile && go test -timeout 1m -race -run=XXXX -bench=. ./...
+#       displayName: tests and benchmarks
 
-    - bash: |
-        source /etc/profile && \
-        go test -timeout 1m -v -race -cover -coverprofile=coverage.txt ./... && \
-        bash <(curl -s https://codecov.io/bash)
-      displayName: codecov
+#     - bash: |
+#         source /etc/profile && \
+#         go test -timeout 1m -v -race -cover -coverprofile=coverage.txt ./... && \
+#         bash <(curl -s https://codecov.io/bash)
+#       displayName: codecov
 
-- job: benchmarks_against_docker_compose
-  workingDirectory: "~/stuff/notgopath/meli"
-  timeoutInMinutes: 3
-  pool:
-    vmImage: "ubuntu-18.04"
-  steps:
-    - bash: |
-        pwd; ls -lsha
-        apt-get -y update
-        apt -y install \
-                    curl \
-                    wget \
-                    git \
-                    python \
-                    python-pip \
-                    software-properties-common \
-                    build-essential \
-                    snapd \
-                    snapcraft \
-                    nano \
-                    apt-transport-https \
-                    ca-certificates
-        # pip install -U pip # see; https://github.com/pypa/pip/issues/5221
-        pip install -U docker-compose
-      displayName: install apt and pip deps
+# - job: benchmarks_against_docker_compose
+#   workingDirectory: "~/stuff/notgopath/meli"
+#   timeoutInMinutes: 3
+#   pool:
+#     vmImage: "ubuntu-18.04"
+#   steps:
+#     - bash: |
+#         pwd; ls -lsha
+#         apt-get -y update
+#         apt -y install \
+#                     curl \
+#                     wget \
+#                     git \
+#                     python \
+#                     python-pip \
+#                     software-properties-common \
+#                     build-essential \
+#                     snapd \
+#                     snapcraft \
+#                     nano \
+#                     apt-transport-https \
+#                     ca-certificates
+#         # pip install -U pip # see; https://github.com/pypa/pip/issues/5221
+#         pip install -U docker-compose
+#       displayName: install apt and pip deps
 
-    - bash: |
-        wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
-        tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
-        export PATH=$PATH:/usr/local/go/bin
-        echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
-        mkdir -p ~/go/bin
-        echo "export PATH=$PATH:~/go/bin" >> /etc/profile
-        echo "export LC_ALL=C.UTF-8" >> /etc/profile
-        echo "export LANG=C.UTF-8" >> /etc/profile
-        echo "export GO111MODULE=on" >> /etc/profile
-        source /etc/profile
-      displayName: install golang
+#     - bash: |
+#         wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
+#         tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
+#         export PATH=$PATH:/usr/local/go/bin
+#         echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
+#         mkdir -p ~/go/bin
+#         echo "export PATH=$PATH:~/go/bin" >> /etc/profile
+#         echo "export LC_ALL=C.UTF-8" >> /etc/profile
+#         echo "export LANG=C.UTF-8" >> /etc/profile
+#         echo "export GO111MODULE=on" >> /etc/profile
+#         source /etc/profile
+#       displayName: install golang
 
-    - bash: |
-        curl -L -o /tmp/docker-$DOCKER_VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VER.tgz
-        tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
-        mv /tmp/docker/* /usr/bin
-        docker version
-      displayName: Install Docker
+#     - bash: |
+#         curl -L -o /tmp/docker-$DOCKER_VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VER.tgz
+#         tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
+#         mv /tmp/docker/* /usr/bin
+#         docker version
+#       displayName: Install Docker
 
-    - bash: |
-        rm meli
-        source /etc/profile && go build -o meli cli/cli.go
-        docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
-        docker-compose version
-        time docker-compose -f testdata/docker-compose.yml up -d
-      displayName: time docker-compose up
+#     - bash: |
+#         rm meli
+#         source /etc/profile && go build -o meli cli/cli.go
+#         docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+#         docker-compose version
+#         time docker-compose -f testdata/docker-compose.yml up -d
+#       displayName: time docker-compose up
 
-    - bash: |
-        docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
-        time ./meli -up -d -f testdata/docker-compose.yml
-      displayName: time meli -up
+#     - bash: |
+#         docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+#         time ./meli -up -d -f testdata/docker-compose.yml
+#       displayName: time meli -up
 
-- job: deploy
-  workingDirectory: "~/stuff/notgopath/meli"
-  dependsOn:
-    - build
-    - tests_and_analysis
-    - benchmarks_against_docker_compose
-  condition: eq("refs/heads/master")
-  timeoutInMinutes: 3
-  pool:
-    vmImage: "ubuntu-18.04"
-  steps:
-    - bash: |
-        pwd; ls -lsha
-        apt-get -y update
-        apt -y install \
-                    curl \
-                    wget \
-                    git \
-                    python \
-                    python-pip \
-                    software-properties-common \
-                    build-essential \
-                    snapd \
-                    snapcraft \
-                    nano \
-                    apt-transport-https \
-                    ca-certificates
-        # pip install -U pip # see; https://github.com/pypa/pip/issues/5221
-        pip install -U docker-compose
-      displayName: install apt and pip deps
+# - job: deploy
+#   workingDirectory: "~/stuff/notgopath/meli"
+#   dependsOn:
+#     - build
+#     - tests_and_analysis
+#     - benchmarks_against_docker_compose
+#   condition: eq("refs/heads/master")
+#   timeoutInMinutes: 3
+#   pool:
+#     vmImage: "ubuntu-18.04"
+#   steps:
+#     - bash: |
+#         pwd; ls -lsha
+#         apt-get -y update
+#         apt -y install \
+#                     curl \
+#                     wget \
+#                     git \
+#                     python \
+#                     python-pip \
+#                     software-properties-common \
+#                     build-essential \
+#                     snapd \
+#                     snapcraft \
+#                     nano \
+#                     apt-transport-https \
+#                     ca-certificates
+#         # pip install -U pip # see; https://github.com/pypa/pip/issues/5221
+#         pip install -U docker-compose
+#       displayName: install apt and pip deps
 
-    - bash: |
-        wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
-        tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
-        export PATH=$PATH:/usr/local/go/bin
-        echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
-        mkdir -p ~/go/bin
-        echo "export PATH=$PATH:~/go/bin" >> /etc/profile
-        echo "export LC_ALL=C.UTF-8" >> /etc/profile
-        echo "export LANG=C.UTF-8" >> /etc/profile
-        echo "export GO111MODULE=on" >> /etc/profile
-        source /etc/profile
-      displayName: install golang
+#     - bash: |
+#         wget --directory-prefix=/usr/local https://dl.google.com/go/$(GOLANG_VERSION).linux-amd64.tar.gz
+#         tar -C /usr/local -xzf /usr/local/$(GOLANG_VERSION).linux-amd64.tar.gz
+#         export PATH=$PATH:/usr/local/go/bin
+#         echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
+#         mkdir -p ~/go/bin
+#         echo "export PATH=$PATH:~/go/bin" >> /etc/profile
+#         echo "export LC_ALL=C.UTF-8" >> /etc/profile
+#         echo "export LANG=C.UTF-8" >> /etc/profile
+#         echo "export GO111MODULE=on" >> /etc/profile
+#         source /etc/profile
+#       displayName: install golang
 
-    - bash: |
-        wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_VERSION/goreleaser_Linux_x86_64.tar.gz
-        tar -C /usr/local -xzf /usr/local/goreleaser_Linux_x86_64.tar.gz
-      displayName: install go releaser
+#     - bash: |
+#         wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_VERSION/goreleaser_Linux_x86_64.tar.gz
+#         tar -C /usr/local -xzf /usr/local/goreleaser_Linux_x86_64.tar.gz
+#       displayName: install go releaser
 
-    - bash: |
-        LAST_GIT_MESSAGE=$(git log -n1 --format=oneline --pretty=%B)
-        echo "last git commit message on master:"
-        echo $LAST_GIT_MESSAGE
-        if [ "$LAST_GIT_MESSAGE" == "do release" ]; then
-            echo "deploying with goreleaser"
-            source /etc/profile
-            /usr/local/goreleaser --rm-dist --config=.goreleaser.yml --debug --skip-validate --release-notes=.github/RELEASE_NOTES.md
-        fi
-      displayName: do new release
+#     - bash: |
+#         LAST_GIT_MESSAGE=$(git log -n1 --format=oneline --pretty=%B)
+#         echo "last git commit message on master:"
+#         echo $LAST_GIT_MESSAGE
+#         if [ "$LAST_GIT_MESSAGE" == "do release" ]; then
+#             echo "deploying with goreleaser"
+#             source /etc/profile
+#             /usr/local/goreleaser --rm-dist --config=.goreleaser.yml --debug --skip-validate --release-notes=.github/RELEASE_NOTES.md
+#         fi
+#       displayName: do new release
