@@ -295,7 +295,7 @@ jobs:
           LAST_GIT_MESSAGE=$(git log -n1 --format=oneline --pretty=%B)
           echo 'last git commit message on master:'
           echo $LAST_GIT_MESSAGE
-          if [ '$LAST_GIT_MESSAGE' == 'do release' ]; then
+          if [ "$LAST_GIT_MESSAGE" == "do release" ]; then
               echo 'deploying with goreleaser'
               source /etc/profile
               /usr/local/goreleaser --rm-dist --config=.goreleaser.yml --debug --skip-validate --release-notes=.github/RELEASE_NOTES.md
