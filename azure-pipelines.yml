@@ -94,6 +94,9 @@ jobs:
         displayName: check that docker linking works I
 
       - bash: |
+          docker ps
+          printf "\n inspect backup:\n" && docker inspect backup
+          printf "\n inspect db:\n" && docker inspect db
           docker exec backup ping -w3 eminem.com
         displayName: check that docker linking works II
 
