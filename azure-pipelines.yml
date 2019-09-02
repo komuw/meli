@@ -98,6 +98,7 @@ jobs:
           docker ps
           printf "\n inspect backup:\n" && docker inspect backup
           printf "\n inspect db:\n" && docker inspect db
+          docker exec backup ping -w3 eminem
           docker exec backup ping -w3 eminem.com
         displayName: check that docker linking works II
 
