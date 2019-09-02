@@ -195,16 +195,16 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 			Cmd:          cmd,
 			Volumes:      volume},
 		&container.HostConfig{
-			// DNS: []string{
-			// 	"8.8.8.8",
-			// 	"8.8.4.4",
-			// 	"2001:4860:4860::8888",
-			// 	"2001:4860:4860::8844"},
-			// DNSSearch: []string{
-			// 	"8.8.8.8",
-			// 	"8.8.4.4",
-			// 	"2001:4860:4860::8888",
-			// 	"2001:4860:4860::8844"},
+			DNS: []string{
+				"8.8.8.8",
+				"8.8.4.4",
+				"2001:4860:4860::8888",
+				"2001:4860:4860::8844"},
+			DNSSearch: []string{
+				"8.8.8.8",
+				"8.8.4.4",
+				"2001:4860:4860::8888",
+				"2001:4860:4860::8844"},
 			PublishAllPorts: false,
 			PortBindings:    portBindingMap,
 			NetworkMode:     container.NetworkMode(dc.NetworkName),
