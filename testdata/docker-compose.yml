@@ -77,14 +77,21 @@ services:
 
   nestedservice:
     build:
-      context: .
-      dockerfile: nestedDir/level1/level2/nestedDockerfile
+      context: nestedDir/level1/level2/
+      dockerfile: nestedDockerfile
     labels:
       - "type=nestedservice"
 
   symbolic-link-service:
     build:
       context: .
+
+  another_nestedservice:
+    build:
+      context: .
+      dockerfile: nestedDir/level1/level2/AnotherNestedDockerfile
+    labels:
+      - "type=nestedservice"
 
 volumes:
   data-volume:

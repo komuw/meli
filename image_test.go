@@ -3,6 +3,7 @@ package meli
 import (
 	"context"
 	"io/ioutil"
+	"strings"
 	"testing"
 )
 
@@ -49,6 +50,20 @@ func TestBuildDockerImage(t *testing.T) {
 			},
 			"meli_myservicename",
 			nil},
+		{
+
+			&DockerContainer{
+				ServiceName:       "myservicename",
+				DockerComposeFile: "testdata/docker-compose.yml",
+				ComposeService: ComposeService{
+					Build: Buildstruct{
+						Dockerfile: "nestedDockerfile",
+						Context:    "nestedDir/level1/level2/"}},
+				LogMedium: ioutil.Discard,
+				Rebuild:   true,
+			},
+			"meli_myservicename",
+			nil},
 	}
 
 	var ctx = context.Background()
@@ -79,11 +94,24 @@ func BenchmarkBuildDockerImage(b *testing.B) {
 	var ctx = context.Background()
 	cli := &mockDockerClient{}
 	dc := &DockerContainer{
-		ServiceName: "myservicename",
+		ServiceName:       "myservicename",
+		DockerComposeFile: "docker-compose.yml",
 		ComposeService: ComposeService{
 			Build: Buildstruct{Dockerfile: "testdata/Dockerfile"}},
-		LogMedium: ioutil.Discard}
+		LogMedium: ioutil.Discard,
+		Rebuild:   true,
+	}
+	LoadAuth()
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		_, _ = BuildDockerImage(ctx, cli, dc)
+	}
+}
+
+func BenchmarkPoolReadFrom(b *testing.B) {
+	r := strings.NewReader("hello")
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		_, _ = poolReadFrom(r)
 	}
 }

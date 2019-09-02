@@ -20,16 +20,12 @@ If you want to exec in to a running container, use docker; if you want to run an
 
 
 # Installing/Upgrading          
-Download a binary release for your particular OS from the [releases page](https://github.com/komuW/meli/releases)           
+Download a binary release for your particular OS from the [releases page](https://github.com/komuw/meli/releases)           
 We have binaries for:                
-- linux(32bit and 64bit)           
-- windows(32bit and 64bit)            
-- darwin(32bit and 64bit)                     
+- linux(64bit)           
+- windows(64bit)            
+- macOS(64bit)                     
 
-Optionally, you can install using curl;       
-```bash
-curl -sfL https://raw.githubusercontent.com/komuw/meli/master/install.sh | sh
-```
 
 # Usage  
 `meli --help`         
@@ -134,10 +130,18 @@ Thus, meli appears to be 2.6 times faster than docker-compose(by wall clock time
 You can [checkout the current benchmark results from circleCI](https://circleci.com/gh/komuW/meli/)              
 However, I'm not making a tool to take docker-compose to the races.                   
 
-# Build                   
+# Development
+#### Build                   
 `git clone git@github.com:komuw/meli.git`           
 `go build -o meli cli/cli.go`           
 `./meli -up -f /path/to/docker-compose-file.yml`                   
+
+#### debug
+`go build -o meli cli/cli.go`       
+`dlv exec ./meli -- -up -f testdata/docker-compose.yml`         
+`(dlv) help`        
+`(dlv) break cli/cli.go:246`        
+`(dlv) continue`          
 
 
 # TODO

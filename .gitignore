@@ -12,3 +12,9 @@ coverage.txt
 
 # binary
 meli
+
+# debug stuff
+debug.test
+meli.test
+mem.prof
+cpu.prof

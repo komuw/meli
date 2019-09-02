@@ -10,12 +10,16 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
+	"runtime/pprof"
 	"strings"
-	"sync"
 
 	"github.com/docker/docker/client"
 	"github.com/komuw/meli"
-	yaml "gopkg.in/yaml.v2"
+	"github.com/pkg/errors"
+	yaml "gopkg.in/yaml.v3"
+
+	"golang.org/x/sync/errgroup"
 )
 
 /* DOCS:
@@ -26,15 +30,11 @@ import (
 var version string
 
 // Cli parses input from stdin
-func Cli() (bool, bool, bool, string) {
+func Cli() (showVersion, followLogs, rebuild bool, dockerComposeFile string, cpuprofile, memprofile string) {
 	// TODO; use a more sensible cli lib.
-	var showVersion bool
 	var up bool
 	var d bool
 	var build bool
-	var dockerComposeFile = "docker-compose.yml"
-	var followLogs = true
-	var rebuild = false
 
 	flag.BoolVar(
 		&showVersion,
@@ -66,11 +66,21 @@ func Cli() (bool, bool, bool, string) {
 		"f",
 		"docker-compose.yml",
 		"path to docker-compose.yml file.")
+	flag.StringVar(
+		&cpuprofile,
+		"cpuprofile",
+		"",
+		"write cpu profile to `file`. This is only useful for debugging meli.")
+	flag.StringVar(
+		&memprofile,
+		"memprofile",
+		"",
+		"write memory profile to `file`. This is only useful for debugging meli.")
 
 	flag.Parse()
 
 	if showVersion {
-		return true, followLogs, rebuild, ""
+		return true, followLogs, rebuild, "", cpuprofile, memprofile
 	}
 	if !up {
 		fmt.Println("to use Meli, run: \n\n\t meli -up")
@@ -78,16 +88,32 @@ func Cli() (bool, bool, bool, string) {
 	}
 	if d {
 		followLogs = false
+	} else {
+		followLogs = true
 	}
 	if build {
 		rebuild = true
 	}
 
-	return false, followLogs, rebuild, dockerComposeFile
+	return false, followLogs, rebuild, dockerComposeFile, cpuprofile, memprofile
 }
 
 func main() {
-	showVersion, followLogs, rebuild, dockerComposeFile := Cli()
+	showVersion, followLogs, rebuild, dockerComposeFile, cpuprofile, memprofile := Cli()
+
+	if cpuprofile != "" {
+		f, err := os.Create(cpuprofile)
+		if err != nil {
+			e := errors.Wrap(err, "could not create CPU profile")
+			log.Fatalf("%+v", e)
+		}
+		if err := pprof.StartCPUProfile(f); err != nil {
+			e := errors.Wrap(err, "could not start CPU profile")
+			log.Fatalf("%+v", e)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
 	if showVersion {
 		fmt.Println("Meli version: ", version)
 		os.Exit(0)
@@ -95,29 +121,33 @@ func main() {
 
 	data, err := ioutil.ReadFile(dockerComposeFile)
 	if err != nil {
-		log.Fatal(err, " :unable to read docker-compose file")
+		e := errors.Wrap(err, "unable to read docker-compose file")
+		log.Fatalf("%+v", e)
 	}
 
 	var dockerCyaml meli.DockerComposeConfig
 	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
 	if err != nil {
-		log.Fatal(err, " :unable to parse docker-compose file contents")
+		e := errors.Wrap(err, "unable to unmarshal docker-compose file contents")
+		log.Fatalf("%+v", e)
 	}
 
 	ctx := context.Background()
-	cli, err := client.NewEnvClient()
+	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		log.Fatal(err, " :unable to intialize docker client")
+		e := errors.Wrap(err, "unable to intialize docker client")
+		log.Fatalf("%+v", e)
 	}
 	defer cli.Close()
 	curentDir, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err, " :unable to get the current working directory")
+		e := errors.Wrap(err, "unable to get the current working directory")
+		log.Fatalf("%+v", e)
 	}
 	networkName := "meli_network_" + getCwdName(curentDir)
 	networkID, err := meli.GetNetwork(ctx, networkName, cli)
 	if err != nil {
-		log.Fatal(err, " :unable to create/get network")
+		log.Fatalf("%+v", err)
 	}
 	meli.LoadAuth()
 
@@ -134,10 +164,8 @@ func main() {
 		}
 	}
 
-	var wg sync.WaitGroup
+	var eg errgroup.Group
 	for k, v := range dockerCyaml.Services {
-		wg.Add(1)
-
 		// use dotted filepath. make it also work for windows
 		r := strings.NewReplacer("/", ".", ":", ".", "\\", ".")
 		dotFormattedrCurentDir := r.Replace(curentDir)
@@ -154,14 +182,33 @@ func main() {
 			CurentDir:         dotFormattedrCurentDir,
 			Rebuild:           rebuild,
 			EnvFile:           v.EnvFile}
-		go startComposeServices(ctx, cli, &wg, dc)
+
+		eg.Go(func() error {
+			err := startComposeServices(ctx, cli, dc)
+			return err
+		})
 	}
-	wg.Wait()
+	err = eg.Wait()
+	if err != nil {
+		log.Fatalf("\n\t %+v", err)
+	}
+
+	if memprofile != "" {
+		f, err := os.Create(memprofile)
+		if err != nil {
+			e := errors.Wrap(err, "could not create memory profile")
+			log.Fatalf("%+v", e)
+		}
+		runtime.GC() // get up-to-date statistics
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			e := errors.Wrap(err, "could not write memory profile")
+			log.Fatalf("%+v", e)
+		}
+		f.Close()
+	}
 }
 
-func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.WaitGroup, dc *meli.DockerContainer) {
-	defer wg.Done()
-
+func startComposeServices(ctx context.Context, cli *client.Client, dc *meli.DockerContainer) error {
 	/*
 		1. Pull Image
 		2. Create a container
@@ -173,51 +220,39 @@ func startComposeServices(ctx context.Context, cli *client.Client, wg *sync.Wait
 	if len(dc.ComposeService.Image) > 0 {
 		err := meli.PullDockerImage(ctx, cli, dc)
 		if err != nil {
-			// clean exit since we want other goroutines for fetching other images
-			// to continue running
-			fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
-			return
+			return err
 		}
 	}
 	alreadyCreated, _, err := meli.CreateContainer(ctx, cli, dc)
 	if err != nil {
-		// clean exit since we want other goroutines for fetching other images
-		// to continue running
-		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
-		return
+		return err
 	}
 
 	if !alreadyCreated {
 		err = meli.ConnectNetwork(ctx, cli, dc)
 		if err != nil {
-			// create whitespace so that error is visible to human
-			fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
-			return
+			return err
 		}
 	}
 
 	err = meli.ContainerStart(ctx, cli, dc)
 	if err != nil {
-		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
-		return
+		return err
 	}
 
 	err = meli.ContainerLogs(ctx, cli, dc)
 	if err != nil {
-		fmt.Printf("\n\t service=%s error=%s", dc.ServiceName, err)
-		return
+		return err
 	}
+
+	return nil
 }
 
 func getCwdName(path string) string {
 	//TODO: investigate if this will work cross platform
 	// it might be  :unable to handle paths in windows OS
 	f := func(c rune) bool {
-		if c == 47 {
-			// 47 is the '/' character
-			return true
-		}
-		return false
+		return c == 47 // 47 is the '/' character
 	}
 	pathSlice := strings.FieldsFunc(path, f)
 	return pathSlice[len(pathSlice)-1]
