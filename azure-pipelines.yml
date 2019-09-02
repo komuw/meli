@@ -79,6 +79,7 @@ jobs:
         displayName: Install Docker
 
       - bash: |
+          docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
           source /etc/profile && go build --race -o meli cli/cli.go
           ./meli -v
           ./meli -up -d -f testdata/docker-compose.yml
