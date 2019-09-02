@@ -287,8 +287,9 @@ jobs:
         displayName: install golang
 
       - bash: |
-          wget --directory-prefix=/usr/local https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_VERSION/goreleaser_Linux_x86_64.tar.gz
-          tar -C /usr/local -xzf /usr/local/goreleaser_Linux_x86_64.tar.gz
+          wget --directory-prefix=/tmp https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_VERSION/goreleaser_Linux_x86_64.tar.gz
+          tar -C /tmp -xzf /tmp/goreleaser_Linux_x86_64.tar.gz
+          chmod +x /tmp/goreleaser
         displayName: install go releaser
 
       - bash: |
@@ -298,6 +299,6 @@ jobs:
           if [ "$LAST_GIT_MESSAGE" == "do release" ]; then
               echo 'deploying with goreleaser'
               source /etc/profile
-              /usr/local/goreleaser --rm-dist --config=.goreleaser.yml --debug --skip-validate --release-notes=.github/RELEASE_NOTES.md
+              /tmp/goreleaser --rm-dist --config=.goreleaser.yml --debug --skip-validate --release-notes=.github/RELEASE_NOTES.md
           fi
         displayName: do new release
