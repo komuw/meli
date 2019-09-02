@@ -96,7 +96,7 @@ jobs:
 
       - bash: |
           docker ps
-          docker exec -it backup cat /etc/resolv.conf
+          docker exec backup cat /etc/resolv.conf
           printf "\n inspect backup:\n" && docker inspect backup
           printf "\n inspect db:\n" && docker inspect db
           docker exec backup ping -w3 eminem
