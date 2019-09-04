@@ -38,7 +38,6 @@ jobs:
 
       - name: check if changes have release notes
         if: github.ref != 'refs/heads/master'
-        my_env_var: ${{ <expression> }}
         run: |
           ChangedFiles=`git diff --name-only origin/master`
           echo $ChangedFiles
