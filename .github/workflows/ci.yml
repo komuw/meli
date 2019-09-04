@@ -8,6 +8,7 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-18.04
+    timeout-minutes: 5
     steps:
       - name: Set up Go 1.13
         uses: actions/setup-go@v1
@@ -26,22 +27,18 @@ jobs:
           sudo apt-get -y update
           sudo apt -y install \
                       curl \
-                      wget \
                       git \
                       python \
                       python-pip \
                       software-properties-common \
                       build-essential \
-                      snapd \
-                      snapcraft \
-                      nano \
                       apt-transport-https \
                       ca-certificates
           pip install -U docker-compose
 
-
       - name: check if changes have release notes
-        if: github.ref != 'master'
+        if: github.ref != 'refs/heads/master'
+        my_env_var: ${{ <expression> }}
         run: |
           ChangedFiles=`git diff --name-only origin/master`
           echo $ChangedFiles
@@ -51,6 +48,62 @@ jobs:
               *)
                   printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
           esac
+      
+      - name: install Docker
+        run: |
+          curl -L -o /tmp/docker-$DOCKER_VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VER.tgz
+          tar -xz -C /tmp -f /tmp/docker-$DOCKER_VER.tgz
+          mv /tmp/docker/* /usr/bin
+          docker version
+        env:
+          DOCKER_VERSION: '18.09.6'
+
+      - name: run meli
+        run: |
+          docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+          source /etc/profile && go build --race -o meli cli/cli.go
+          ./meli -v
+          ./meli -up -d -f testdata/docker-compose.yml
+          num_containers=$(docker ps -q | wc -l)
+          echo "number of containers are; $num_containers"
+          if [ "$num_containers" != "12" ]; then
+              echo "wanted 12 containers, got $num_containers" && exit 500
+          fi
+
+      - name: check that docker linking works
+        run: |
+          docker exec backup ping -w3 redis
+          docker exec backup ping -w3 eminem.com
+
+      - name: check that docker .env file works
+        run: |
+          CHECK_ENV_VAR=$(docker exec -it buildservice printenv | grep NAME_IN_ENV_FILE)
+          echo 'env var from .env file is; $CHECK_ENV_VAR'
+          if [[ $CHECK_ENV_VAR != *'Mutabaruka'* ]]; then
+              echo 'wanted env var NAME_IN_ENV_FILE=Mutabaruka, got $CHECK_ENV_VAR'
+          fi
+
+      - name: run meli in testdata
+        run: |
+          docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+          cp meli testdata/ && cd testdata/ && ./meli -up -d
+          num_containers=$(docker ps -q | wc -l)
+          echo "number of containers are; $num_containers"
+          if [ "$num_containers" != "12" ]; then
+              echo "wanted 12 containers, got $num_containers" && exit 500
+          fi
+
+      - name: check rebuild
+        run: |
+          docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+          ./meli -up -d -f testdata/docker-compose.yml -build
+          all_containers=$(docker ps -aq | wc -l)
+          running_containers=$(docker ps -q | wc -l)
+          echo "number of all containers; $all_containers"
+          echo "number of running containers are; $running_containers"
+          if [ "$running_containers" != "12" ]; then
+              echo "wanted 12 containers, got $running_containers" && exit 500
+          fi
 
   # tests_and_analysis:
   #   name: tests_and_analysis

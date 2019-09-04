@@ -16,7 +16,12 @@ variables:      # pipeline-level
   GOBIN_VERSION: 'v0.0.11'
   STATICCHECK_VERSION: '2019.2.3'
 
-
+        env:
+          DOCKER_VERSION: '18.09.6'
+          GORELEASER_VERSION: 'v0.117.1'
+          GOBIN_VERSION: 'v0.0.11'
+          STATICCHECK_VERSION: '2019.2.3'
+          
 jobs:
 
   - job: build
