@@ -1,0 +1,56 @@
+# DOCS: https://help.github.com/en/articles/workflow-syntax-for-github-actions
+
+name: meli ci
+on: [push, pull_request]
+
+jobs:
+
+  build:
+    name: build
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: install apt and pip deps
+        env:
+          someEnvVarName: someEnvVarValue
+        run: |
+          pwd; ls -lsha
+          sudo apt-get -y update
+          sudo apt -y install \
+                      curl \
+                      wget \
+                      git \
+                      python \
+                      python-pip \
+                      software-properties-common \
+                      build-essential \
+                      snapd \
+                      snapcraft \
+                      nano \
+                      apt-transport-https \
+                      ca-certificates
+          pip install -U docker-compose
+
+
+      - name: check if changes have release notes
+        if: github.ref != 'master'
+        run: |
+          ChangedFiles=`git diff --name-only origin/master`
+          echo $ChangedFiles
+          case "$ChangedFiles" in
+              *RELEASE_NOTES.*)
+                  printf '\n Thanks, your commits include update to release notes. \n';;
+              *)
+                  printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
+          esac
+
+  # tests_and_analysis:
+  #   name: tests_and_analysis
