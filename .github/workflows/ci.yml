@@ -1,7 +1,7 @@
 # DOCS: https://help.github.com/en/articles/workflow-syntax-for-github-actions
 
 name: meli ci
-on: [pull_request]
+on: [pull_request, push]
 
 jobs:
 

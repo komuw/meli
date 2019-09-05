@@ -1,6 +1,7 @@
 # meli            
 
-[![CircleCI](https://circleci.com/gh/komuw/meli.svg?style=svg)](https://circleci.com/gh/komuw/meli)
+
+[![ci](https://github.com/komuw/meli/workflows/meli%20ci/badge.svg)](https://github.com/komuw/meli)
 [![codecov](https://codecov.io/gh/komuw/meli/branch/master/graph/badge.svg)](https://codecov.io/gh/komuw/meli)
 [![GoDoc](https://godoc.org/github.com/komuw/meli?status.svg)](https://godoc.org/github.com/komuw/meli)
 [![Go Report Card](https://goreportcard.com/badge/github.com/komuw/meli)](https://goreportcard.com/report/github.com/komuw/meli)          
