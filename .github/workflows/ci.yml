@@ -53,7 +53,6 @@ jobs:
           wget --directory-prefix=/tmp https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VERSION.tgz
           tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION.tgz
           chmod +x /tmp/docker/docker
-          /tmp/docker/docker version
           sudo mv /tmp/docker/* /usr/bin
           docker version
         env:
@@ -61,8 +60,7 @@ jobs:
 
       - name: run meli
         run: |
-          docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
-          source /etc/profile && go build --race -o meli cli/cli.go
+          go build --race -o meli cli/cli.go
           ./meli -v
           ./meli -up -d -f testdata/docker-compose.yml
           num_containers=$(docker ps -q | wc -l)
@@ -106,5 +104,54 @@ jobs:
               echo "wanted 12 containers, got $running_containers" && exit 500
           fi
 
-  # tests_and_analysis:
-  #   name: tests_and_analysis
+  tests_and_analysis:
+    name: tests_and_analysis
+    runs-on: ubuntu-18.04
+    timeout-minutes: 5
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: install apt and pip deps
+        env:
+          someEnvVarName: someEnvVarValue
+        run: |
+          pwd; ls -lsha
+          sudo apt-get -y update
+          sudo apt -y install \
+                      curl \
+                      wget \
+                      git \
+                      apt-transport-https \
+                      ca-certificates
+
+      - name: install tools
+        run: |
+          wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
+          mv /tmp/linux-amd64 /tmp/gobin
+          chmod +x /tmp/gobin
+          /tmp/gobin honnef.co/go/tools/cmd/staticcheck@$STATICCHECK_VERSION
+        env:
+          GOBIN_VERSION: 'v0.0.11'
+          STATICCHECK_VERSION: '2019.2.3'
+
+      - name: static analysis
+        run: |
+          go vet -v -all ./...
+          /tmp/staticcheck -tests -show-ignored -go 1.13 -unused.whole-program ./...
+
+      - name: tests and benchmarks
+        run: |
+          go test -timeout 1m -race -cover -v ./...
+          go test -timeout 1m -race -run=XXXX -bench=. ./...
+
+      - name: codecov
+        run: |
+          go test -timeout 1m -v -race -cover -coverprofile=coverage.txt ./... && \
+          bash <(curl -s https://codecov.io/bash)
