@@ -77,7 +77,7 @@ jobs:
 
       - name: check that docker .env file works
         run: |
-          CHECK_ENV_VAR=$(docker exec -it buildservice printenv | grep NAME_IN_ENV_FILE)
+          CHECK_ENV_VAR=$(docker exec buildservice printenv | grep NAME_IN_ENV_FILE)
           echo 'env var from .env file is; $CHECK_ENV_VAR'
           if [[ $CHECK_ENV_VAR != *'Mutabaruka'* ]]; then
               echo 'wanted env var NAME_IN_ENV_FILE=Mutabaruka, got $CHECK_ENV_VAR'
@@ -85,7 +85,7 @@ jobs:
 
       - name: run meli in testdata
         run: |
-          docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+          docker system prune -af
           cp meli testdata/ && cd testdata/ && ./meli -up -d
           num_containers=$(docker ps -q | wc -l)
           echo "number of containers are; $num_containers"
@@ -95,7 +95,7 @@ jobs:
 
       - name: check rebuild
         run: |
-          docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+          docker system prune -af
           ./meli -up -d -f testdata/docker-compose.yml -build
           all_containers=$(docker ps -aq | wc -l)
           running_containers=$(docker ps -q | wc -l)
@@ -142,7 +142,7 @@ jobs:
       - name: static analysis
         run: |
           go vet -v -all ./...
-          staticcheck -tests -show-ignored -go 1.13 -unused.whole-program ./...
+          /home/runner/go/bin/staticcheck -tests -show-ignored -go 1.13 -unused.whole-program ./...
 
       - name: tests and benchmarks
         run: |
@@ -199,14 +199,14 @@ jobs:
 
       - name: time docker-compose up
         run: | 
-          docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+          docker system prune -af
           docker-compose version
           time docker-compose -f testdata/docker-compose.yml up -d
 
       - name: time meli -up
         run: |
           go build -o meli cli/cli.go
-          docker ps -aq | xargs docker rm -f; docker image prune -fa; docker system prune -af
+          docker system prune -af
           time ./meli -up -d -f testdata/docker-compose.yml
 
   deploy:
