@@ -85,7 +85,7 @@ jobs:
 
       - name: run meli in testdata
         run: |
-          docker system prune -af
+          docker ps -aq | xargs docker rm -f && docker image prune -fa && docker system prune -af
           cp meli testdata/ && cd testdata/ && ./meli -up -d
           num_containers=$(docker ps -q | wc -l)
           echo "number of containers are; $num_containers"
@@ -95,7 +95,7 @@ jobs:
 
       - name: check rebuild
         run: |
-          docker system prune -af
+          docker ps -aq | xargs docker rm -f && docker image prune -fa && docker system prune -af
           ./meli -up -d -f testdata/docker-compose.yml -build
           all_containers=$(docker ps -aq | wc -l)
           running_containers=$(docker ps -q | wc -l)
@@ -199,14 +199,14 @@ jobs:
 
       - name: time docker-compose up
         run: | 
-          docker system prune -af
+          docker ps -aq | xargs docker rm -f && docker image prune -fa && docker system prune -af
           docker-compose version
           time docker-compose -f testdata/docker-compose.yml up -d
 
       - name: time meli -up
         run: |
           go build -o meli cli/cli.go
-          docker system prune -af
+          docker ps -aq | xargs docker rm -f && docker image prune -fa && docker system prune -af
           time ./meli -up -d -f testdata/docker-compose.yml
 
   deploy:
