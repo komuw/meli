@@ -1,0 +1,256 @@
+# DOCS: https://help.github.com/en/articles/workflow-syntax-for-github-actions
+
+name: meli ci
+on: [pull_request]
+
+jobs:
+
+  build:
+    name: build
+    runs-on: ubuntu-18.04
+    timeout-minutes: 5
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: install apt and pip deps
+        env:
+          someEnvVarName: someEnvVarValue
+        run: |
+          pwd; ls -lsha
+          sudo apt-get -y update
+          sudo apt -y install \
+                      curl \
+                      git \
+                      python \
+                      python-pip \
+                      software-properties-common \
+                      build-essential \
+                      apt-transport-https \
+                      ca-certificates
+          pip install -U docker-compose
+
+      - name: check if changes have release notes
+        if: github.ref != 'refs/heads/master'
+        run: |
+          ChangedFiles=`git diff --name-only origin/master`
+          echo $ChangedFiles
+          case "$ChangedFiles" in
+              *RELEASE_NOTES.*)
+                  printf '\n Thanks, your commits include update to release notes. \n';;
+              *)
+                  printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
+          esac
+      
+      - name: install Docker
+        run: |
+          wget --directory-prefix=/tmp https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VERSION.tgz
+          tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION.tgz
+          chmod +x /tmp/docker/docker
+          sudo mv /tmp/docker/* /usr/bin
+          docker version
+        env:
+          DOCKER_VERSION: '18.09.6'
+
+      - name: run meli
+        run: |
+          go build --race -o meli cli/cli.go
+          ./meli -v
+          ./meli -up -d -f testdata/docker-compose.yml
+          num_containers=$(docker ps -q | wc -l)
+          echo "number of containers are; $num_containers"
+          if [ "$num_containers" != "12" ]; then
+              echo "wanted 12 containers, got $num_containers" && exit 500
+          fi
+
+      - name: check that docker linking works
+        run: |
+          docker exec backup ping -w3 redis
+          # TODO: this works locally but not in github ci
+          #docker exec backup ping -w3 eminem.com
+
+      - name: check that docker .env file works
+        run: |
+          CHECK_ENV_VAR=$(docker exec buildservice printenv | grep NAME_IN_ENV_FILE)
+          echo 'env var from .env file is; $CHECK_ENV_VAR'
+          if [[ $CHECK_ENV_VAR != *'Mutabaruka'* ]]; then
+              echo 'wanted env var NAME_IN_ENV_FILE=Mutabaruka, got $CHECK_ENV_VAR'
+          fi
+
+      - name: run meli in testdata
+        run: |
+          docker ps -aq | xargs docker rm -f && docker image prune -fa && docker system prune -af
+          cp meli testdata/ && cd testdata/ && ./meli -up -d
+          num_containers=$(docker ps -q | wc -l)
+          echo "number of containers are; $num_containers"
+          if [ "$num_containers" != "12" ]; then
+              echo "wanted 12 containers, got $num_containers" && exit 500
+          fi
+
+      - name: check rebuild
+        run: |
+          docker ps -aq | xargs docker rm -f && docker image prune -fa && docker system prune -af
+          ./meli -up -d -f testdata/docker-compose.yml -build
+          all_containers=$(docker ps -aq | wc -l)
+          running_containers=$(docker ps -q | wc -l)
+          echo "number of all containers; $all_containers"
+          echo "number of running containers are; $running_containers"
+          if [ "$running_containers" != "12" ]; then
+              echo "wanted 12 containers, got $running_containers" && exit 500
+          fi
+
+  tests_and_analysis:
+    name: tests_and_analysis
+    runs-on: ubuntu-18.04
+    timeout-minutes: 5
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: install apt and pip deps
+        run: |
+          pwd; ls -lsha
+          sudo apt-get -y update
+          sudo apt -y install \
+                      curl \
+                      wget \
+                      git \
+                      apt-transport-https \
+                      ca-certificates
+
+      - name: install tools
+        run: |
+          wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
+          mv /tmp/linux-amd64 /tmp/gobin
+          chmod +x /tmp/gobin
+          /tmp/gobin honnef.co/go/tools/cmd/staticcheck@$STATICCHECK_VERSION
+        env:
+          GOBIN_VERSION: 'v0.0.11'
+          STATICCHECK_VERSION: '2019.2.3'
+
+      - name: static analysis
+        run: |
+          go vet -v -all ./...
+          /home/runner/go/bin/staticcheck -tests -show-ignored -go 1.13 -unused.whole-program ./...
+
+      - name: tests and benchmarks
+        run: |
+          go test -timeout 1m -race -cover -v ./...
+          go test -timeout 1m -race -run=XXXX -bench=. ./...
+
+      - name: codecov
+        run: |
+          go test -timeout 1m -v -race -cover -coverprofile=coverage.txt ./... && \
+          bash <(curl -s https://codecov.io/bash)
+
+  benchmarks_against_docker_compose:
+    name: benchmarks_against_docker_compose
+    runs-on: ubuntu-18.04
+    timeout-minutes: 5
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: install apt and pip deps
+        run: |
+          pwd; ls -lsha
+          sudo apt-get -y update
+          sudo apt -y install \
+                      curl \
+                      wget \
+                      git \
+                      python \
+                      python-pip \
+                      software-properties-common \
+                      build-essential \
+                      snapd \
+                      snapcraft \
+                      nano \
+                      apt-transport-https \
+                      ca-certificates
+          # pip install -U pip # see; https://github.com/pypa/pip/issues/5221
+          pip install -U docker-compose
+
+      - name: install Docker
+        run: |
+          wget --directory-prefix=/tmp https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VERSION.tgz
+          tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION.tgz
+          chmod +x /tmp/docker/docker
+          sudo mv /tmp/docker/* /usr/bin
+          docker version
+        env:
+          DOCKER_VERSION: '18.09.6'
+
+      - name: time docker-compose up
+        run: | 
+          docker ps -aq | xargs docker rm -f && docker image prune -fa && docker system prune -af
+          docker-compose version
+          time docker-compose -f testdata/docker-compose.yml up -d
+
+      - name: time meli -up
+        run: |
+          go build -o meli cli/cli.go
+          docker ps -aq | xargs docker rm -f && docker image prune -fa && docker system prune -af
+          time ./meli -up -d -f testdata/docker-compose.yml
+
+  deploy:
+    name: deploy
+    runs-on: ubuntu-18.04
+    timeout-minutes: 5
+    needs: [build, tests_and_analysis, benchmarks_against_docker_compose]
+    steps:
+      - name: Set up Go 1.13
+        if: github.ref == 'refs/heads/master'
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Check out code into the Go module directory
+        if: github.ref == 'refs/heads/master'
+        uses: actions/checkout@v1
+
+      - name: install apt and pip deps
+        if: github.ref == 'refs/heads/master'
+        run: |
+          pwd; ls -lsha
+          sudo apt-get -y update
+          sudo apt -y install \
+                      wget \
+                      git
+
+      - name: install go releaser
+        if: github.ref == 'refs/heads/master'
+        run: |
+          wget --directory-prefix=/tmp https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_VERSION/goreleaser_Linux_x86_64.tar.gz
+          tar -C /tmp -xzf /tmp/goreleaser_Linux_x86_64.tar.gz
+          chmod +x /tmp/goreleaser
+        env:
+          GORELEASER_VERSION: 'v0.117.1'
+
+      - name: do new release
+        if: github.ref == 'refs/heads/master'
+        run: |
+          LAST_GIT_MESSAGE=$(git log -n1 --format=oneline --pretty=%B)
+          echo 'last git commit message on master:'
+          echo $LAST_GIT_MESSAGE
+          if [ "$LAST_GIT_MESSAGE" == "do release" ]; then
+              echo 'deploying with goreleaser'
+              source /etc/profile
+              /tmp/goreleaser --rm-dist --config=.goreleaser.yml --debug --skip-validate --skip-sign --release-notes=.github/RELEASE_NOTES.md
+          fi
