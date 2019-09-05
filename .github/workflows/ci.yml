@@ -214,17 +214,19 @@ jobs:
     runs-on: ubuntu-18.04
     timeout-minutes: 5
     needs: [build, tests_and_analysis, benchmarks_against_docker_compose]
-    if: github.ref == 'refs/heads/master'
     steps:
       - name: Set up Go 1.13
+        if: github.ref == 'refs/heads/master'
         uses: actions/setup-go@v1
         with:
           go-version: 1.13
 
       - name: Check out code into the Go module directory
+        if: github.ref == 'refs/heads/master'
         uses: actions/checkout@v1
 
       - name: install apt and pip deps
+        if: github.ref == 'refs/heads/master'
         run: |
           pwd; ls -lsha
           sudo apt-get -y update
@@ -233,6 +235,7 @@ jobs:
                       git
 
       - name: install go releaser
+        if: github.ref == 'refs/heads/master'
         run: |
           wget --directory-prefix=/tmp https://github.com/goreleaser/goreleaser/releases/download/$GORELEASER_VERSION/goreleaser_Linux_x86_64.tar.gz
           tar -C /tmp -xzf /tmp/goreleaser_Linux_x86_64.tar.gz
@@ -241,6 +244,7 @@ jobs:
           GORELEASER_VERSION: 'v0.117.1'
 
       - name: do new release
+        if: github.ref == 'refs/heads/master'
         run: |
           LAST_GIT_MESSAGE=$(git log -n1 --format=oneline --pretty=%B)
           echo 'last git commit message on master:'
