@@ -299,6 +299,8 @@ jobs:
           if [ "$LAST_GIT_MESSAGE" == "do release" ]; then
               echo 'deploying with goreleaser'
               source /etc/profile
-              /tmp/goreleaser --rm-dist --config=.goreleaser.yml --debug --skip-validate --release-notes=.github/RELEASE_NOTES.md
+              /tmp/goreleaser --rm-dist --config=.goreleaser.yml --debug --skip-validate --skip-sign --release-notes=.github/RELEASE_NOTES.md
           fi
         displayName: do new release
+        env:
+          GITHUB_TOKEN: $(github_token)
