@@ -4,17 +4,20 @@ name: meli ci
 on: [pull_request, push]
 
 jobs:
-
   build:
+
     name: build
-    runs-on: ubuntu-18.04
     timeout-minutes: 5
+    strategy:
+      matrix:
+        go-version: [1.13]
+        platform: [ubuntu-18.04, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
     steps:
       - name: Set up Go 1.13
         uses: actions/setup-go@v1
         with:
-          go-version: 1.13
-        id: go
+          go-version: ${{ matrix.go-version }}
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
@@ -38,16 +41,26 @@ jobs:
 
       - name: check if changes have release notes
         if: github.ref != 'refs/heads/master'
+        env:
+          GIT_BRANCH: ${{ github.ref }}
         run: |
-          ChangedFiles=`git diff --name-only origin/master`
-          echo $ChangedFiles
-          case "$ChangedFiles" in
-              *RELEASE_NOTES.*)
-                  printf '\n Thanks, your commits include update to release notes. \n';;
-              *)
-                  printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
-          esac
-      
+          if [ "$GIT_BRANCH" == "master" ]
+          then
+              printf "\n $GIT_BRANCH branch, ignoring check for relese notes \n"
+          elif [ "$GIT_BRANCH" == *"refs/tags/"* ]
+          then
+              printf "\n $GIT_BRANCH branch, ignoring check for relese notes \n"
+          else
+              ChangedFiles=`git diff --name-only origin/master`
+              echo $ChangedFiles
+              case "$ChangedFiles" in
+                *RELEASE_NOTES.*)
+                    printf "\n Thanks, your commits include update to release notes. \n";;
+                *)
+                    printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
+              esac
+          fi
+
       - name: install Docker
         run: |
           wget --directory-prefix=/tmp https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VERSION.tgz
