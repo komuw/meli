@@ -22,23 +22,6 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
 
-      - name: install apt and pip deps
-        env:
-          someEnvVarName: someEnvVarValue
-        run: |
-          pwd; ls -lsha
-          sudo apt-get -y update
-          sudo apt -y install \
-                      curl \
-                      git \
-                      python \
-                      python-pip \
-                      software-properties-common \
-                      build-essential \
-                      apt-transport-https \
-                      ca-certificates
-          pip install -U docker-compose
-
       - name: check if changes have release notes
         if: github.ref != 'refs/heads/master'
         env:
@@ -60,6 +43,23 @@ jobs:
                     printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
               esac
           fi
+
+      - name: install apt and pip deps
+        env:
+          someEnvVarName: someEnvVarValue
+        run: |
+          pwd; ls -lsha
+          sudo apt-get -y update
+          sudo apt -y install \
+                      curl \
+                      git \
+                      python \
+                      python-pip \
+                      software-properties-common \
+                      build-essential \
+                      apt-transport-https \
+                      ca-certificates
+          pip install -U docker-compose
 
       - name: install Docker
         run: |
