@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"github.com/docker/docker/api/types/volume"
-	"github.com/pkg/errors"
 )
 
 // CreateDockerVolume creates a docker volume
@@ -17,7 +16,8 @@ func CreateDockerVolume(ctx context.Context, cli APIclient, name, driver string,
 			Driver: driver,
 			Name:   name})
 	if err != nil {
-		return "", errors.Wrapf(err, "unable to create docker volume %v", name)
+		return "", fmt.Errorf("unable to create docker volume %v: %w", name, err)
+
 	}
 	fmt.Fprintf(dst, "\ndocker volume: %s created successfully.\n", volume.Name)
 

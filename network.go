@@ -2,10 +2,10 @@ package meli
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
-	"github.com/pkg/errors"
 )
 
 // GetNetwork gets or creates newtwork(if it doesn't exist yet.)
@@ -13,7 +13,7 @@ func GetNetwork(ctx context.Context, networkName string, cli APIclient) (string,
 	// return early if network exists
 	netList, err := cli.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
-		return "", errors.Wrap(err, "unable to list docker networks")
+		return "", fmt.Errorf("unable to list docker networks: %w", err)
 
 	}
 	for _, v := range netList {
@@ -35,7 +35,8 @@ func GetNetwork(ctx context.Context, networkName string, cli APIclient) (string,
 		networkName,
 		typeNetworkCreate)
 	if err != nil {
-		return "", errors.Wrapf(err, "unable to create docker network %v", networkName)
+		return "", fmt.Errorf("unable to create docker network %v: %w", networkName, err)
+
 	}
 	return networkCreateResponse.ID, nil
 
@@ -49,7 +50,8 @@ func ConnectNetwork(ctx context.Context, cli APIclient, dc *DockerContainer) err
 		dc.ContainerID,
 		&network.EndpointSettings{})
 	if err != nil {
-		return errors.Wrapf(err, "unable to connect container %s of service %v to network %s", dc.ContainerID, dc.ServiceName, dc.NetworkID)
+		return fmt.Errorf("unable to connect container %s of service %v to network %s: %w", dc.ContainerID, dc.ServiceName, dc.NetworkID, err)
+
 	}
 	return nil
 }

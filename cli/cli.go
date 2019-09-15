@@ -16,7 +16,6 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/komuw/meli"
-	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v3"
 
 	"golang.org/x/sync/errgroup"
@@ -104,11 +103,11 @@ func main() {
 	if cpuprofile != "" {
 		f, err := os.Create(cpuprofile)
 		if err != nil {
-			e := errors.Wrap(err, "could not create CPU profile")
+			e := fmt.Errorf("could not create CPU profile: %w", err)
 			log.Fatalf("%+v", e)
 		}
 		if err := pprof.StartCPUProfile(f); err != nil {
-			e := errors.Wrap(err, "could not start CPU profile")
+			e := fmt.Errorf("could not start CPU profiley: %w", err)
 			log.Fatalf("%+v", e)
 		}
 		defer pprof.StopCPUProfile()
@@ -121,27 +120,27 @@ func main() {
 
 	data, err := ioutil.ReadFile(dockerComposeFile)
 	if err != nil {
-		e := errors.Wrap(err, "unable to read docker-compose file")
+		e := fmt.Errorf("unable to read docker-compose file: %w", err)
 		log.Fatalf("%+v", e)
 	}
 
 	var dockerCyaml meli.DockerComposeConfig
 	err = yaml.Unmarshal([]byte(data), &dockerCyaml)
 	if err != nil {
-		e := errors.Wrap(err, "unable to unmarshal docker-compose file contents")
+		e := fmt.Errorf("unable to unmarshal docker-compose file contents: %w", err)
 		log.Fatalf("%+v", e)
 	}
 
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
-		e := errors.Wrap(err, "unable to intialize docker client")
+		e := fmt.Errorf("unable to intialize docker client: %w", err)
 		log.Fatalf("%+v", e)
 	}
 	defer cli.Close()
 	curentDir, err := os.Getwd()
 	if err != nil {
-		e := errors.Wrap(err, "unable to get the current working directory")
+		e := fmt.Errorf("unable to get the current working directory: %w", err)
 		log.Fatalf("%+v", e)
 	}
 	networkName := "meli_network_" + getCwdName(curentDir)
@@ -196,12 +195,12 @@ func main() {
 	if memprofile != "" {
 		f, err := os.Create(memprofile)
 		if err != nil {
-			e := errors.Wrap(err, "could not create memory profile")
+			e := fmt.Errorf("could not create memory profile: %w", err)
 			log.Fatalf("%+v", e)
 		}
 		runtime.GC() // get up-to-date statistics
 		if err := pprof.WriteHeapProfile(f); err != nil {
-			e := errors.Wrap(err, "could not write memory profile")
+			e := fmt.Errorf("could not write memory profile: %w", err)
 			log.Fatalf("%+v", e)
 		}
 		f.Close()
