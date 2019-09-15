@@ -137,7 +137,7 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 	if dc.ComposeService.Build != (Buildstruct{}) {
 		imageName, shadowErr := BuildDockerImage(ctx, cli, dc)
 		if shadowErr != nil {
-			return false, "", fmt.Errorf("unable to build image for service %v: %w", dc.ServiceName, err)
+			return false, "", fmt.Errorf("unable to build image for service %v: %w", dc.ServiceName, shadowErr)
 		}
 		// done this way so that we can manipulate the value of the
 		// imageName inside this scope
