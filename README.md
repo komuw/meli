@@ -137,12 +137,29 @@ However, I'm not making a tool to take docker-compose to the races.
 `go build -o meli cli/cli.go`           
 `./meli -up -f /path/to/docker-compose-file.yml`                   
 
-#### debug
+#### 
+#### 1   
 `go build -o meli cli/cli.go`       
 `dlv exec ./meli -- -up -f testdata/docker-compose.yml`         
 `(dlv) help`        
 `(dlv) break cli/cli.go:246`        
-`(dlv) continue`          
+`(dlv) continue`        
+
+#### 2
+`dlv debug cli/cli.go -- -up -f testdata/docker-compose.yml`    
+`(dlv) help`   
+
+
+#### 3    
+you can also insert `runtime.Breakpoint()` at any point in code and then use delve(it will break at the point u did the insert)
+```go
+func main(){
+	x:=90
+	runtime.Breakpoint()
+	fmt.Println(x)
+}
+```
+`dlv debug main.go -- -someArg someArgValue`    
 
 
 # TODO
