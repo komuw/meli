@@ -2,6 +2,13 @@ build:
   main: cli/cli.go
   binary: meli
   ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+  flags:
+    - -trimpath
+    - -v
+  asmflags:
+    - all=-trimpath={{.Env.GOPATH}}
+  gcflags:
+    - all=-trimpath={{.Env.GOPATH}}
   env:
     - CGO_ENABLED=0
   goos:

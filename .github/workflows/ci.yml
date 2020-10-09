@@ -73,7 +73,7 @@ jobs:
 
       - name: run meli
         run: |
-          go build --race -o meli cli/cli.go
+          go build -trimpath --race -o meli cli/cli.go
           ./meli -v
           ./meli -up -d -f testdata/docker-compose.yml
           num_containers=$(docker ps -q | wc -l)
@@ -218,7 +218,7 @@ jobs:
 
       - name: time meli -up
         run: |
-          go build -o meli cli/cli.go
+          go build -trimpath -o meli cli/cli.go
           docker ps -aq | xargs docker rm -f && docker image prune -fa && docker system prune -af
           time ./meli -up -d -f testdata/docker-compose.yml
 
