@@ -139,7 +139,7 @@ However, I'm not making a tool to take docker-compose to the races.
 
 #### 
 #### 1   
-`go build -trimpath -o meli cli/cli.go`       
+`go build -gcflags="all=-N -l" -trimpath -o meli cli/cli.go`       
 `dlv exec ./meli -- -up -f testdata/docker-compose.yml`         
 `(dlv) help`        
 `(dlv) break cli/cli.go:246`        
@@ -159,7 +159,8 @@ func main(){
 	fmt.Println(x)
 }
 ```
-`dlv debug main.go -- -someArg someArgValue`    
+`dlv debug main.go -- -someArg someArgValue`   
+`dlv --init <(printf continue) debug main.go -- -someArg someArgValue` # this one will auto-continue so that you just find yourself at the breakpoint
 
 
 # TODO
