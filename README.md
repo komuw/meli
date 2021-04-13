@@ -162,6 +162,9 @@ func main(){
 `dlv debug main.go -- -someArg someArgValue`   
 `dlv --init <(printf continue) debug main.go -- -someArg someArgValue` # this one will auto-continue so that you just find yourself at the breakpoint
 
+or
+`dlv --init <(printf break\ main.go:34\\ncontinue) debug main.go` # this will set breakpoint and auto-ontinue
+
 
 # TODO
 - add better documentation(godoc)
