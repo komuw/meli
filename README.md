@@ -143,7 +143,8 @@ However, I'm not making a tool to take docker-compose to the races.
 `dlv exec ./meli -- -up -f testdata/docker-compose.yml`         
 `(dlv) help`        
 `(dlv) break cli/cli.go:246`        
-`(dlv) continue`        
+`(dlv) continue`   
+`dlv --init <(printf break\ segment.go:56\\ncontinue) test -- -test.timeout 30s -test.run ^TestNewSegment$`
 
 #### 2
 `dlv debug cli/cli.go -- -up -f testdata/docker-compose.yml`    
