@@ -137,37 +137,6 @@ However, I'm not making a tool to take docker-compose to the races.
 `go build -trimpath -o meli cli/cli.go`           
 `./meli -up -f /path/to/docker-compose-file.yml`                   
 
-#### 
-#### 1   
-`go build -gcflags="all=-N -l" -trimpath -o meli cli/cli.go`       
-`dlv exec ./meli -- -up -f testdata/docker-compose.yml`         
-`(dlv) help`        
-`(dlv) break cli/cli.go:246`        
-`(dlv) continue`   
-`dlv --init <(printf break\ segment.go:56\\ncontinue) test -- -test.timeout 30s -test.run ^TestNewSegment$`
-
-#### 2
-`dlv debug cli/cli.go -- -up -f testdata/docker-compose.yml`    
-`(dlv) help`   
-
-
-#### 3    
-you can also insert `runtime.Breakpoint()` at any point in code and then use delve(it will break at the point u did the insert)
-```go
-func main(){
-	x:=90
-	runtime.Breakpoint()
-	fmt.Println(x)
-}
-```
-`dlv debug main.go -- -someArg someArgValue`   
-`dlv --init <(printf continue) debug main.go -- -someArg someArgValue` # this one will auto-continue so that you just find yourself at the breakpoint
-
-or
-`dlv --init <(printf break\ main.go:34\\ncontinue) debug main.go` # this will set breakpoint and auto-ontinue
-
-For using `delve` with `rr` see: http://choly.ca/post/debugging-go-with-rr/
-
 
 # TODO
 - add better documentation(godoc)
