@@ -212,7 +212,7 @@ func BuildDockerImage(ctx context.Context, cli APIclient, dc *DockerContainer) (
 		dockerFileTarReader,
 		types.ImageBuildOptions{
 			//PullParent:     true,
-			//Squash:     true, currently only supported in experimenta mode
+			Squash:         true, //currently only supported in experimenta mode
 			Tags:           []string{imageName},
 			Remove:         true, //remove intermediary containers after build
 			NoCache:        dc.Rebuild,
