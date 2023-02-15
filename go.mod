@@ -15,7 +15,7 @@ require (
 	github.com/gorilla/mux v1.7.3 // indirect
 	github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
-	github.com/opencontainers/image-spec v1.0.1 // indirect
+	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.4.0 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
