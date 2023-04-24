@@ -12,8 +12,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 const (
@@ -80,11 +78,12 @@ func parseLine(s string, env env) error {
 
 			if len(vs) > 1 {
 				if _, ok := env[vs[1]]; !ok {
-					return errors.New(fmt.Sprintf("Line `%s` has an unset variable", st))
+					return fmt.Errorf("line `%s` has an unset variable", st)
+
 				}
 			}
 		}
-		return errors.New(fmt.Sprintf("Line `%s` doesn't match format", s))
+		return fmt.Errorf("line `%s` doesn't match format", s)
 	}
 
 	key := rm[1]

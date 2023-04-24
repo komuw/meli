@@ -53,7 +53,6 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/go-connections/nat"
-	"github.com/pkg/errors"
 )
 
 // CreateContainer creates a docker container
@@ -138,7 +137,7 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 	if dc.ComposeService.Build != (Buildstruct{}) {
 		imageName, shadowErr := BuildDockerImage(ctx, cli, dc)
 		if shadowErr != nil {
-			return false, "", errors.Wrapf(shadowErr, "unable to build image for service %v", dc.ServiceName)
+			return false, "", fmt.Errorf("unable to build image for service %v: %w", dc.ServiceName, shadowErr)
 		}
 		// done this way so that we can manipulate the value of the
 		// imageName inside this scope
@@ -168,7 +167,8 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 			dotEnvFile := filepath.Join(dirWithComposeFile, v)
 			f, shadowErr := os.Open(dotEnvFile)
 			if shadowErr != nil {
-				return false, "", errors.Wrapf(shadowErr, "unable to open env file %v", dotEnvFile)
+				return false, "", fmt.Errorf("unable to open env file %v: %w", dotEnvFile, shadowErr)
+
 			}
 			// TODO: replace env with a []string since ComposeService.Environment is a []string
 			env := parsedotenv(f)
@@ -214,7 +214,8 @@ func CreateContainer(ctx context.Context, cli APIclient, dc *DockerContainer) (b
 		nil,
 		dc.ServiceName)
 	if err != nil {
-		return false, "", errors.Wrapf(err, "unable to create container for service %v", dc.ServiceName)
+		return false, "", fmt.Errorf("unable to create container for service %v: %w", dc.ServiceName, err)
+
 	}
 
 	dc.UpdateContainerID(containerCreateResp.ID)
@@ -228,7 +229,7 @@ func ContainerStart(ctx context.Context, cli APIclient, dc *DockerContainer) err
 		dc.ContainerID,
 		types.ContainerStartOptions{})
 	if err != nil {
-		return errors.Wrapf(err, "unable to start container %v of service %v", dc.ContainerID, dc.ServiceName)
+		return fmt.Errorf("unable to start container %v of service %v: %w", dc.ContainerID, dc.ServiceName, err)
 
 	}
 	return nil
@@ -248,7 +249,8 @@ func ContainerLogs(ctx context.Context, cli APIclient, dc *DockerContainer) erro
 			Tail:       "all"})
 
 	if err != nil {
-		return errors.Wrapf(err, "unable to get logs for container %v of service %v", dc.ContainerID, dc.ServiceName)
+		return fmt.Errorf("unable to get logs for container %v of service %v: %w", dc.ContainerID, dc.ServiceName, err)
+
 	}
 
 	scanner := bufio.NewScanner(containerLogResp)
